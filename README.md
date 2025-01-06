@@ -1046,7 +1046,11 @@ export class AppComponent {
 
 ```
 
+We can run the project and see the following result:
+
 ![my-first-in-app-component.png](readme/my-first-in-app-component.png)
+
+The `MyFirstComponent` appears six times. Three times in one row. A click on a _Send Title_ button updates the green box with the related title.
 
 
 ## Create an own Service
@@ -1197,7 +1201,7 @@ Once we have done that, we can inject a reference to a HttpTestingController,
 which will allow us to control the behavior of our mocked HttpClient,
 by setting expectations and returning fake data for testing purposes.
 
-The test now looks like this:
+You can study the code of the unit test:
 
 ```typescript
 import { TestBed } from '@angular/core/testing';
