@@ -1,0 +1,17 @@
+<h4 class="component-title">Todo Lists</h4>
+<p class="sub-para todo-info">Example angular application with Spring Boot Backend and OpenApi generated REST API</p>
+<p class="sub-para todo-listinfo">Todo Lists: {{ todoLists.count }}</p>
+
+<section class="container legend">
+  @for (listId of todoLists.todoItemList; track listId; let i = $index) {
+    <div class="row">
+      <div
+        tabindex="0"
+        (keydown.enter)="onEnterKeyDown(listId)"
+        [routerLink]="['/todoitem/', listId]"
+        class="col-sm-8 py-1 my-1 clickable">
+        List {{ i + 1 }} : {{ listId }}
+      </div>
+    </div>
+  }
+</section>

@@ -6,7 +6,12 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "lint:check": "ng lint",
+    "lint:fix": "ng lint --fix",
+    "prettier:write": "prettier --config .prettierrc.json --write .",
+    "prettier:check": "prettier --config .prettierrc.json --check .",
+    "generate:api": "openapi-generator-cli generate -g typescript-angular -i  src/app/openapi/api-docs.yaml -o src/app/openapi-gen"
   },
   "private": true,
   "dependencies": {
@@ -18,6 +23,9 @@
     "@angular/platform-browser": "^19.0.0",
     "@angular/platform-browser-dynamic": "^19.0.0",
     "@angular/router": "^19.0.0",
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.3",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
@@ -26,13 +34,21 @@
     "@angular-devkit/build-angular": "^19.0.5",
     "@angular/cli": "^19.0.5",
     "@angular/compiler-cli": "^19.0.0",
+    "@openapitools/openapi-generator-cli": "^2.15.3",
     "@types/jasmine": "~5.1.0",
+    "angular-eslint": "19.0.2",
+    "eslint": "^9.16.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
     "jasmine-core": "~5.4.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.6.2"
+    "prettier": "^3.4.2",
+    "prettier-eslint": "^16.3.0",
+    "typescript": "~5.6.2",
+    "typescript-eslint": "8.18.0"
   }
 }
