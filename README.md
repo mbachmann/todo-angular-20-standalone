@@ -1580,21 +1580,21 @@ describe('TodoListsComponent Test with spy', () => {
 
 1. **Test Initialization:**
 
-- `TestBed` is used to configure the testing environment.
-- Mocks or spies are created for `TodoService` and `Router`.
+  - `TestBed` is used to configure the testing environment.
+  - Mocks or spies are created for `TodoService` and `Router`.
 
 2. **Test Cases**:
 
-- **Component Creation**: Ensures the component is instantiated correctly.
-- **Data Fetching**: Tests the `useOwnService` method for proper API calls and state updates.
-- **Error Handling**: Verifies error handling logic by mocking an error response.
-- **Navigation**: Confirms the `onEnterKeyDown` method navigates to the expected route.
-- **Subscription Cleanup**: Checks that `ngOnDestroy` unsubscribes from active subscriptions.
+  - **Component Creation**: Ensures the component is instantiated correctly.
+  - **Data Fetching**: Tests the `useOwnService` method for proper API calls and state updates.
+  - **Error Handling**: Verifies error handling logic by mocking an error response.
+  - **Navigation**: Confirms the `onEnterKeyDown` method navigates to the expected route.
+  - **Subscription Cleanup**: Checks that `ngOnDestroy` unsubscribes from active subscriptions.
 
 3. **Mock Services**:
 
-- The `TodoService`'s `getListIDs` method is mocked to return observable values (of for success, `throwError` for failure).
-- The Router's navigate method is mocked to track navigation calls.
+  - The `TodoService`'s `getListIDs` method is mocked to return observable values (of for success, `throwError` for failure).
+  - The Router's navigate method is mocked to track navigation calls.
 
 #### Alternative Unit Tests for the TodoList component
 
@@ -2744,6 +2744,33 @@ describe('AppComponent', () => {
   });
 });
 ```
+
+**Code Explanation**
+
+**Angular-Specific Features**
+
+1. Routing:
+
+  - [routerLink] enables navigation between views (e.g., /home, /myfirst).
+  - <router-outlet> dynamically renders the components associated with the current route.
+
+2. State Management:
+
+  - [routerLinkActive] ensures the currently active route is styled with the active class.
+
+**Responsive Design**
+
+  - Bootstrap's grid system ensures the layout adapts to different screen sizes.
+  - Collapsible navigation and flex-based footer contribute to a mobile-friendly design.
+
+3. Structure
+
+The file uses Bootstrap classes for responsive design and styling. The Angular directives ([routerLink], [routerLinkActive]) enable routing to different application views. Key sections include:
+
+  1. Container Div: The main wrapper for the application, marked with classes container px-0 app.
+  2. Navigation Bar: A fixed-top bar with branding, navigation links, and buttons.
+  3. Main Content: Placeholder for dynamic content controlled by Angular's router.
+  4. Footer: Contains social media links and additional information.
 
 ## Add global styles
 
