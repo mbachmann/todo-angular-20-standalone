@@ -1,59 +1,76 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TodoListsComponent } from './todo-lists.component';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TodoItemControllerService } from '../openapi-gen';
+import { Router } from '@angular/router';
+import { TodoService } from '../services/todo.service';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { ApiModule, BASE_PATH, TodoItemControllerService, TodoItemListsDTO } from '../openapi-gen';
-import { importProvidersFrom } from '@angular/core';
-import { environment } from '../../environments/environment';
+import { of, throwError } from 'rxjs';
 
-describe('TodoListsComponent', () => {
+describe('TodoListsComponent Test with spy', () => {
   let component: TodoListsComponent;
   let fixture: ComponentFixture<TodoListsComponent>;
-  let httpMock: HttpTestingController;
-  let baseUrl: string;
+  let todoService: jasmine.SpyObj<TodoService>;
+  let router: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
+    const todoServiceSpy = jasmine.createSpyObj('TodoService', ['getListIDs']);
+    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     await TestBed.configureTestingModule({
       imports: [TodoListsComponent],
       providers: [
-        TodoItemControllerService,
         provideHttpClient(withInterceptorsFromDi()),
-        importProvidersFrom(ApiModule),
-        {
-          provide: BASE_PATH,
-          useValue: environment.API_BASE_PATH,
-        },
-        provideHttpClientTesting(),
+        TodoItemControllerService,
+        { provide: TodoService, useValue: todoServiceSpy },
+        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
-    httpMock = TestBed.inject(HttpTestingController);
-    baseUrl = environment.API_BASE_PATH;
+
     fixture = TestBed.createComponent(TodoListsComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    todoService = TestBed.inject(TodoService) as jasmine.SpyObj<TodoService>;
+    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+  });
+
+  afterEach(() => {
+    if (component['subscription']) {
+      component['subscription'].unsubscribe();
+    }
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should  display TodoListsComponent with 2 items', async () => {
-    const req = httpMock.expectOne(baseUrl + '/api/v1/listids');
-    expect(req.request.method).toEqual('GET');
-    // Then we set the fake data to be returned by the mock
-    const todoList: TodoItemListsDTO = {
-      count: 3,
-      todoItemList: [
-        '083e8820-0186-4c68-af01-af2ced91805a',
-        '1da5ba97-4365-4560-bb23-2335f099288e',
-        '1da5ea4a-fa71-4192-a17d-35d8ae8167ef',
-      ],
-    };
-    req.flush(todoList);
-    // await new Promise(resolve => setTimeout(resolve, 500)); // 500 ms
-    console.log('TodoListComponent.todoLists.count', component.todoLists.count);
-    expect(component.todoLists.count).toBe(todoList.count);
-    expect(component.todoLists.todoItemList).toBe(todoList.todoItemList);
+  it('should fetch todo lists and update the todoLists property', () => {
+    const mockData = { todoItemList: ['list1', 'list2'], count: 2 };
+    todoService.getListIDs.and.returnValue(of(mockData));
+
+    component.useOwnService();
+    expect(todoService.getListIDs).toHaveBeenCalled();
+    expect(component.todoLists).toEqual(mockData);
+  });
+
+  it('should handle errors when fetching todo lists', () => {
+    spyOn(console, 'log');
+    todoService.getListIDs.and.returnValue(throwError(() => new Error('Error fetching data')));
+
+    component.useOwnService();
+    expect(todoService.getListIDs).toHaveBeenCalled();
+    expect(console.log).toHaveBeenCalledWith(new Error('Error fetching data'));
+  });
+
+  it('should navigate to the correct route when onEnterKeyDown is called', () => {
+    const listId = 'list1';
+    component.onEnterKeyDown(listId);
+    expect(router.navigate).toHaveBeenCalledWith(['/todoitem/', listId]);
+  });
+
+  it('should unsubscribe on destroy', () => {
+    const mockSubscription = jasmine.createSpyObj('Subscription', ['unsubscribe']);
+    component['subscription'] = mockSubscription;
+
+    component.ngOnDestroy();
+    expect(mockSubscription.unsubscribe).toHaveBeenCalled();
   });
 });
