@@ -1,5 +1,11 @@
 import { parseIsoDateStrToDate } from './utils';
 
+/**
+ * Here’s a unit test suite for the parseIsoDateStrToDate function.
+ * It tests various scenarios, including valid ISO date strings
+ * (with and without milliseconds, with timezone offsets),
+ * invalid inputs, and edge cases.
+ */
 describe('parseIsoDateStrToDate', () => {
   it('should return a Date object when given a valid ISO date string with milliseconds', () => {
     const isoDateString = '2023-12-01T10:15:30.123Z';

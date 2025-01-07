@@ -1,11 +1,33 @@
 import { TestBed } from '@angular/core/testing';
-import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ApiModule, BASE_PATH, TodoItem, TodoItemControllerService, TodoItemsDTO } from '../openapi-gen';
 import { TodoService } from './todo.service';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { importProvidersFrom } from '@angular/core';
 import { environment } from '../../environments/environment';
 
+/**
+ * Explanation
+ * Test Initialization:
+ *
+ * HttpClientTestingModule is imported to mock HTTP requests.
+ * TodoItemControllerService is injected for testing.
+ *
+ * Key Features
+ * HttpClientTestingModule: Provides tools to mock HTTP requests.
+ * HttpTestingController: Allows validation of requests made by the service.
+ * Mock Data: Used mockTodoItem and mockTodoItemsDTO to simulate API responses.
+ * Verification: Ensures all HTTP requests match expected calls and methods.
+ *
+ * Test Cases:
+ *
+ * The first test ensures the service calls the correct endpoint with the PUT method and returns a mock TodoItem when successful.
+ * The second test ensures the service throws an error if the id parameter is null or undefined.
+ * Mock HTTP Request:
+ *
+ * httpMock.expectOne() verifies that the correct API endpoint is called.
+ * req.flush() sends a mock response.
+ */
 describe('TodoItemControllerService', () => {
   let service: TodoItemControllerService;
   let httpMock: HttpTestingController;
