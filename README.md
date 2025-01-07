@@ -300,13 +300,12 @@ module.exports = tseslint.config(
     },
   }
 );
-
 ```
 
 Disable the next line from linting:
 
 ```typescript
-  // eslint-disable-next-line
+// eslint-disable-next-line
 ```
 
 In typescript, we can disable several lines from linting by using:
@@ -320,11 +319,10 @@ In typescript, we can disable several lines from linting by using:
 In `HTML` we can disable several lines from linting by using:
 
 ```html
-  <!-- eslint-disable -->
-  ...
-  <!-- eslint-enable -->
+<!-- eslint-disable -->
+...
+<!-- eslint-enable -->
 ```
-
 
 If we run `ng lint` we are likely to get multiple lint errors. If we want simple errors to be fixed quickly,
 we will type `ng lint --fix`; some of them may need to be manually modified by us.
@@ -573,7 +571,7 @@ The cli has created four different files:
 
 **CSS Rules**
 
-We add the following  _css rules_ to the file `my-first.component.scss`:
+We add the following _css rules_ to the file `my-first.component.scss`:
 
 ```css
 .paragraph {
@@ -620,7 +618,6 @@ export class MyFirstComponent {
     console.log($event);
   }
 }
-
 ```
 
 ### Explanation of the code
@@ -668,7 +665,10 @@ This Angular template demonstrates dynamic data binding, interactive event handl
 It provides a solid foundation for creating user interfaces that respond to user interactions in real-time.
 
 ```html
-<p class="paragraph" [style.background-color]="backgroundColor" [style.color]="textColor">
+<p
+  class="paragraph"
+  [style.background-color]="backgroundColor"
+  [style.color]="textColor">
   {{ headerTitle }}
 </p>
 
@@ -687,12 +687,17 @@ It provides a solid foundation for creating user interfaces that respond to user
   <p class="type">Type: {{ event?.type }}</p>
   <p>x: {{ clientX }}, y: {{ clientY }}</p>
   <p>
-    <small>ctrl: {{ event?.ctrlKey }}, shift: {{ event?.shiftKey }}, meta: {{ event?.metaKey }}</small>
+    <small
+      >ctrl: {{ event?.ctrlKey }}, shift: {{ event?.shiftKey }}, meta: {{
+      event?.metaKey }}</small
+    >
   </p>
 </div>
 
 <div>
-  <button class="btn btn-primary btn-sm" (click)="sendEvent()">Send Title</button>
+  <button class="btn btn-primary btn-sm" (click)="sendEvent()">
+    Send Title
+  </button>
 </div>
 ```
 
@@ -701,7 +706,10 @@ It provides a solid foundation for creating user interfaces that respond to user
 #### 1. Paragraph Element
 
 ```html
-<p class="paragraph" [style.background-color]="backgroundColor" [style.color]="textColor">
+<p
+  class="paragraph"
+  [style.background-color]="backgroundColor"
+  [style.color]="textColor">
   {{ headerTitle }}
 </p>
 ```
@@ -719,7 +727,6 @@ It provides a solid foundation for creating user interfaces that respond to user
   - {{ headerTitle }}: Interpolates the value of the headerTitle property from the component and displays it as text content.
 
 #### 2. Mouse Events Section
-
 
 ```html
 <h3 class="title">Mouse Events</h3>
@@ -739,8 +746,8 @@ Displays a static title for the section.
   (click)="onEvent($event)"
   (keydown.enter)="onKeyEvent($event)"
   (dblclick)="onEvent($event)"
-  on-contextmenu="onEvent($event)">
- ```
+  on-contextmenu="onEvent($event)"></div>
+```
 
 **Features:**
 
@@ -765,7 +772,10 @@ Displays a static title for the section.
 <p class="type">Type: {{ event?.type }}</p>
 <p>x: {{ clientX }}, y: {{ clientY }}</p>
 <p>
-  <small>ctrl: {{ event?.ctrlKey }}, shift: {{ event?.shiftKey }}, meta: {{ event?.metaKey }}</small>
+  <small
+    >ctrl: {{ event?.ctrlKey }}, shift: {{ event?.shiftKey }}, meta: {{
+    event?.metaKey }}</small
+  >
 </p>
 ```
 
@@ -782,9 +792,12 @@ Displays a static title for the section.
 
 ```html
 <div>
-  <button class="btn btn-primary btn-sm" (click)="sendEvent()">Send Title</button>
+  <button class="btn btn-primary btn-sm" (click)="sendEvent()">
+    Send Title
+  </button>
 </div>
 ```
+
 **Features:**
 
 - **Styling**:
@@ -794,8 +807,6 @@ Displays a static title for the section.
 - **Event Binding**:
 
   - `(click)="sendEvent()"`: Triggers the `sendEvent()` method in the component when clicked.
-
-
 
 **Unit Test**
 
@@ -831,7 +842,9 @@ describe('MyFirstComponent', () => {
    * Checks that the headerTitle property value is rendered correctly in the paragraph element.
    */
   it('should render headerTitle in the paragraph', () => {
-    const paragraph = fixture.debugElement.query(By.css('.paragraph')).nativeElement;
+    const paragraph = fixture.debugElement.query(
+      By.css('.paragraph')
+    ).nativeElement;
     expect(paragraph.textContent).toContain('My first component');
   });
 
@@ -842,7 +855,9 @@ describe('MyFirstComponent', () => {
     component.backgroundColor = 'blue';
     component.textColor = 'white';
     fixture.detectChanges();
-    const paragraph = fixture.debugElement.query(By.css('.paragraph')).nativeElement;
+    const paragraph = fixture.debugElement.query(
+      By.css('.paragraph')
+    ).nativeElement;
     expect(paragraph.style.backgroundColor).toBe('blue');
     expect(paragraph.style.color).toBe('white');
   });
@@ -910,7 +925,7 @@ describe('MyFirstComponent', () => {
 6. Keydown Event Handling: Ensures the `keydown.enter` event triggers `onKeyEvent` and logs the event.
 7. Mouse Click Handling: Tests the handling of a click event.
 
-### Add the MyFirstComponent to AppComponent 
+### Add the MyFirstComponent to AppComponent
 
 To make the `MyFirst` component work, we need to include it in the `app.component.html` file.
 First, delete the existing generated content, and then replace it with the following:
@@ -919,24 +934,36 @@ First, delete the existing generated content, and then replace it with the follo
 <div class=" container-md">
   <div class="mt-3 row">
     <div class="col-md-4">
-      <app-my-first (myEvent)="onMyEvent($event)" headerTitle="Static 1"></app-my-first>
+      <app-my-first
+        (myEvent)="onMyEvent($event)"
+        headerTitle="Static 1"></app-my-first>
     </div>
     <div class="col-md-4">
-      <app-my-first (myEvent)="onMyEvent($event)" headerTitle="Static 2"></app-my-first>
+      <app-my-first
+        (myEvent)="onMyEvent($event)"
+        headerTitle="Static 2"></app-my-first>
     </div>
     <div class="col-md-4">
-      <app-my-first (myEvent)="onMyEvent($event)" headerTitle="Static 3"></app-my-first>
+      <app-my-first
+        (myEvent)="onMyEvent($event)"
+        headerTitle="Static 3"></app-my-first>
     </div>
   </div>
   <div class="mt-3 row">
     <div class="col-md-4">
-      <app-my-first (myEvent)="onMyEvent($event)" [headerTitle]="title1"></app-my-first>
+      <app-my-first
+        (myEvent)="onMyEvent($event)"
+        [headerTitle]="title1"></app-my-first>
     </div>
     <div class="col-md-4">
-      <app-my-first (myEvent)="onMyEvent($event)" [headerTitle]="title2"></app-my-first>
+      <app-my-first
+        (myEvent)="onMyEvent($event)"
+        [headerTitle]="title2"></app-my-first>
     </div>
     <div class="col-md-4">
-      <app-my-first (myEvent)="onMyEvent($event)" [headerTitle]="title3"></app-my-first>
+      <app-my-first
+        (myEvent)="onMyEvent($event)"
+        [headerTitle]="title3"></app-my-first>
     </div>
   </div>
   <h2 class="mt-3 alert alert-success">{{myEvent}}</h2>
@@ -945,81 +972,92 @@ First, delete the existing generated content, and then replace it with the follo
 
 **Code Explanation**
 
-This Angular template defines a responsive layout for displaying multiple instances of 
-a custom component (app-my-first) within a Bootstrap container. 
+This Angular template defines a responsive layout for displaying multiple instances of
+a custom component (app-my-first) within a Bootstrap container.
 It also includes dynamic property binding, event handling, and data interpolation.
 
 1. **Container**:
 
 ```html
-<div class="container-md">
+<div class="container-md"></div>
 ```
-  - The outermost `<div>` uses the `container-md class from Bootstrap, 
-    providing a responsive fixed-width container for medium-sized screens and above.
+
+- The outermost `<div>` uses the `container-md class from Bootstrap,
+  providing a responsive fixed-width container for medium-sized screens and above.
 
 2. **First Row of Components**:
 
 ```html
 <div class="mt-3 row">
   <div class="col-md-4">
-    <app-my-first (myEvent)="onMyEvent($event)" headerTitle="Static 1"></app-my-first>
+    <app-my-first
+      (myEvent)="onMyEvent($event)"
+      headerTitle="Static 1"></app-my-first>
   </div>
   <div class="col-md-4">
-    <app-my-first (myEvent)="onMyEvent($event)" headerTitle="Static 2"></app-my-first>
+    <app-my-first
+      (myEvent)="onMyEvent($event)"
+      headerTitle="Static 2"></app-my-first>
   </div>
   <div class="col-md-4">
-    <app-my-first (myEvent)="onMyEvent($event)" headerTitle="Static 3"></app-my-first>
+    <app-my-first
+      (myEvent)="onMyEvent($event)"
+      headerTitle="Static 3"></app-my-first>
   </div>
 </div>
 ```
 
-  - **Row Setup**: The row is created with `class="row"`, and `mt-3` adds a top margin.
-  - **Columns**: Each column (`class="col-md-4"`) spans 4 out of 12 grid columns in Bootstrap, 
-                 creating three equally spaced columns on medium-sized screens and above.
-  - **Component Instances**: The `app-my-first` custom component is rendered three times in this row:
-      - `headerTitle` is a static input property with values `"Static 1"`, `"Static 2"`, and `"Static 3"`.
-      - `(myEvent)` is an output event from app-my-first that triggers the `onMyEvent($event)` method in the parent component when emitted.
+- **Row Setup**: The row is created with `class="row"`, and `mt-3` adds a top margin.
+- **Columns**: Each column (`class="col-md-4"`) spans 4 out of 12 grid columns in Bootstrap,
+  creating three equally spaced columns on medium-sized screens and above.
+- **Component Instances**: The `app-my-first` custom component is rendered three times in this row:
+  - `headerTitle` is a static input property with values `"Static 1"`, `"Static 2"`, and `"Static 3"`.
+  - `(myEvent)` is an output event from app-my-first that triggers the `onMyEvent($event)` method in the parent component when emitted.
 
 3. **Second Row of Components**:
 
 ```html
 <div class="mt-3 row">
   <div class="col-md-4">
-    <app-my-first (myEvent)="onMyEvent($event)" [headerTitle]="title1"></app-my-first>
+    <app-my-first
+      (myEvent)="onMyEvent($event)"
+      [headerTitle]="title1"></app-my-first>
   </div>
   <div class="col-md-4">
-    <app-my-first (myEvent)="onMyEvent($event)" [headerTitle]="title2"></app-my-first>
+    <app-my-first
+      (myEvent)="onMyEvent($event)"
+      [headerTitle]="title2"></app-my-first>
   </div>
   <div class="col-md-4">
-    <app-my-first (myEvent)="onMyEvent($event)" [headerTitle]="title3"></app-my-first>
+    <app-my-first
+      (myEvent)="onMyEvent($event)"
+      [headerTitle]="title3"></app-my-first>
   </div>
 </div>
 ```
 
-  - **Dynamic Input Binding**:
+- **Dynamic Input Binding**:
 
-     - Instead of static string values, `[headerTitle]` binds to dynamic properties `title1`, `title2`, and `title3`, 
-       which must be defined in the parent component’s TypeScript file.
-     - Event Binding: Similar to the first row, `(myEvent)` is used to handle events emitted by the child component.
+  - Instead of static string values, `[headerTitle]` binds to dynamic properties `title1`, `title2`, and `title3`,
+    which must be defined in the parent component’s TypeScript file.
+  - Event Binding: Similar to the first row, `(myEvent)` is used to handle events emitted by the child component.
 
-    
 4. **Dynamic Event Output**:
 
 ```html
 <h2 class="mt-3 alert alert-success">{{myEvent}}</h2>
 ```
 
-  - **Interpolation**: The value of the `myEvent` property in the parent component is displayed here 
-    using Angular interpolation `({{ }})`.
+- **Interpolation**: The value of the `myEvent` property in the parent component is displayed here
+  using Angular interpolation `({{ }})`.
 
-  - **Styling**:
-    - `mt-3`: Adds a top margin.
-    - `alert` `alert-success`: Applies Bootstrap styles for a green alert box.
-
+- **Styling**:
+  - `mt-3`: Adds a top margin.
+  - `alert` `alert-success`: Applies Bootstrap styles for a green alert box.
 
 #### Add the variables and the method to app.component.ts
 
-And add the variables `title1`, `title2`, `title3`, `myEvent` 
+And add the variables `title1`, `title2`, `title3`, `myEvent`
 and the method `onMyEvent($event: string)` to `app.component.ts`.
 
 ```typescript
@@ -1043,7 +1081,6 @@ export class AppComponent {
     this.myEvent = $event;
   }
 }
-
 ```
 
 We can run the project and see the following result:
@@ -1051,7 +1088,6 @@ We can run the project and see the following result:
 ![my-first-in-app-component.png](readme/my-first-in-app-component.png)
 
 The `MyFirstComponent` appears six times. Three times in one row. A click on a _Send Title_ button updates the green box with the related title.
-
 
 ## Create an own Service
 
@@ -1303,8 +1339,20 @@ We can run the test through:
 npm run test
 ```
 
-
 ## Create the TodoLists component
+
+The `TodoListsComponent` is responsible for:
+
+1. Fetching and displaying a list of to-do item lists.
+2. Providing navigation to individual to-do list details when a list is
+   clicked or the "Enter" key is pressed.
+
+**Key Features**
+
+**Service Abstraction**: Allows switching between custom service and OpenAPI service for fetching data.
+**Unsubscription**: Prevents memory leaks by unsubscribing from observables during cleanup.
+**Accessibility**: Supports keyboard navigation for enhanced usability.
+**Dynamic Navigation**: Uses Angular's Router to navigate to individual to-do list details.
 
 ```sh
 ng generate component TodoLists
@@ -1382,11 +1430,41 @@ export class TodoListsComponent implements OnInit, OnDestroy {
 }
 ```
 
+**Code Explanation**
+
+**Properties**
+
+1. `subscription`: Tracks the active observable subscription for later cleanup.
+2. `todoLists`: Holds the data fetched from the backend, following the structure defined by `TodoItemListsDTO`.
+
+**Constructor**
+
+Dependencies are injected:
+
+- `TodoItemControllerService`: OpenAPI-generated service for fetching to-do lists.
+- `TodoService`: Custom service providing similar functionality.
+- `Router`: Used for navigation.
+
+**Lifecycle Hooks**
+
+1. `ngOnInit`: Called when the component is initialized. It invokes `useOwnService` to fetch to-do list data using the custom `TodoService`.
+   - Optional: You could switch to `useOpenApiService` to use the OpenAPI service instead.
+2. ngOnDestroy: Ensures the subscription is unsubscribed to avoid memory leaks when the component is destroyed.
+
+**Methods**
+
+1. `useOwnService`: Uses the custom `TodoService` to fetch a list of IDs and updates the `todoLists` property.
+2. `useOpenApiService`: Uses the OpenAPI-generated service to fetch the same data.
+3. `onEnterKeyDown`: Navigates to the detail page for a to-do list when the "Enter" key is pressed on a specific list.
+
 Add to the `todo-lists.component.html` file the template code:
 
 ```html
 <h4 class="component-title">Todo Lists</h4>
-<p class="sub-para todo-info">Example angular application with Spring Boot Backend and OpenApi generated REST API</p>
+<p class="sub-para todo-info">
+  Example angular application with Spring Boot Backend and OpenApi generated
+  REST API
+</p>
 <p class="sub-para todo-listinfo">Todo Lists: {{ todoLists.count }}</p>
 
 <section class="container legend">
@@ -1405,12 +1483,127 @@ Add to the `todo-lists.component.html` file the template code:
 Instead of using `*ngFor`the new flow syntax with `@for` can be used:
 
 ```html
-@for (listId of todoLists.todoItemList; track listId; let i = $index) {
-  ...
-}
+@for (listId of todoLists.todoItemList; track listId; let i = $index) { ... }
 ```
 
-Add to the `todo-lists.component.spec.ts` file the typescript code:
+#### Unit Tests for the TodoList component
+
+Add some unit tests to the file `todo-lists.component.spec.ts` file and add the following typescript code:
+
+```typescript
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { TodoListsComponent } from './todo-lists.component';
+import { TodoItemControllerService } from '../openapi-gen';
+import { Router } from '@angular/router';
+import { TodoService } from '../services/todo.service';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
+import { of, throwError } from 'rxjs';
+
+describe('TodoListsComponent Test with spy', () => {
+  let component: TodoListsComponent;
+  let fixture: ComponentFixture<TodoListsComponent>;
+  let todoService: jasmine.SpyObj<TodoService>;
+  let router: jasmine.SpyObj<Router>;
+
+  beforeEach(async () => {
+    const todoServiceSpy = jasmine.createSpyObj('TodoService', ['getListIDs']);
+    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    await TestBed.configureTestingModule({
+      imports: [TodoListsComponent],
+      providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        TodoItemControllerService,
+        { provide: TodoService, useValue: todoServiceSpy },
+        { provide: Router, useValue: routerSpy },
+      ],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(TodoListsComponent);
+    component = fixture.componentInstance;
+    todoService = TestBed.inject(TodoService) as jasmine.SpyObj<TodoService>;
+    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+  });
+
+  afterEach(() => {
+    if (component['subscription']) {
+      component['subscription'].unsubscribe();
+    }
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should fetch todo lists and update the todoLists property', () => {
+    const mockData = { todoItemList: ['list1', 'list2'], count: 2 };
+    todoService.getListIDs.and.returnValue(of(mockData));
+
+    component.useOwnService();
+    expect(todoService.getListIDs).toHaveBeenCalled();
+    expect(component.todoLists).toEqual(mockData);
+  });
+
+  it('should handle errors when fetching todo lists', () => {
+    spyOn(console, 'log');
+    todoService.getListIDs.and.returnValue(
+      throwError(() => new Error('Error fetching data'))
+    );
+
+    component.useOwnService();
+    expect(todoService.getListIDs).toHaveBeenCalled();
+    expect(console.log).toHaveBeenCalledWith(new Error('Error fetching data'));
+  });
+
+  it('should navigate to the correct route when onEnterKeyDown is called', () => {
+    const listId = 'list1';
+    component.onEnterKeyDown(listId);
+    expect(router.navigate).toHaveBeenCalledWith(['/todoitem/', listId]);
+  });
+
+  it('should unsubscribe on destroy', () => {
+    const mockSubscription = jasmine.createSpyObj('Subscription', [
+      'unsubscribe',
+    ]);
+    component['subscription'] = mockSubscription;
+
+    component.ngOnDestroy();
+    expect(mockSubscription.unsubscribe).toHaveBeenCalled();
+  });
+});
+```
+
+**Explanation of the unit test**
+
+1. **Test Initialization:**
+
+- `TestBed` is used to configure the testing environment.
+- Mocks or spies are created for `TodoService` and `Router`.
+
+2. **Test Cases**:
+
+- **Component Creation**: Ensures the component is instantiated correctly.
+- **Data Fetching**: Tests the `useOwnService` method for proper API calls and state updates.
+- **Error Handling**: Verifies error handling logic by mocking an error response.
+- **Navigation**: Confirms the `onEnterKeyDown` method navigates to the expected route.
+- **Subscription Cleanup**: Checks that `ngOnDestroy` unsubscribes from active subscriptions.
+
+3. **Mock Services**:
+
+- The `TodoService`'s `getListIDs` method is mocked to return observable values (of for success, `throwError` for failure).
+- The Router's navigate method is mocked to track navigation calls.
+
+#### Alternative Unit Tests for the TodoList component
+
+The code tests the TodoListsComponent of an Angular application using the
+Angular TestBed and the HTTP testing utilities provided by Angular.
+It checks that the component initializes correctly and verifies its
+behavior when interacting with a mock HTTP service.
+
+Create the file `todo-lists-httpmock.component.spec.ts` file and add the following typescript code:
 
 ```typescript
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -1433,7 +1626,7 @@ import {
 import { importProvidersFrom } from '@angular/core';
 import { environment } from '../../environments/environment';
 
-describe('TodoListsComponent', () => {
+describe('TodoListsComponent Test with http mock', () => {
   let component: TodoListsComponent;
   let fixture: ComponentFixture<TodoListsComponent>;
   let httpMock: HttpTestingController;
@@ -1446,10 +1639,7 @@ describe('TodoListsComponent', () => {
         TodoItemControllerService,
         provideHttpClient(withInterceptorsFromDi()),
         importProvidersFrom(ApiModule),
-        {
-          provide: BASE_PATH,
-          useValue: environment.API_BASE_PATH,
-        },
+        { provide: BASE_PATH, useValue: environment.API_BASE_PATH },
         provideHttpClientTesting(),
       ],
     }).compileComponents();
@@ -1464,7 +1654,7 @@ describe('TodoListsComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should  display TodoListsComponent with 2 items', async () => {
+  it('should  display TodoListsComponent with 3 items', async () => {
     const req = httpMock.expectOne(baseUrl + '/api/v1/listids');
     expect(req.request.method).toEqual('GET');
     // Then we set the fake data to be returned by the mock
@@ -1491,13 +1681,40 @@ We can run the test through:
 npm run test
 ```
 
-The above unit test code uses the Angular TestBed to configure our environment under test,
-which is going to use the HttpClientTestingModule instead of the regular HttpClientModule.
-The fake TodoList contains 3 todoItems with a count of 3.
+**Code Explanation**
+
+The above unit test code uses the Angular `TestBed` to configure our environment under test,
+which is going to use the `HttpClientTestingModule` instead of the regular `HttpClientModule`.
+The fake `TodoList` contains 3 todoItems with a count of 3.
+
+1. **Setup**
+
+- `TestBed.configureTestingModule` sets up the test environment with:
+
+  - `TodoListsComponent` as the component under test.
+  - The `TodoItemControllerService` and `ApiModule` for handling HTTP-related operations.
+  - `BASE_PATH` configured with the `API_BASE_PATH` from the environment file.
+  - HTTP testing utilities to mock requests and responses.
+
+- After configuring the module, `HttpTestingController` is injected to control and verify HTTP requests during tests.
+
+- A `ComponentFixture` for the `TodoListsComponent` is created, allowing interaction with the component instance and DOM.
+
+1. **Test 1: Component Creation**
+
+- The first test case simply verifies that the component is created and initialized without errors.
+
+1. **Test 2: Mocking HTTP Requests**
+
+- A GET request to `/api/v1/listids` is expected. This is verified using `httpMock.expectOne`.
+- The mock response (`todoList`) is defined and returned using `req.flush(todoList)`.
+- Assertions check:
+  - The number of todo items (count) in the component matches the mock response.
+  - The todo item IDs in the component match the mock response.
 
 ## Display the TodoLists Component through the Router
 
-To make the `TodoList`  component work, we need to include it in the `app.component.html` file. 
+To make the `TodoList` component work, we need to include it in the `app.component.html` file.
 First, delete the existing generated content, and then replace it with the following:
 
 ```html
@@ -1549,9 +1766,11 @@ We can start the application and should see the following.
 
 ![todo-list-display.png](readme/todo-list-display.png)
 
+#### Unit Test for the App component
+
 We can add a unit test for `AppComponent` which is navigating
 through the `RouterTestingHarness` to load the TodoListComponent.
-We are using the HttpClientTestingModule to Mock the call to the backend.
+We are using the `HttpClientTestingModule` to Mock the call to the backend.
 We are loading 2 todo items.
 
 ```typescript
@@ -1646,6 +1865,38 @@ describe('AppComponent', () => {
 });
 ```
 
+**Code Explanation**
+
+This unit test checks the functionality of the AppComponent in an Angular application.
+It uses Angular's testing utilities and HTTP mocking to validate application behavior.
+
+Here's a detailed explanation of the code:
+
+1. **Test Setup**
+
+- **Imports**:
+
+  - `AppComponent`: The component under test.
+  - `RouterModule.forRoot`: Sets up routing with two routes (`/home` and `/`), both pointing to `TodoListsComponent`.
+
+- **Providers**:
+
+  - `TodoItemControllerService`: Service for interacting with the API.
+  - `provideHttpClient(withInterceptorsFromDi())`: Configures the HTTP client with interceptors.
+  - `importProvidersFrom(ApiModule)`: Imports the `ApiModule` for API integration.
+  - `BASE_PATH`: Provides the base API path from the environment configuration.
+  - `provideHttpClientTesting()`: Sets up HTTP client testing utilities.
+
+2. **Test Cases**
+
+  - **App Creation Test**
+  - **Navigation and API Interaction Test**
+    - Tests routing to `/` and API response handling in `TodoListsComponent`.
+    - **Step 1: Navigate to Route**. `RouterTestingHarness`: Simulates routing and retrieves the component rendered at a route (`TodoListsComponent` for `/`).
+    - **Step 2: Mock API Request**. Expects a GET request to `/api/v1/listids`. Asserts the request method is GET.
+    - **Step 3: Provide Fake API Response**. Provides mock response data (`todoList`) to the intercepted API request.
+    - **Step 4: Validate Component Data**. Logs and verifies that the `TodoListsComponent` correctly receives and handles the API response data.
+    
 We can run the test through:
 
 ```shell
@@ -1715,7 +1966,13 @@ Add to the `todo-items.component.scss` file the css rules:
 Add to the `todo-items.component.ts` file the typescript code:
 
 ```typescript
-import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  OnDestroy,
+} from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TodoItem, TodoItemControllerService } from '../openapi-gen';
 import { ActivatedRoute } from '@angular/router';
@@ -1729,7 +1986,9 @@ import { NgFor, NgStyle } from '@angular/common';
   imports: [NgFor, NgStyle],
 })
 export class TodoItemsComponent implements OnInit, OnDestroy {
-  @ViewChild('taskNameTextField', { static: false }) taskNameTextField: ElementRef<HTMLInputElement> | undefined;
+  @ViewChild('taskNameTextField', { static: false }) taskNameTextField:
+    | ElementRef<HTMLInputElement>
+    | undefined;
   private routeSubscription: Subscription | undefined;
   private subscription: Subscription | undefined;
   listId = '';
@@ -1776,7 +2035,8 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
 
   onEdit(index: number) {
     if (this.taskNameTextField !== undefined) {
-      this.taskNameTextField.nativeElement.value = this.todoItems[index].taskName;
+      this.taskNameTextField.nativeElement.value =
+        this.todoItems[index].taskName;
       this.editIndex = index;
     }
   }
@@ -1791,17 +2051,21 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
   }
 
   refreshList(listId: string) {
-    this.subscription = this.todoItemControllerService.getItem(listId).subscribe({
-      next: data => {
-        this.todoItems = data;
-        this.todoItems.forEach(item => (item.createdAt = parseIsoDateStrToDate(item.createdAt)));
-        if (this.taskNameTextField !== undefined) {
-          this.taskNameTextField.nativeElement.focus();
-          this.taskNameTextField.nativeElement.select();
-        }
-      },
-      error: err => console.log(err),
-    });
+    this.subscription = this.todoItemControllerService
+      .getItem(listId)
+      .subscribe({
+        next: data => {
+          this.todoItems = data;
+          this.todoItems.forEach(
+            item => (item.createdAt = parseIsoDateStrToDate(item.createdAt))
+          );
+          if (this.taskNameTextField !== undefined) {
+            this.taskNameTextField.nativeElement.focus();
+            this.taskNameTextField.nativeElement.select();
+          }
+        },
+        error: err => console.log(err),
+      });
   }
 
   onEnterKeyDown() {
@@ -1810,10 +2074,12 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
       if (taskName.length > 0) {
         if (this.editIndex >= 0) {
           this.todoItems[this.editIndex].taskName = taskName;
-          this.todoItemControllerService.editTodoItem(this.todoItems[this.editIndex]).subscribe({
-            next: () => this.refreshList(this.listId),
-            error: err => console.log(err),
-          });
+          this.todoItemControllerService
+            .editTodoItem(this.todoItems[this.editIndex])
+            .subscribe({
+              next: () => this.refreshList(this.listId),
+              error: err => console.log(err),
+            });
 
           this.editIndex = -1;
         } else {
@@ -1832,19 +2098,20 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
     }
   }
 }
-
 ```
 
 In `ngOnInit` is a `route.params` subscription to get the `listID` from the route URL:
 
-| Description                 | Method                        |
-|-----------------------------|-------------------------------|
-| Load a list with Todo Items | refreshList(listId: string)   | 
-| Create a Todo Item          | onEnterKeyDown()              |
-| Save a Todo Item            | onEnterKeyDown()              |
-| Delete a Todo Item          | onDelete(itemId: number)      | 
-| Set the done state          | onDone(itemId: number)        | 
-| Edit                        | onEdit(index: number)         | 
+| Description                 | Method                      |
+| --------------------------- | --------------------------- |
+| Load a list with Todo Items | refreshList(listId: string) |
+| Create a Todo Item          | onEnterKeyDown()            |
+| Save a Todo Item            | onEnterKeyDown()            |
+| Delete a Todo Item          | onDelete(itemId: number)    |
+| Set the done state          | onDone(itemId: number)      |
+| Edit                        | onEdit(index: number)       |
+
+
 
 
 Add to the `todo-items.component.html` file the template code:
@@ -1861,7 +2128,7 @@ Add to the `todo-items.component.html` file the template code:
       <input
         type="text"
         id="taskNameTextField"
-        tabIndex="1"
+        tabindex="1"
         #taskNameTextField
         class="form-control"
         (keydown.enter)="onEnterKeyDown()"
@@ -1876,11 +2143,12 @@ Add to the `todo-items.component.html` file the template code:
         [checked]="todoItem.done"
         (click)="onDone(todoItem.itemId)"
         class="form-check-input"
-        tabIndex="{{ i * 3 + 2 }}"
+        tabindex="{{ i * 3 + 2 }}"
         type="checkbox" />
-      &nbsp;<span [ngStyle]="{ 'text-decoration': todoItem.done ? 'line-through' : 'none' }">
+      &nbsp;<span
+        [ngStyle]="{ 'text-decoration': todoItem.done ? 'line-through' : 'none' }">
         {{ todoItem.taskName }}</span
-    >
+      >
       <!-- eslint-disable -->
       <span
         (click)="onDelete(todoItem.itemId)"
@@ -1891,23 +2159,24 @@ Add to the `todo-items.component.html` file the template code:
         <i class="fa fa-trash"></i>
       </span>
 
-      <span (click)="onEdit(i)" (keydown)="onEdit(i)" role="button" tabIndex="{{ i * 3 + 3 }}" class="cmd-buttons">
+      <span
+        (click)="onEdit(i)"
+        (keydown)="onEdit(i)"
+        role="button"
+        tabIndex="{{ i * 3 + 3 }}"
+        class="cmd-buttons">
         <i class="fa fa-edit"></i>
       </span>
       <!-- eslint-enable -->
     </div>
   </div>
 </section>
-
 ```
-
 
 Instead of using `*ngFor`the new flow syntax with `@for` can be used:
 
 ```html
-@for (todoItem of todoItems; track i; let i = $index) {
-  ...
-}
+@for (todoItem of todoItems; track i; let i = $index) { ... }
 ```
 
 Add to the `todo-items.component.spec.ts` file the typescript code:
@@ -1916,11 +2185,11 @@ Add to the `todo-items.component.spec.ts` file the typescript code:
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { TodoItemsComponent } from './todo-items.component';
-import {TodoItem, TodoItemControllerService} from '../openapi-gen';
+import { TodoItem, TodoItemControllerService } from '../openapi-gen';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 import { FormsModule } from '@angular/forms';
-import {importProvidersFrom} from '@angular/core';
+import { importProvidersFrom } from '@angular/core';
 
 describe('TodoItemsComponent', () => {
   let component: TodoItemsComponent;
@@ -1929,13 +2198,16 @@ describe('TodoItemsComponent', () => {
   let mockActivatedRoute: Partial<ActivatedRoute>;
 
   beforeEach(async () => {
-    mockTodoItemControllerService = jasmine.createSpyObj('TodoItemControllerService', [
-      'deleteTodoItem',
-      'changeDoneState',
-      'getItem',
-      'editTodoItem',
-      'newTodoItem',
-    ]);
+    mockTodoItemControllerService = jasmine.createSpyObj(
+      'TodoItemControllerService',
+      [
+        'deleteTodoItem',
+        'changeDoneState',
+        'getItem',
+        'editTodoItem',
+        'newTodoItem',
+      ]
+    );
 
     mockActivatedRoute = {
       params: of({ id: '123' }),
@@ -1944,9 +2216,12 @@ describe('TodoItemsComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TodoItemsComponent],
       providers: [
-        { provide: TodoItemControllerService, useValue: mockTodoItemControllerService },
+        {
+          provide: TodoItemControllerService,
+          useValue: mockTodoItemControllerService,
+        },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        importProvidersFrom(FormsModule)
+        importProvidersFrom(FormsModule),
       ],
     }).compileComponents();
 
@@ -1971,7 +2246,9 @@ describe('TodoItemsComponent', () => {
     ] as TodoItem[];
     fixture.detectChanges();
 
-    const listInfo = fixture.debugElement.query(By.css('.todo-info')).nativeElement;
+    const listInfo = fixture.debugElement.query(
+      By.css('.todo-info')
+    ).nativeElement;
     const text: string = listInfo.textContent;
     expect(text.endsWith('123')).toBe(true);
   });
@@ -1983,7 +2260,9 @@ describe('TodoItemsComponent', () => {
     ] as TodoItem[];
     fixture.detectChanges();
 
-    const listInfo = fixture.debugElement.query(By.css('.todo-listinfo')).nativeElement;
+    const listInfo = fixture.debugElement.query(
+      By.css('.todo-listinfo')
+    ).nativeElement;
     expect(listInfo.textContent).toContain('Todo Items : 2 Items');
   });
 
@@ -1991,11 +2270,12 @@ describe('TodoItemsComponent', () => {
     mockTodoItemControllerService.newTodoItem.and.returnValue(of());
     spyOn(component, 'refreshList');
 
-    const inputElement = fixture.debugElement.query(By.css('#taskNameTextField')).nativeElement;
+    const inputElement = fixture.debugElement.query(
+      By.css('#taskNameTextField')
+    ).nativeElement;
     inputElement.value = 'New Task';
     fixture.detectChanges();
     inputElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
-
 
     expect(mockTodoItemControllerService.newTodoItem).toHaveBeenCalledWith(
       jasmine.objectContaining({ taskName: 'New Task' })
@@ -2013,8 +2293,10 @@ describe('TodoItemsComponent', () => {
     const todoItems = fixture.debugElement.queryAll(By.css('.row'));
     expect(todoItems.length).toBe(3);
 
-    const firstItemText = todoItems[1].query(By.css('span')).nativeElement.textContent;
-    const secondItemText = todoItems[2].query(By.css('span')).nativeElement.textContent;
+    const firstItemText = todoItems[1].query(By.css('span')).nativeElement
+      .textContent;
+    const secondItemText = todoItems[2].query(By.css('span')).nativeElement
+      .textContent;
 
     expect(firstItemText).toContain('Task 1');
     expect(secondItemText).toContain('Task 2');
@@ -2053,13 +2335,14 @@ describe('TodoItemsComponent', () => {
     ] as any;
     fixture.detectChanges();
 
-    const checkbox = fixture.debugElement.query(By.css('input[type="checkbox"]'));
+    const checkbox = fixture.debugElement.query(
+      By.css('input[type="checkbox"]')
+    );
     checkbox.triggerEventHandler('click', null);
 
     expect(component.onDone).toHaveBeenCalledWith(1);
   });
 });
-
 ```
 
 **Explanation of Test Cases:**
@@ -2068,7 +2351,6 @@ describe('TodoItemsComponent', () => {
 2. Event Handling Tests:Tests key events like pressing the Enter key, clicking the delete and edit buttons, and interacting with checkboxes.
 3. Dynamic Rendering Tests: Confirms that the todo items render properly based on todoItems array content.
 4. Integration with Component Logic: Ensures that clicking buttons and interacting with the template triggers the correct methods in the component.
-
 
 ## Add the Routings for TodoItemsComponent
 
@@ -2095,7 +2377,6 @@ export const routes: Routes = [
     component: TodoItemsComponent,
   },
 ];
-
 ```
 
 ## Redefine the AppComponent
@@ -2104,7 +2385,7 @@ Add to the `app.component.scss` file the rules:
 
 ```scss
 .app {
-  background-color:#FFF;
+  background-color: #fff;
   min-height: 100vh;
 }
 
@@ -2115,7 +2396,7 @@ Add to the `app.component.scss` file the rules:
 }
 
 .nav-link:hover {
-  background-color:#DDD;
+  background-color: #ddd;
 }
 
 .nav-link {
@@ -2123,14 +2404,14 @@ Add to the `app.component.scss` file the rules:
 }
 
 .active {
-  background-color:#DDD;
+  background-color: #ddd;
 }
 
 .navbar {
   -webkit-box-shadow: 0 8px 6px -6px #999;
   -moz-box-shadow: 0 8px 6px -6px #999;
   box-shadow: 0 8px 6px -6px #999;
-  background-color:#f8f8f8;
+  background-color: #f8f8f8;
 }
 
 .navbar-brand {
@@ -2148,7 +2429,7 @@ Add to the `app.component.ts` file the typescript code:
 
 ```typescript
 import { Component } from '@angular/core';
-import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -2159,18 +2440,20 @@ import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 export class AppComponent {
   title = 'todo-angular';
 }
-
 ```
 
 Add to the `app.component.html` file the template code:
 
 ```html
 <div class="container px-0 app">
-
   <nav class="fixed-top navbar navbar-light navbar-expand-md bg-faded px-2">
-    <div [routerLink]="['/home']" class="navbar-brand"><img alt="todo-logo" src="/todo.svg" width="50px"> Todo App
+    <div [routerLink]="['/home']" class="navbar-brand">
+      <img alt="todo-logo" src="/todo.svg" width="50px" /> Todo App
     </div>
-    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar">
+    <button
+      class="navbar-toggler"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbar">
       <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -2186,20 +2469,34 @@ Add to the `app.component.html` file the template code:
           <a class="nav-link" [routerLink]="['/temp']">Temp C</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/mbachmann/spring-boot-todo-app" target="_blank">Github
-            Backend</a>
+          <a
+            class="nav-link"
+            href="https://github.com/mbachmann/spring-boot-todo-app"
+            target="_blank"
+            >Github Backend</a
+          >
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/mbachmann/todo-angular-19-standalone.git" target="_blank">Github
-            Angular 19</a>
+          <a
+            class="nav-link"
+            href="https://github.com/mbachmann/todo-angular-19-standalone.git"
+            target="_blank"
+            >Github Angular 19</a
+          >
         </li>
       </ul>
       <form class="form-inline ms-auto">
-        <button class="btn btn-secondary" type="button"
-                [routerLink]="['/signup']">Signup
+        <button
+          class="btn btn-secondary"
+          type="button"
+          [routerLink]="['/signup']">
+          Signup
         </button>
-        <button class="btn btn-primary ms-1" type="button"
-                [routerLink]="['/login']">Login
+        <button
+          class="btn btn-primary ms-1"
+          type="button"
+          [routerLink]="['/login']">
+          Login
         </button>
       </form>
     </div>
@@ -2210,8 +2507,8 @@ Add to the `app.component.html` file the template code:
   </main>
 
   <footer class="fixed-bottom px-3 mt-4 bg-light">
-    <section class="container d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
-
+    <section
+      class="container d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
       <!-- Left -->
       <div class="me-5 d-none d-lg-block">
         <span>Get connected with us on social networks:</span>
@@ -2220,16 +2517,28 @@ Add to the `app.component.html` file the template code:
 
       <!-- Right -->
       <div>
-        <a href="https://www.youtube.com/channel/UCGLcphLMTcUNZRIRGUVu8rg" target="_blank" class="me-4 text-reset">
+        <a
+          href="https://www.youtube.com/channel/UCGLcphLMTcUNZRIRGUVu8rg"
+          target="_blank"
+          class="me-4 text-reset">
           <i class="fa-brands  fa-youtube"></i>
         </a>
-        <a href="https://x.com/mbachmann4" target="_blank" class="me-4 text-reset">
+        <a
+          href="https://x.com/mbachmann4"
+          target="_blank"
+          class="me-4 text-reset">
           <i class="fa-brands fa-x-twitter"></i>
         </a>
-        <a href="https://www.linkedin.com/in/matthias-bachmann-b3809541/" target="_blank" class="me-4 text-reset">
+        <a
+          href="https://www.linkedin.com/in/matthias-bachmann-b3809541/"
+          target="_blank"
+          class="me-4 text-reset">
           <i class="fa-brands  fa-linkedin"></i>
         </a>
-        <a href="https://github.com/mbachmann" target="_blank" class="me-4 text-reset">
+        <a
+          href="https://github.com/mbachmann"
+          target="_blank"
+          class="me-4 text-reset">
           <i class="fa-brands fa-github"></i>
         </a>
       </div>
@@ -2238,7 +2547,6 @@ Add to the `app.component.html` file the template code:
     <!-- Section: Social media -->
   </footer>
 </div>
-
 ```
 
 Add to the `app.component.spec.ts` file the typescript code:
@@ -2291,7 +2599,7 @@ Please replace the code below with the content of the `styles.scss` file:
 body {
   font-size: 18px;
   line-height: 1.58;
-  background: #6699FF;
+  background: #6699ff;
   background: -webkit-linear-gradient(to left, #336699, #228899);
   background: linear-gradient(to left, #336699, #228899);
   color: #333;
@@ -2314,7 +2622,6 @@ body {
 .todo-listinfo {
   margin-bottom: 30px;
 }
-
 ```
 
 ## Add the image todo.svg to the public folder
