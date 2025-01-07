@@ -1598,7 +1598,7 @@ describe('TodoListsComponent Test with spy', () => {
 
 #### Alternative Unit Tests for the TodoList component
 
-The code tests the TodoListsComponent of an Angular application using the
+The code tests the `TodoListsComponent of an Angular application using the
 Angular TestBed and the HTTP testing utilities provided by Angular.
 It checks that the component initializes correctly and verifies its
 behavior when interacting with a mock HTTP service.
@@ -1930,6 +1930,10 @@ We can generate a new `TodoItem` Component:
 ng generate component TodoItems
 ```
 
+This Angular 19 component, TodoItemsComponent, is designed to manage a todo list. 
+It interacts with a service to perform CRUD operations, 
+allowing the user to view, add, edit, and delete todo items.
+
 Add to the `todo-items.component.scss` file the css rules:
 
 ```scss
@@ -2100,6 +2104,8 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
 }
 ```
 
+**Explanation of Angular 19 TodoItemsComponent**
+
 In `ngOnInit` is a `route.params` subscription to get the `listID` from the route URL:
 
 | Description                 | Method                      |
@@ -2112,7 +2118,68 @@ In `ngOnInit` is a `route.params` subscription to get the `listID` from the rout
 | Edit                        | onEdit(index: number)       |
 
 
+1. **Component Lifecycle Hooks**
+   
+  - ngOnInit
 
+    - Subscribes to route parameters to retrieve the listId.
+    - Calls refreshList() to fetch the todo items for the list.
+  - ngOnDestroy
+
+    - Ensures subscriptions are unsubscribed to prevent memory leaks.
+  
+2. **Properties**
+   
+  - `taskNameTextField`
+
+    - A reference to the input field for adding/editing tasks.
+
+  - Subscriptions (`routeSubscription`, `subscription`)
+
+    - Used to manage observables for route changes and service calls.
+    
+  - `listId`
+
+    - Stores the current todo list's ID
+    
+  - `todoItems`
+
+    - Holds the array of todo items fetched from the service.
+
+  - `editIndex`
+
+    - Tracks the index of the item being edited.
+    
+3. **Methods**
+
+  - `refreshList(listId: string)`
+
+    - Fetches the todo items for the given listId.
+    - Converts item creation dates to JavaScript Date objects using parseIsoDateStrToDate.
+
+  - `onEnterKeyDown()`
+
+    - Handles adding or editing tasks when the Enter key is pressed.
+    - Creates a new task if no item is being edited.
+    - Updates an existing task if editIndex is set.
+
+  - `onEdit(index: number)`
+
+    - Prepares a task for editing by populating the input field with the task name and setting editIndex.
+
+  - `onDelete(itemId: number | undefined)`
+
+    - Deletes the task with the given ID by calling the service.
+    
+  - `onDone(itemId: number | undefined)`
+
+    - Toggles the "done" state of a task by calling the service.
+
+  - `getListId(id: number): string | undefined`
+
+    - Retrieves the listId of the first todo item, or an empty string if the list is empty.
+
+#### TodoItems HTML file
 
 Add to the `todo-items.component.html` file the template code:
 
@@ -2178,6 +2245,26 @@ Instead of using `*ngFor`the new flow syntax with `@for` can be used:
 ```html
 @for (todoItem of todoItems; track i; let i = $index) { ... }
 ```
+
+**Key Features**
+
+1. **Dynamic Updates**
+
+  - The UI updates in real-time as tasks are added, edited, or removed.
+
+2. **Focus Management**
+
+  - Automatically focuses on the input field after actions to improve usability.
+
+3. **Reactive Design**
+
+  - Relies on RxJS for managing asynchronous operations like fetching and updating tasks.
+
+4. **Error Handling**
+
+  - Errors during service calls are logged in the console.
+
+#### TodoItem Unit Test
 
 Add to the `todo-items.component.spec.ts` file the typescript code:
 
@@ -2347,10 +2434,10 @@ describe('TodoItemsComponent', () => {
 
 **Explanation of Test Cases:**
 
-1. Data Binding Tests: Verifies that listId and the number of todo items are displayed correctly in the template.
-2. Event Handling Tests:Tests key events like pressing the Enter key, clicking the delete and edit buttons, and interacting with checkboxes.
-3. Dynamic Rendering Tests: Confirms that the todo items render properly based on todoItems array content.
-4. Integration with Component Logic: Ensures that clicking buttons and interacting with the template triggers the correct methods in the component.
+1. **Data Binding Tests**: Verifies that `listId and the number of todo items are displayed correctly in the template.
+2. **Event Handling Tests**:Tests key events like pressing the Enter key, clicking the delete and edit buttons, and interacting with checkboxes.
+3. **Dynamic Rendering Tests**: Confirms that the todo items render properly based on `todoItems` array content.
+4. **Integration with Component Logic**: Ensures that clicking buttons and interacting with the template triggers the correct methods in the component.
 
 ## Add the Routings for TodoItemsComponent
 
@@ -2553,15 +2640,46 @@ Add to the `app.component.spec.ts` file the typescript code:
 
 ```typescript
 import { TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
+import { RouterTestingHarness } from '@angular/router/testing';
+import { TodoListsComponent } from './todo-lists/todo-lists.component';
+import { RouterModule } from '@angular/router';
+import { ApiModule, BASE_PATH, TodoItemControllerService, TodoItemListsDTO } from './openapi-gen';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { importProvidersFrom } from '@angular/core';
+import { environment } from '../environments/environment';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('AppComponent', () => {
+  let httpMock: HttpTestingController;
+  let baseUrl: string;
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RouterTestingModule],
-      declarations: [AppComponent],
+      imports: [
+        AppComponent,
+        RouterModule.forRoot([
+          { path: 'home', component: TodoListsComponent },
+          { path: '', component: TodoListsComponent },
+        ]),
+      ],
+      providers: [
+        TodoItemControllerService,
+        provideHttpClient(withInterceptorsFromDi()),
+        importProvidersFrom(ApiModule),
+        {
+          provide: BASE_PATH,
+          useValue: environment.API_BASE_PATH,
+        },
+        provideHttpClientTesting(),
+      ],
     }).compileComponents();
+    httpMock = TestBed.inject(HttpTestingController);
+    baseUrl = environment.API_BASE_PATH;
+  });
+
+  afterEach(() => {
+    httpMock.verify();
   });
 
   it('should create the app', () => {
@@ -2580,11 +2698,28 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.navbar-brand').textContent).toContain(
-      'Todo App'
-    );
+    expect(compiled.querySelector('.navbar-brand').textContent).toContain('Todo App');
+  });
+
+  it('should navigate to home and display TodoListsComponent', async () => {
+    const harness = await RouterTestingHarness.create();
+    // Navigate to the route to get your component
+    const activatedComponent = await harness.navigateByUrl('/', TodoListsComponent);
+    const req = httpMock.expectOne(baseUrl + '/api/v1/listids');
+    expect(req.request.method).toEqual('GET');
+    // Then we set the fake data to be returned by the mock
+    const todoList: TodoItemListsDTO = {
+      count: 2,
+      todoItemList: ['083e8820-0186-4c68-af01-af2ced91805a', '1da5ba97-4365-4560-bb23-2335f099288e'],
+    };
+    req.flush(todoList);
+    // await new Promise(resolve => setTimeout(resolve, 500)); // 500 ms
+    console.log('AppComponent.activatedComponent.todoLists.count', activatedComponent.todoLists.count);
+    expect(activatedComponent.todoLists.count).toBe(todoList.count);
+    expect(activatedComponent.todoLists.todoItemList).toBe(todoList.todoItemList);
   });
 });
+
 ```
 
 ## Add global styles
