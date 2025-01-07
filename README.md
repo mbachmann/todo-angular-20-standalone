@@ -2749,28 +2749,29 @@ describe('AppComponent', () => {
 
 **Angular-Specific Features**
 
-1. Routing:
+1. **Routing**:
 
   - [routerLink] enables navigation between views (e.g., /home, /myfirst).
   - <router-outlet> dynamically renders the components associated with the current route.
 
-2. State Management:
+2. **State Management**:
 
   - [routerLinkActive] ensures the currently active route is styled with the active class.
 
-**Responsive Design**
+3. **Responsive Design**
 
   - Bootstrap's grid system ensures the layout adapts to different screen sizes.
   - Collapsible navigation and flex-based footer contribute to a mobile-friendly design.
 
-3. Structure
+4. **Structure**
 
-The file uses Bootstrap classes for responsive design and styling. The Angular directives ([routerLink], [routerLinkActive]) enable routing to different application views. Key sections include:
+The file uses Bootstrap classes for responsive design and styling. 
+The Angular directives (`[routerLink]`, `[routerLinkActive]`) enable routing to different application views. Key sections include:
 
-  1. Container Div: The main wrapper for the application, marked with classes container px-0 app.
-  2. Navigation Bar: A fixed-top bar with branding, navigation links, and buttons.
-  3. Main Content: Placeholder for dynamic content controlled by Angular's router.
-  4. Footer: Contains social media links and additional information.
+  1. **Container Div**: The main wrapper for the application, marked with classes container `px-0` app.
+  2. **Navigation Bar**: A fixed-top bar with branding, navigation links, and buttons.
+  3. **Main Content**: Placeholder for dynamic content controlled by Angular's router.
+  4. **Footer**: Contains social media links and additional information.
 
 ## Add global styles
 
