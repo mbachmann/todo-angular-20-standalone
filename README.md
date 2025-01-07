@@ -1689,28 +1689,28 @@ The fake `TodoList` contains 3 todoItems with a count of 3.
 
 1. **Setup**
 
-- `TestBed.configureTestingModule` sets up the test environment with:
+  - `TestBed.configureTestingModule` sets up the test environment with:
 
-  - `TodoListsComponent` as the component under test.
-  - The `TodoItemControllerService` and `ApiModule` for handling HTTP-related operations.
-  - `BASE_PATH` configured with the `API_BASE_PATH` from the environment file.
-  - HTTP testing utilities to mock requests and responses.
+    - `TodoListsComponent` as the component under test.
+    - The `TodoItemControllerService` and `ApiModule` for handling HTTP-related operations.
+    - `BASE_PATH` configured with the `API_BASE_PATH` from the environment file.
+    - HTTP testing utilities to mock requests and responses.
 
-- After configuring the module, `HttpTestingController` is injected to control and verify HTTP requests during tests.
+  - After configuring the module, `HttpTestingController` is injected to control and verify HTTP requests during tests.
 
-- A `ComponentFixture` for the `TodoListsComponent` is created, allowing interaction with the component instance and DOM.
+  - A `ComponentFixture` for the `TodoListsComponent` is created, allowing interaction with the component instance and DOM.
 
-1. **Test 1: Component Creation**
+2. **Test 1: Component Creation**
 
-- The first test case simply verifies that the component is created and initialized without errors.
+  - The first test case simply verifies that the component is created and initialized without errors.
 
-1. **Test 2: Mocking HTTP Requests**
+3. **Test 2: Mocking HTTP Requests**
 
-- A GET request to `/api/v1/listids` is expected. This is verified using `httpMock.expectOne`.
-- The mock response (`todoList`) is defined and returned using `req.flush(todoList)`.
-- Assertions check:
-  - The number of todo items (count) in the component matches the mock response.
-  - The todo item IDs in the component match the mock response.
+  - A GET request to `/api/v1/listids` is expected. This is verified using `httpMock.expectOne`.
+  - The mock response (`todoList`) is defined and returned using `req.flush(todoList)`.
+  - Assertions check:
+    - The number of todo items (count) in the component matches the mock response.
+    - The todo item IDs in the component match the mock response.
 
 ## Display the TodoLists Component through the Router
 
@@ -1874,18 +1874,18 @@ Here's a detailed explanation of the code:
 
 1. **Test Setup**
 
-- **Imports**:
+  - **Imports**:
 
-  - `AppComponent`: The component under test.
-  - `RouterModule.forRoot`: Sets up routing with two routes (`/home` and `/`), both pointing to `TodoListsComponent`.
+    - `AppComponent`: The component under test.
+    - `RouterModule.forRoot`: Sets up routing with two routes (`/home` and `/`), both pointing to `TodoListsComponent`.
 
-- **Providers**:
+  - **Providers**:
 
-  - `TodoItemControllerService`: Service for interacting with the API.
-  - `provideHttpClient(withInterceptorsFromDi())`: Configures the HTTP client with interceptors.
-  - `importProvidersFrom(ApiModule)`: Imports the `ApiModule` for API integration.
-  - `BASE_PATH`: Provides the base API path from the environment configuration.
-  - `provideHttpClientTesting()`: Sets up HTTP client testing utilities.
+    - `TodoItemControllerService`: Service for interacting with the API.
+    - `provideHttpClient(withInterceptorsFromDi())`: Configures the HTTP client with interceptors.
+    - `importProvidersFrom(ApiModule)`: Imports the `ApiModule` for API integration.
+    - `BASE_PATH`: Provides the base API path from the environment configuration.
+    - `provideHttpClientTesting()`: Sets up HTTP client testing utilities.
 
 2. **Test Cases**
 
@@ -1896,7 +1896,7 @@ Here's a detailed explanation of the code:
     - **Step 2: Mock API Request**. Expects a GET request to `/api/v1/listids`. Asserts the request method is GET.
     - **Step 3: Provide Fake API Response**. Provides mock response data (`todoList`) to the intercepted API request.
     - **Step 4: Validate Component Data**. Logs and verifies that the `TodoListsComponent` correctly receives and handles the API response data.
-    
+
 We can run the test through:
 
 ```shell
@@ -1930,8 +1930,8 @@ We can generate a new `TodoItem` Component:
 ng generate component TodoItems
 ```
 
-This Angular 19 component, TodoItemsComponent, is designed to manage a todo list. 
-It interacts with a service to perform CRUD operations, 
+This Angular 19 component, TodoItemsComponent, is designed to manage a todo list.
+It interacts with a service to perform CRUD operations,
 allowing the user to view, add, edit, and delete todo items.
 
 Add to the `todo-items.component.scss` file the css rules:
@@ -2117,19 +2117,19 @@ In `ngOnInit` is a `route.params` subscription to get the `listID` from the rout
 | Set the done state          | onDone(itemId: number)      |
 | Edit                        | onEdit(index: number)       |
 
-
 1. **Component Lifecycle Hooks**
-   
+
   - ngOnInit
 
     - Subscribes to route parameters to retrieve the listId.
     - Calls refreshList() to fetch the todo items for the list.
+
   - ngOnDestroy
 
     - Ensures subscriptions are unsubscribed to prevent memory leaks.
-  
+
 2. **Properties**
-   
+
   - `taskNameTextField`
 
     - A reference to the input field for adding/editing tasks.
@@ -2137,11 +2137,11 @@ In `ngOnInit` is a `route.params` subscription to get the `listID` from the rout
   - Subscriptions (`routeSubscription`, `subscription`)
 
     - Used to manage observables for route changes and service calls.
-    
+
   - `listId`
 
     - Stores the current todo list's ID
-    
+
   - `todoItems`
 
     - Holds the array of todo items fetched from the service.
@@ -2149,7 +2149,7 @@ In `ngOnInit` is a `route.params` subscription to get the `listID` from the rout
   - `editIndex`
 
     - Tracks the index of the item being edited.
-    
+
 3. **Methods**
 
   - `refreshList(listId: string)`
@@ -2170,7 +2170,7 @@ In `ngOnInit` is a `route.params` subscription to get the `listID` from the rout
   - `onDelete(itemId: number | undefined)`
 
     - Deletes the task with the given ID by calling the service.
-    
+
   - `onDone(itemId: number | undefined)`
 
     - Toggles the "done" state of a task by calling the service.
@@ -2250,19 +2250,19 @@ Instead of using `*ngFor`the new flow syntax with `@for` can be used:
 
 1. **Dynamic Updates**
 
-  - The UI updates in real-time as tasks are added, edited, or removed.
+- The UI updates in real-time as tasks are added, edited, or removed.
 
 2. **Focus Management**
 
-  - Automatically focuses on the input field after actions to improve usability.
+- Automatically focuses on the input field after actions to improve usability.
 
 3. **Reactive Design**
 
-  - Relies on RxJS for managing asynchronous operations like fetching and updating tasks.
+- Relies on RxJS for managing asynchronous operations like fetching and updating tasks.
 
 4. **Error Handling**
 
-  - Errors during service calls are logged in the console.
+- Errors during service calls are logged in the console.
 
 #### TodoItem Unit Test
 
@@ -2644,11 +2644,22 @@ import { AppComponent } from './app.component';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { TodoListsComponent } from './todo-lists/todo-lists.component';
 import { RouterModule } from '@angular/router';
-import { ApiModule, BASE_PATH, TodoItemControllerService, TodoItemListsDTO } from './openapi-gen';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import {
+  ApiModule,
+  BASE_PATH,
+  TodoItemControllerService,
+  TodoItemListsDTO,
+} from './openapi-gen';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
 import { importProvidersFrom } from '@angular/core';
 import { environment } from '../environments/environment';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
 
 describe('AppComponent', () => {
   let httpMock: HttpTestingController;
@@ -2698,28 +2709,40 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.navbar-brand').textContent).toContain('Todo App');
+    expect(compiled.querySelector('.navbar-brand').textContent).toContain(
+      'Todo App'
+    );
   });
 
   it('should navigate to home and display TodoListsComponent', async () => {
     const harness = await RouterTestingHarness.create();
     // Navigate to the route to get your component
-    const activatedComponent = await harness.navigateByUrl('/', TodoListsComponent);
+    const activatedComponent = await harness.navigateByUrl(
+      '/',
+      TodoListsComponent
+    );
     const req = httpMock.expectOne(baseUrl + '/api/v1/listids');
     expect(req.request.method).toEqual('GET');
     // Then we set the fake data to be returned by the mock
     const todoList: TodoItemListsDTO = {
       count: 2,
-      todoItemList: ['083e8820-0186-4c68-af01-af2ced91805a', '1da5ba97-4365-4560-bb23-2335f099288e'],
+      todoItemList: [
+        '083e8820-0186-4c68-af01-af2ced91805a',
+        '1da5ba97-4365-4560-bb23-2335f099288e',
+      ],
     };
     req.flush(todoList);
     // await new Promise(resolve => setTimeout(resolve, 500)); // 500 ms
-    console.log('AppComponent.activatedComponent.todoLists.count', activatedComponent.todoLists.count);
+    console.log(
+      'AppComponent.activatedComponent.todoLists.count',
+      activatedComponent.todoLists.count
+    );
     expect(activatedComponent.todoLists.count).toBe(todoList.count);
-    expect(activatedComponent.todoLists.todoItemList).toBe(todoList.todoItemList);
+    expect(activatedComponent.todoLists.todoItemList).toBe(
+      todoList.todoItemList
+    );
   });
 });
-
 ```
 
 ## Add global styles
