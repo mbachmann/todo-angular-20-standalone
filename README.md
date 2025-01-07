@@ -2529,6 +2529,8 @@ export class AppComponent {
 }
 ```
 
+#### HTML Template of AppComponent
+
 Add to the `app.component.html` file the template code:
 
 ```html
@@ -2635,6 +2637,38 @@ Add to the `app.component.html` file the template code:
   </footer>
 </div>
 ```
+
+**Code Explanation**
+
+**Angular-Specific Features**
+
+1. **Routing**:
+
+- [routerLink] enables navigation between views (e.g., /home, /myfirst).
+- <router-outlet> dynamically renders the components associated with the current route.
+
+2. **State Management**:
+
+- [routerLinkActive] ensures the currently active route is styled with the active class.
+
+3. **Responsive Design**
+
+- Bootstrap's grid system ensures the layout adapts to different screen sizes.
+- Collapsible navigation and flex-based footer contribute to a mobile-friendly design.
+
+4. **Structure**
+
+The file uses Bootstrap classes for responsive design and styling.
+The Angular directives (`[routerLink]`, `[routerLinkActive]`) enable routing to different application views. Key sections include:
+
+1. **Container Div**: The main wrapper for the application, marked with classes container `px-0` app.
+2. **Navigation Bar**: A fixed-top bar with branding, navigation links, and buttons.
+3. **Main Content**: Placeholder for dynamic content controlled by Angular's router.
+4. **Footer**: Contains social media links and additional information.
+
+### Unit Test of AppComponent
+
+This unit test file is for an Angular application and tests the behavior of the `AppComponent`.
 
 Add to the `app.component.spec.ts` file the typescript code:
 
@@ -2747,31 +2781,24 @@ describe('AppComponent', () => {
 
 **Code Explanation**
 
-**Angular-Specific Features**
+1. **Mocked Services**: The `HttpTestingController` ensures no real API calls are made and that expected requests are correctly structured.
+2. **Routing**: The `RouterTestingHarness` simplifies testing of Angular routing and ensures components activate as expected.
+3. **Component Interaction**: Tests confirm that `AppComponent` integrates properly with routing and API data.
+4. **Isolation**: The test suite isolates `AppComponent` and its dependencies without requiring a live backend or actual routing.
 
-1. **Routing**:
+**Setup and Teardown**
 
-  - [routerLink] enables navigation between views (e.g., /home, /myfirst).
-  - <router-outlet> dynamically renders the components associated with the current route.
+- `beforeEach`
 
-2. **State Management**:
+  - `TestBed.configureTestingModule`: Sets up the test module:
+    - Declares the `AppComponent`.
+    - Configures the router with routes pointing to `TodoListsComponent` for both the `root` and `/home`.
+    - Provides services such as `TodoItemControllerService`, the `ApiModule`, and HTTP testing utilities.
+    - Injects the `BASE_PATH` token with the API base path from the environment configuration.
+  - Mocks: `httpMock` is initialized to intercept and verify HTTP requests.
 
-  - [routerLinkActive] ensures the currently active route is styled with the active class.
-
-3. **Responsive Design**
-
-  - Bootstrap's grid system ensures the layout adapts to different screen sizes.
-  - Collapsible navigation and flex-based footer contribute to a mobile-friendly design.
-
-4. **Structure**
-
-The file uses Bootstrap classes for responsive design and styling. 
-The Angular directives (`[routerLink]`, `[routerLinkActive]`) enable routing to different application views. Key sections include:
-
-  1. **Container Div**: The main wrapper for the application, marked with classes container `px-0` app.
-  2. **Navigation Bar**: A fixed-top bar with branding, navigation links, and buttons.
-  3. **Main Content**: Placeholder for dynamic content controlled by Angular's router.
-  4. **Footer**: Contains social media links and additional information.
+- `afterEach`
+  - `httpMock.verify()`: Ensures all mocked HTTP requests have been handled to avoid unverified requests.
 
 ## Add global styles
 
