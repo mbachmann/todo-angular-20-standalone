@@ -10,7 +10,7 @@ export function parseIsoDateStrToDate(value: any) {
 
 export function getUUID(): string {
   let result = '';
-  let hexcodes:string[] = "0123456789abcdef".split("");
+  const hexcodes: string[] = '0123456789abcdef'.split('');
 
   for (let index = 0; index < 32; index++) {
     let value = Math.floor(Math.random() * 16);
@@ -24,7 +24,7 @@ export function getUUID(): string {
         result += '-';
         break;
       case 16:
-        value = value & 3 | 8;
+        value = (value & 3) | 8;
         result += '-';
         break;
       case 20:

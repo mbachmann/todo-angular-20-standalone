@@ -15,7 +15,10 @@ describe('TodoListsComponent', () => {
 
   beforeEach(async () => {
     mockTodoListNameControllerService = jasmine.createSpyObj('TodoListNameControllerService', [
-      'getAllTodoListNames', 'createTodoListName', 'updateTodoListName', 'deleteTodoListName'
+      'getAllTodoListNames',
+      'createTodoListName',
+      'updateTodoListName',
+      'deleteTodoListName',
     ]);
 
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
@@ -26,8 +29,8 @@ describe('TodoListsComponent', () => {
         { provide: TodoItemControllerService, useValue: {} },
         { provide: TodoListNameControllerService, useValue: mockTodoListNameControllerService },
         { provide: TodoService, useValue: {} },
-        { provide: Router, useValue: mockRouter }
-      ]
+        { provide: Router, useValue: mockRouter },
+      ],
     }).compileComponents();
   });
 
@@ -84,15 +87,16 @@ describe('TodoListsComponent', () => {
     expect(mockTodoListNameControllerService.deleteTodoListName).toHaveBeenCalledWith('1');
   });
 
-  function initRefreshListReponse () {
+  function initRefreshListReponse() {
     const mockTodoLists: TodoListNameDTO[] = [
       {
-        "count": 3,
-        "listId": "da2c63f8-b414-46fb-8ae9-c54c1e5c0f00",
-        "fromDate": "2025-03-11T08:27:45.741982Z",
-        "toDate": "2025-03-16T08:27:45.741990Z",
-        "listName": "To-Do List for business"
-      }];
+        count: 3,
+        listId: 'da2c63f8-b414-46fb-8ae9-c54c1e5c0f00',
+        fromDate: '2025-03-11T08:27:45.741982Z',
+        toDate: '2025-03-16T08:27:45.741990Z',
+        listName: 'To-Do List for business',
+      },
+    ];
     mockTodoListNameControllerService.getAllTodoListNames.and.returnValue(of(mockTodoLists as any));
     return mockTodoLists;
   }

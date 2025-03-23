@@ -1,4 +1,4 @@
-import {getUUID, parseIsoDateStrToDate} from './utils';
+import { getUUID, parseIsoDateStrToDate } from './utils';
 
 /**
  * Here’s a unit test suite for the parseIsoDateStrToDate function.
@@ -53,7 +53,6 @@ describe('parseIsoDateStrToDate', () => {
     expect(result.toISOString()).toBe('2023-12-31T23:59:59.000Z');
   });
 });
-
 
 describe('getUUID', () => {
   it('returns a string', () => {

@@ -1729,16 +1729,16 @@ Add to the `todo-lists.component.html` file the template code:
           </span>
 
           <!-- eslint-disable -->
-        <span (click)="onDelete(row.listId)" click-stop-propagation
-              (keydown.enter)="onEdit(i)" keydown-stop-propagation
+        <span (click)="onDelete(row.listId)" clickStopPropagation
+              (keydown.enter)="onEdit(i)" keydownStopPropagation
               role="button"
               tabindex="{{ i * 3 + 4 }}"
               class="float-right">
               <i class="fa fa-trash"></i>
           </span>
 
-        <span (click)="onEdit(i)" click-stop-propagation
-              (keydown.enter)="onEdit(i)" keydown-stop-propagation
+        <span (click)="onEdit(i)" clickStopPropagation
+              (keydown.enter)="onEdit(i)" keydownStopPropagation
               role="button"
               tabindex="{{ i * 3 + 3 }}"
               class="float-right">

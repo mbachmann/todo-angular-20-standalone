@@ -1,24 +1,23 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {Subscription} from 'rxjs';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
 import {
-  TodoItem,
   TodoItemControllerService,
-  TodoItemListsDTO, TodoListName,
+  TodoListName,
   TodoListNameControllerService,
-  TodoListNameDTO
+  TodoListNameDTO,
 } from '../openapi-gen';
-import {TodoService} from '../services/todo.service';
-import {Router, RouterLink} from '@angular/router';
-import {DatePipe} from '@angular/common';
-import {ClickStopPropagation} from '../shared/directive/click-stop-propagation.directive';
-import {KeydownStopPropagationDirective} from '../shared/directive/keydown-stop-propagation.directive';
-import {getUUID} from '../shared/utils';
+import { TodoService } from '../services/todo.service';
+import { Router, RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
+import { ClickStopPropagationDirective } from '../shared/directive/click-stop-propagation.directive';
+import { KeydownStopPropagationDirective } from '../shared/directive/keydown-stop-propagation.directive';
+import { getUUID } from '../shared/utils';
 
 @Component({
   selector: 'app-todo-lists',
   templateUrl: './todo-lists.component.html',
   styleUrls: ['./todo-lists.component.scss'],
-  imports: [RouterLink, DatePipe, ClickStopPropagation, KeydownStopPropagationDirective],
+  imports: [RouterLink, DatePipe, ClickStopPropagationDirective, KeydownStopPropagationDirective],
 })
 export class TodoListsComponent implements OnInit, OnDestroy {
   @ViewChild('listNameTextField', { static: false }) listNameTextField: ElementRef<HTMLInputElement> | undefined;
@@ -31,11 +30,9 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     private readonly todoListNameControllerService: TodoListNameControllerService,
     private readonly todoService: TodoService,
     private readonly router: Router
-  ) {
-  }
+  ) {}
 
   ngOnDestroy(): void {
-
     if (this.todoListNamesSubscription != undefined) {
       this.todoListNamesSubscription.unsubscribe();
     }
@@ -46,7 +43,6 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   }
 
   refreshList(): void {
-
     this.todoListNamesSubscription = this.todoListNameControllerService.getAllTodoListNames().subscribe({
       next: data => (this.todoListNames = data),
       error: err => console.log(err),
@@ -95,10 +91,13 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   }
 
   onEdit(index: number) {
-    if (this.listNameTextField !== undefined && this.todoListNames[index] !== undefined && this.todoListNames[index].listName !== undefined) {
+    if (
+      this.listNameTextField !== undefined &&
+      this.todoListNames[index] !== undefined &&
+      this.todoListNames[index].listName !== undefined
+    ) {
       this.listNameTextField.nativeElement.value = this.todoListNames[index].listName;
       this.editIndex = index;
     }
   }
-
 }

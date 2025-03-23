@@ -1,9 +1,9 @@
-import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TodoItem, TodoItemControllerService } from '../openapi-gen';
 import { ActivatedRoute } from '@angular/router';
 import { parseIsoDateStrToDate } from '../shared/utils';
-import {DatePipe, NgStyle} from '@angular/common';
+import { DatePipe, NgStyle } from '@angular/common';
 
 @Component({
   selector: 'app-todo-items',
