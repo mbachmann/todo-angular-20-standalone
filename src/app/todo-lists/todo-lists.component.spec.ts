@@ -1,76 +1,99 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { TodoListsComponent } from './todo-lists.component';
-import { TodoItemControllerService } from '../openapi-gen';
-import { Router } from '@angular/router';
+import { TodoItemControllerService, TodoListNameControllerService, TodoListNameDTO } from '../openapi-gen';
 import { TodoService } from '../services/todo.service';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { of, throwError } from 'rxjs';
+import { Router } from '@angular/router';
+import { of } from 'rxjs';
+import { ElementRef } from '@angular/core';
+import { HttpResponse } from '@angular/common/http';
 
-describe('TodoListsComponent Test with spy', () => {
+describe('TodoListsComponent', () => {
   let component: TodoListsComponent;
   let fixture: ComponentFixture<TodoListsComponent>;
-  let todoService: jasmine.SpyObj<TodoService>;
-  let router: jasmine.SpyObj<Router>;
+  let mockTodoListNameControllerService: jasmine.SpyObj<TodoListNameControllerService>;
+  let mockRouter: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
-    const todoServiceSpy = jasmine.createSpyObj('TodoService', ['getListIDs']);
-    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    mockTodoListNameControllerService = jasmine.createSpyObj('TodoListNameControllerService', [
+      'getAllTodoListNames', 'createTodoListName', 'updateTodoListName', 'deleteTodoListName'
+    ]);
+
+    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+
     await TestBed.configureTestingModule({
       imports: [TodoListsComponent],
       providers: [
-        provideHttpClient(withInterceptorsFromDi()),
-        TodoItemControllerService,
-        { provide: TodoService, useValue: todoServiceSpy },
-        { provide: Router, useValue: routerSpy },
-      ],
+        { provide: TodoItemControllerService, useValue: {} },
+        { provide: TodoListNameControllerService, useValue: mockTodoListNameControllerService },
+        { provide: TodoService, useValue: {} },
+        { provide: Router, useValue: mockRouter }
+      ]
     }).compileComponents();
-
-    fixture = TestBed.createComponent(TodoListsComponent);
-    component = fixture.componentInstance;
-    todoService = TestBed.inject(TodoService) as jasmine.SpyObj<TodoService>;
-    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
   });
 
-  afterEach(() => {
-    if (component['subscription']) {
-      component['subscription'].unsubscribe();
-    }
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TodoListsComponent);
+    component = fixture.componentInstance;
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should fetch todo lists and update the todoLists property', () => {
-    const mockData = { todoItemList: ['list1', 'list2'], count: 2 };
-    todoService.getListIDs.and.returnValue(of(mockData));
-
-    component.useOwnService();
-    expect(todoService.getListIDs).toHaveBeenCalled();
-    expect(component.todoLists).toEqual(mockData);
+  it('should fetch todo list names on initialization', () => {
+    const mockTodoLists = initRefreshListReponse();
+    component.ngOnInit();
+    expect(component.todoListNames).toEqual(mockTodoLists);
   });
 
-  it('should handle errors when fetching todo lists', () => {
-    spyOn(console, 'log');
-    todoService.getListIDs.and.returnValue(throwError(() => new Error('Error fetching data')));
+  it('should call createTodoListName when adding a new list', () => {
+    component.listNameTextField = new ElementRef(document.createElement('input'));
+    component.listNameTextField.nativeElement.value = 'New List';
+    mockTodoListNameControllerService.createTodoListName.and.returnValue(of(new HttpResponse({ status: 201 })) as any);
+    initRefreshListReponse();
 
-    component.useOwnService();
-    expect(todoService.getListIDs).toHaveBeenCalled();
-    expect(console.log).toHaveBeenCalledWith(new Error('Error fetching data'));
+    component.onEnterKeyDownField();
+
+    expect(mockTodoListNameControllerService.createTodoListName).toHaveBeenCalled();
   });
 
-  it('should navigate to the correct route when onEnterKeyDown is called', () => {
-    const listId = 'list1';
-    component.onEnterKeyDown(listId);
-    expect(router.navigate).toHaveBeenCalledWith(['/todoitem/', listId]);
+  it('should call updateTodoListName when editing an existing list', () => {
+    component.listNameTextField = new ElementRef(document.createElement('input'));
+    component.listNameTextField.nativeElement.value = 'Updated List';
+    component.todoListNames = [{ listId: '1', listName: 'Old List', count: 0 }];
+    component.editIndex = 0;
+    mockTodoListNameControllerService.updateTodoListName.and.returnValue(of(new HttpResponse({ status: 200 })) as any);
+    initRefreshListReponse();
+
+    component.onEnterKeyDownField();
+
+    expect(mockTodoListNameControllerService.updateTodoListName).toHaveBeenCalledWith('1', jasmine.any(Object));
   });
 
-  it('should unsubscribe on destroy', () => {
-    const mockSubscription = jasmine.createSpyObj('Subscription', ['unsubscribe']);
-    component['subscription'] = mockSubscription;
-
-    component.ngOnDestroy();
-    expect(mockSubscription.unsubscribe).toHaveBeenCalled();
+  it('should navigate to todo item page onEnterKeyDownList', () => {
+    component.onEnterKeyDownList('1');
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/todoitem/', '1']);
   });
+
+  it('should delete a todo list when onDelete is called', () => {
+    mockTodoListNameControllerService.deleteTodoListName.and.returnValue(of(new HttpResponse({ status: 200 })));
+    initRefreshListReponse();
+
+    component.onDelete('1');
+
+    expect(mockTodoListNameControllerService.deleteTodoListName).toHaveBeenCalledWith('1');
+  });
+
+  function initRefreshListReponse () {
+    const mockTodoLists: TodoListNameDTO[] = [
+      {
+        "count": 3,
+        "listId": "da2c63f8-b414-46fb-8ae9-c54c1e5c0f00",
+        "fromDate": "2025-03-11T08:27:45.741982Z",
+        "toDate": "2025-03-16T08:27:45.741990Z",
+        "listName": "To-Do List for business"
+      }];
+    mockTodoListNameControllerService.getAllTodoListNames.and.returnValue(of(mockTodoLists as any));
+    return mockTodoLists;
+  }
 });

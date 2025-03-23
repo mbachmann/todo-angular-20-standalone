@@ -1,4 +1,4 @@
-import { parseIsoDateStrToDate } from './utils';
+import {getUUID, parseIsoDateStrToDate} from './utils';
 
 /**
  * Here’s a unit test suite for the parseIsoDateStrToDate function.
@@ -51,5 +51,27 @@ describe('parseIsoDateStrToDate', () => {
     const result = parseIsoDateStrToDate(isoDateString);
     expect(result instanceof Date).toBeTrue();
     expect(result.toISOString()).toBe('2023-12-31T23:59:59.000Z');
+  });
+});
+
+
+describe('getUUID', () => {
+  it('returns a string', () => {
+    const uuid = getUUID();
+    expect(typeof uuid).toBe('string');
+  });
+
+  it('returns a valid UUID format', () => {
+    const uuid = getUUID();
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    expect(uuidRegex.test(uuid)).toBe(true);
+  });
+
+  it('generates unique UUIDs', () => {
+    const uuids = new Set();
+    for (let i = 0; i < 1000; i++) {
+      uuids.add(getUUID());
+    }
+    expect(uuids.size).toBe(1000);
   });
 });

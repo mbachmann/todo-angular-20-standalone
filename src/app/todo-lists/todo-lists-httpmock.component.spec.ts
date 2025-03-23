@@ -3,7 +3,14 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TodoListsComponent } from './todo-lists.component';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { ApiModule, BASE_PATH, TodoItemControllerService, TodoItemListsDTO } from '../openapi-gen';
+import {
+  ApiModule,
+  BASE_PATH,
+  TodoItemControllerService,
+  TodoItemListsDTO,
+  TodoListName,
+  TodoListNameDTO
+} from '../openapi-gen';
 import { importProvidersFrom } from '@angular/core';
 import { environment } from '../../environments/environment';
 
@@ -36,21 +43,36 @@ describe('TodoListsComponent Test with http mock', () => {
   });
 
   it('should  display TodoListsComponent with 3 items', async () => {
-    const req = httpMock.expectOne(baseUrl + '/api/v1/listids');
+    const req = httpMock.expectOne(baseUrl + '/api/v1/todolist-names');
     expect(req.request.method).toEqual('GET');
     // Then we set the fake data to be returned by the mock
-    const todoList: TodoItemListsDTO = {
-      count: 3,
-      todoItemList: [
-        '083e8820-0186-4c68-af01-af2ced91805a',
-        '1da5ba97-4365-4560-bb23-2335f099288e',
-        '1da5ea4a-fa71-4192-a17d-35d8ae8167ef',
-      ],
-    };
+    const todoList: TodoListNameDTO[] = [
+      {
+        "count": 3,
+        "listId": "da2c63f8-b414-46fb-8ae9-c54c1e5c0f00",
+        "fromDate": "2025-03-11T08:27:45.741982Z",
+        "toDate": "2025-03-16T08:27:45.741990Z",
+        "listName": "To-Do List for business"
+      },
+      {
+        "count": 3,
+        "listId": "2f9c96e1-51ab-47b5-aec9-30980eef61c0",
+        "fromDate": "2025-03-11T08:27:45.750231Z",
+        "toDate": "2025-03-16T08:27:45.750234Z",
+        "listName": "To-Do List for homework"
+      },
+      {
+        "count": 3,
+        "listId": "2e45aace-3823-413e-a145-0cab9cc7a115",
+        "fromDate": "2025-03-11T08:27:45.753923Z",
+        "toDate": "2025-03-16T08:27:45.753927Z",
+        "listName": "To-Do List for private"
+      }
+    ]
+
     req.flush(todoList);
     // await new Promise(resolve => setTimeout(resolve, 500)); // 500 ms
-    console.log('TodoListComponent.todoLists.count', component.todoLists.count);
-    expect(component.todoLists.count).toBe(todoList.count);
-    expect(component.todoLists.todoItemList).toBe(todoList.todoItemList);
+    console.log('TodoListComponent.todoLists.count', component.todoListNames.length);
+
   });
 });

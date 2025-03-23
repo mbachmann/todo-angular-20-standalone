@@ -11,8 +11,8 @@
  */
 
 
-export interface TodoItemListsDTO { 
-    count?: number;
-    todoItemList?: Array<string>;
+export interface ErrorMessage { 
+    errors?: Array<string>;
+    timestamp?: string;
 }
 

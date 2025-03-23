@@ -3,11 +3,11 @@ import { AppComponent } from './app.component';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { TodoListsComponent } from './todo-lists/todo-lists.component';
 import { RouterModule } from '@angular/router';
-import { ApiModule, BASE_PATH, TodoItemControllerService, TodoItemListsDTO } from './openapi-gen';
+import {ApiModule, BASE_PATH, TodoItemControllerService, TodoItemListsDTO, TodoListNameDTO} from './openapi-gen';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { importProvidersFrom } from '@angular/core';
 import { environment } from '../environments/environment';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import {HttpTestingController, provideHttpClientTesting, TestRequest} from '@angular/common/http/testing';
 
 describe('AppComponent', () => {
   let httpMock: HttpTestingController;
@@ -64,17 +64,33 @@ describe('AppComponent', () => {
     const harness = await RouterTestingHarness.create();
     // Navigate to the route to get your component
     const activatedComponent = await harness.navigateByUrl('/', TodoListsComponent);
-    const req = httpMock.expectOne(baseUrl + '/api/v1/listids');
-    expect(req.request.method).toEqual('GET');
-    // Then we set the fake data to be returned by the mock
+    const reqListNames = httpMock.expectOne(baseUrl + '/api/v1/todolist-names');
+    expect(reqListNames.request.method).toEqual('GET');
+
     const todoList: TodoItemListsDTO = {
       count: 2,
       todoItemList: ['083e8820-0186-4c68-af01-af2ced91805a', '1da5ba97-4365-4560-bb23-2335f099288e'],
     };
-    req.flush(todoList);
+    const todoListNames: TodoListNameDTO[] = [
+      {
+        count: 3,
+        listId: "da2c63f8-b414-46fb-8ae9-c54c1e5c0f00",
+        fromDate: "2025-03-11T08:27:45.741982Z",
+        toDate: "2025-03-16T08:27:45.741990Z",
+        listName: "To-Do List for business"
+      },
+      {
+        count: 3,
+        listId: "2f9c96e1-51ab-47b5-aec9-30980eef61c0",
+        fromDate: "2025-03-11T08:27:45.750231Z",
+        toDate: "2025-03-16T08:27:45.750234Z",
+        listName: "To-Do List for homework"
+      }
+    ];
+
+    reqListNames.flush(todoListNames);
+
     // await new Promise(resolve => setTimeout(resolve, 500)); // 500 ms
-    console.log('AppComponent.activatedComponent.todoLists.count', activatedComponent.todoLists.count);
-    expect(activatedComponent.todoLists.count).toBe(todoList.count);
-    expect(activatedComponent.todoLists.todoItemList).toBe(todoList.todoItemList);
+    expect(activatedComponent.todoListNames).toBe(todoListNames);
   });
 });

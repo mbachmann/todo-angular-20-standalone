@@ -11,8 +11,11 @@
  */
 
 
-export interface TodoItemListsDTO { 
+export interface TodoListNameDTO { 
     count?: number;
-    todoItemList?: Array<string>;
+    listId?: string;
+    fromDate?: string;
+    toDate?: string;
+    listName?: string;
 }
 

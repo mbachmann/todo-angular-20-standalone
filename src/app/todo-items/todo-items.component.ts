@@ -3,13 +3,13 @@ import { Subscription } from 'rxjs';
 import { TodoItem, TodoItemControllerService } from '../openapi-gen';
 import { ActivatedRoute } from '@angular/router';
 import { parseIsoDateStrToDate } from '../shared/utils';
-import { NgStyle } from '@angular/common';
+import {DatePipe, NgStyle} from '@angular/common';
 
 @Component({
   selector: 'app-todo-items',
   templateUrl: './todo-items.component.html',
   styleUrls: ['./todo-items.component.scss'],
-  imports: [NgStyle],
+  imports: [NgStyle, DatePipe],
 })
 export class TodoItemsComponent implements OnInit, OnDestroy {
   @ViewChild('taskNameTextField', { static: false }) taskNameTextField: ElementRef<HTMLInputElement> | undefined;
@@ -74,7 +74,7 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
   }
 
   refreshList(listId: string) {
-    this.subscription = this.todoItemControllerService.getItem(listId).subscribe({
+    this.subscription = this.todoItemControllerService.getItemsOfOneList(listId).subscribe({
       next: data => {
         this.todoItems = data;
         this.todoItems.forEach(item => (item.createdAt = parseIsoDateStrToDate(item.createdAt)));

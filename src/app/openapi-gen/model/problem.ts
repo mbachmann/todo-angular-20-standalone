@@ -11,8 +11,8 @@
  */
 
 
-export interface TodoItemListsDTO { 
-    count?: number;
-    todoItemList?: Array<string>;
+export interface Problem { 
+    logRef?: string;
+    message?: string;
 }
 

@@ -1,16 +1,66 @@
 <h4 class="component-title">Todo Lists</h4>
 <p class="sub-para todo-info">Example angular application with Spring Boot Backend and OpenApi generated REST API</p>
-<p class="sub-para todo-listinfo">Todo Lists: {{ todoLists.count }}</p>
+<p class="sub-para todo-listinfo">Todo Lists: {{ todoListNames.length }}</p>
 
-<section class="container legend">
-  @for (listId of todoLists.todoItemList; track listId; let i = $index) {
+
+<div class="container" style="padding-left: 0">
+  <div class="row">
+    <div class="col-sm-9 my-3 pe-0">
+      <input
+        type="text"
+        id="listNameTextField"
+        tabIndex="1"
+        #listNameTextField
+        class="form-control"
+        (keydown.enter)="onEnterKeyDownField()"
+        placeholder="Input list name then tap Enter to add"/>
+    </div>
+  </div>
+</div>
+<section class="container legend todo-list-name-row">
+  @for (row of todoListNames; track row.listId; let i = $index) {
     <div class="row">
-      <div
-        tabindex="0"
-        (keydown.enter)="onEnterKeyDown(listId)"
-        [routerLink]="['/todoitem/', listId]"
-        class="col-sm-8 py-1 my-1 clickable">
-        List {{ i + 1 }} : {{ listId }}
+      <div class="col-sm-9 py-1 my-1 clickable"
+           [routerLink]="['/todoitem/', row.listId] ">
+        <span
+              tabindex=-1
+              (keydown.enter)="onEnterKeyDownList(row.listId)">
+              List {{ i + 1 }}
+          <span role="link"
+                tabindex="{{ i * 3 + 1 }}">
+                    : {{ row.listName }} &nbsp;
+          </span>
+          <span class="badge">
+                {{ row.count }}
+          </span>
+
+        <!-- eslint-disable -->
+        <span (click)="onDelete(row.listId)" click-stop-propagation
+              (keydown.enter)="onEdit(i)" keydown-stop-propagation
+              role="button"
+              tabindex="{{ i * 3 + 4 }}"
+              class="float-right">
+              <i class="fa fa-trash"></i>
+          </span>
+
+        <span (click)="onEdit(i)" click-stop-propagation
+              (keydown.enter)="onEdit(i)" keydown-stop-propagation
+              role="button"
+              tabindex="{{ i * 3 + 3 }}"
+              class="float-right">
+              <i class="fa fa-edit"></i>
+          </span>
+        <!-- eslint-enable -->
+        <span class="float-right"
+              tabindex=-1
+              [routerLink]="['/todoitem/', row.listId]">
+              {{ row.fromDate | date: 'dd.MM.yyyy' }}
+          @if (row.count && row.count > 0) {
+            -
+          }
+          {{ row.toDate | date: 'dd.MM.yyyy' }}
+          </span>
+        </span>
       </div>
     </div>
   }

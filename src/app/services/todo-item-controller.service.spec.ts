@@ -106,7 +106,7 @@ describe('TodoItemControllerService', () => {
 
   it('should fetch a single todo item by list ID', () => {
     const listId = '123';
-    service.getItem(listId).subscribe((response: any) => {
+    service.getItemsOfOneList(listId).subscribe((response: any) => {
       expect(response).toEqual([mockTodoItem]);
     });
 

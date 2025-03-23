@@ -532,10 +532,10 @@ Please add below code into `styles.scss` file:
 ## Create a utils file
 
 Create a folder `src/app/shared`. In this folder create a file `utils.ts`.This file contains a data reviver function,
-restoring a ISO8601 string to a Date object.
+restoring a ISO8601 string to a Date object a function `getUUID` to create a UUID.
 
 ```typescript
-let isoDateFormat: RegExp =
+const isoDateFormat =
   /(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/;
 
 export function parseIsoDateStrToDate(value: any) {
@@ -544,7 +544,81 @@ export function parseIsoDateStrToDate(value: any) {
   }
   return value;
 }
+
+export function getUUID() {
+  let result = '';
+  let hexcodes = "0123456789abcdef".split("");
+
+  for (let index = 0; index < 32; index++) {
+    let value = Math.floor(Math.random() * 16);
+
+    switch (index) {
+      case 8:
+        result += '-';
+        break;
+      case 12:
+        value = 4;
+        result += '-';
+        break;
+      case 16:
+        value = value & 3 | 8;
+        result += '-';
+        break;
+      case 20:
+        result += '-';
+        break;
+    }
+    result += hexcodes[value];
+  }
+  return result;
+}
 ```
+
+Create a folder `src/app/shared/directive`. In this folder create the files 
+
+- `click-stop-propagation.directive.ts` and
+- `keydown-stop-propagation.directive.ts`
+
+The directive can be used in the HTML template to stop the propagation of the click and keydown events.
+
+**click-stop-propagation.directive.ts**
+
+```typescript
+import {Directive, HostListener} from "@angular/core";
+
+@Directive({
+  selector: "[click-stop-propagation]"
+})
+export class ClickStopPropagation
+{
+  @HostListener("click", ["$event"])
+  public onClick(event: any): void
+  {
+    event.stopPropagation();
+  }
+}
+```
+
+**keydown-stop-propagation.directive.ts**
+
+```typescript
+import {Directive, HostListener} from "@angular/core";
+
+@Directive({
+  selector: "[keydown-stop-propagation]"
+})
+export class KeydownStopPropagationDirective
+{
+  @HostListener("keydown", ["$event"])
+  public onKeydown(event: any): void
+  {
+    event.stopPropagation();
+  }
+}
+```
+
+The directives will be used later for the `TodoListsComponent`.
+
 
 ## Create the MyFirst component
 
@@ -1346,17 +1420,35 @@ The `TodoListsComponent` is responsible for:
 1. Fetching and displaying a list of to-do item lists.
 2. Providing navigation to individual to-do list details when a list is
    clicked or the "Enter" key is pressed.
+3. Creating new to-do lists and updating existing lists.
+4. Deleting to-do lists.
+
+![todo-lists.png](readme/todo-lists.png)
+
 
 **Key Features**
 
-**Service Abstraction**: Allows switching between custom service and OpenAPI service for fetching data.
-**Unsubscription**: Prevents memory leaks by unsubscribing from observables during cleanup.
-**Accessibility**: Supports keyboard navigation for enhanced usability.
-**Dynamic Navigation**: Uses Angular's Router to navigate to individual to-do list details.
+- **Service Abstraction**: Allows switching between custom service and OpenAPI service for fetching data.
+- **Unsubscription**: Prevents memory leaks by unsubscribing from observables during cleanup.
+- **Accessibility**: Supports keyboard navigation for enhanced usability.
+- **Dynamic Navigation**: Uses Angular's Router to navigate to individual to-do list details.
 
 ```sh
 ng generate component TodoLists
 ```
+
+The backend is providing us with the following api endpoints: 
+
+- `GET /api/v1/listnames`: Fetches all to-do list names.
+- `POST /api/v1/listnames`: Creates a new to-do list.
+- `PUT /api/v1/listnames/{listId}`: Updates an existing to-do list.
+- `DELETE /api/v1/listnames/{listId}`: Deletes a to-do list.
+- `GET /api/v1/listitems/{listId}`: Fetches all to-do items for a specific list.
+
+
+The `TodoListsComponent` will use the `TodoListNameControllerService` to interact with the backend.
+
+
 
 Add to the `todo-lists.component.scss` file the rules:
 
@@ -1371,113 +1463,303 @@ Add to the `todo-lists.component.scss` file the rules:
     0 0 3px 3px rgba(0, 0, 0, 0.19);
   cursor: pointer;
 }
+
+.todo-list-name-row {
+  font-size: 0.9em;
+}
+
+.float-right {
+  padding-left: 5px;
+  padding-right: 5px;
+  float: right;
+}
+
+.badge {
+  background-color: rgba(34, 136, 153, 0.36);
+  color: white;
+  padding: 3px 6px;
+  text-align: center;
+  border-radius: 5px;
+}
+
+
+.form-control {
+  font-size: 16px;
+  padding-left: 15px;
+  outline: none;
+  border: 1px solid #e8e8e8;
+}
+
+
 ```
 
 Add to the `todo-lists.component.ts` file the typescript code:
 
 ```typescript
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { TodoItemControllerService, TodoItemListsDTO } from '../openapi-gen';
-import { TodoService } from '../services/todo.service';
-import { NgFor } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Subscription} from 'rxjs';
+import {
+  TodoItem,
+  TodoItemControllerService,
+  TodoItemListsDTO, TodoListName,
+  TodoListNameControllerService,
+  TodoListNameDTO
+} from '../openapi-gen';
+import {TodoService} from '../services/todo.service';
+import {Router, RouterLink} from '@angular/router';
+import {DatePipe} from '@angular/common';
+import {ClickStopPropagation} from '../shared/directive/click-stop-propagation.directive';
+import {KeydownStopPropagationDirective} from '../shared/directive/keydown-stop-propagation.directive';
+import {getUUID} from '../shared/utils';
 
 @Component({
   selector: 'app-todo-lists',
   templateUrl: './todo-lists.component.html',
   styleUrls: ['./todo-lists.component.scss'],
-  imports: [NgFor, RouterLink],
+  imports: [RouterLink, DatePipe, ClickStopPropagation, KeydownStopPropagationDirective],
 })
 export class TodoListsComponent implements OnInit, OnDestroy {
-  private subscription: Subscription | undefined;
-  todoLists: TodoItemListsDTO = {};
+  @ViewChild('listNameTextField', { static: false }) listNameTextField: ElementRef<HTMLInputElement> | undefined;
+  private todoListNamesSubscription: Subscription | undefined;
+  todoListNames: TodoListNameDTO[] = [];
+  editIndex = -1;
 
   constructor(
     private readonly todoItemControllerService: TodoItemControllerService,
+    private readonly todoListNameControllerService: TodoListNameControllerService,
     private readonly todoService: TodoService,
     private readonly router: Router
-  ) {}
+  ) {
+  }
 
   ngOnDestroy(): void {
-    if (this.subscription != undefined) {
-      this.subscription.unsubscribe();
+
+    if (this.todoListNamesSubscription != undefined) {
+      this.todoListNamesSubscription.unsubscribe();
     }
   }
 
   ngOnInit(): void {
-    this.useOwnService();
-    // this.useOpenApiService();
+    this.refreshList();
   }
 
-  useOwnService(): void {
-    this.subscription = this.todoService.getListIDs().subscribe({
-      next: data => (this.todoLists = data),
+  refreshList(): void {
+
+    this.todoListNamesSubscription = this.todoListNameControllerService.getAllTodoListNames().subscribe({
+      next: data => (this.todoListNames = data),
       error: err => console.log(err),
     });
   }
 
-  useOpenApiService(): void {
-    this.subscription = this.todoItemControllerService.getListIDs().subscribe({
-      next: data => (this.todoLists = data),
-      error: err => console.log(err),
+  onEnterKeyDownField() {
+    const inputField = this.listNameTextField?.nativeElement;
+    if (!inputField) return;
+
+    const listName = inputField.value.trim();
+    if (!listName) return;
+
+    const isEditing = this.editIndex >= 0;
+    const existingList = isEditing ? this.todoListNames[this.editIndex] : null;
+
+    const todoListName: TodoListName = {
+      id: existingList?.listId ?? getUUID(),
+      name: listName,
+    };
+
+    const request$ = isEditing
+      ? this.todoListNameControllerService.updateTodoListName(todoListName.id, todoListName)
+      : this.todoListNameControllerService.createTodoListName(todoListName);
+
+    request$.subscribe({
+      next: () => this.refreshList(),
+      error: console.error,
     });
+
+    if (isEditing) this.editIndex = -1;
+    inputField.value = '';
   }
 
-  onEnterKeyDown(listId: string) {
+  onEnterKeyDownList(listId: string | undefined) {
     this.router.navigate(['/todoitem/', listId]);
   }
+
+  onDelete(listId: string | undefined) {
+    if (listId !== undefined) {
+      this.todoListNameControllerService.deleteTodoListName(listId).subscribe({
+        next: () => this.refreshList(),
+        error: err => console.log(err),
+      });
+    }
+  }
+
+  onEdit(index: number) {
+    if (this.listNameTextField !== undefined && this.todoListNames[index] !== undefined && this.todoListNames[index].listName !== undefined) {
+      this.listNameTextField.nativeElement.value = this.todoListNames[index].listName;
+      this.editIndex = index;
+    }
+  }
+
 }
+
 ```
 
-**Code Explanation**
+**TodoListsComponent Explanation**
 
-**Properties**
+**Overview**
+The `TodoListsComponent` is an Angular component responsible for managing and displaying a list of To-Do lists. It allows users to create, edit, delete, and navigate to individual To-Do lists.
 
-1. `subscription`: Tracks the active observable subscription for later cleanup.
-2. `todoLists`: Holds the data fetched from the backend, following the structure defined by `TodoItemListsDTO`.
+**Imports**
 
-**Constructor**
+The component imports various Angular and custom dependencies:
+- **Core Angular Modules:** `Component`, `ElementRef`, `OnDestroy`, `OnInit`, `ViewChild`.
+- **RxJS:** `Subscription` for managing observable subscriptions.
+- **OpenAPI Generated Services:** `TodoItemControllerService`, `TodoListNameControllerService`, DTOs for interacting with the backend.
+- **Services:** `TodoService` for additional logic.
+- **Routing:** `Router` and `RouterLink` for navigation.
+- **Directives:** `ClickStopPropagation`, `KeydownStopPropagationDirective` for handling event propagation.
+- **Utilities:** `getUUID()` for generating unique identifiers.
 
-Dependencies are injected:
+**Component Decorator**
 
-- `TodoItemControllerService`: OpenAPI-generated service for fetching to-do lists.
-- `TodoService`: Custom service providing similar functionality.
-- `Router`: Used for navigation.
+- Defines the selector `app-todo-lists` for use in templates.
+- Specifies associated HTML and CSS files.
+- Declares imported modules and directives.
+
+**Class Properties**
+```typescript
+@ViewChild('listNameTextField', { static: false })
+listNameTextField: ElementRef<HTMLInputElement> | undefined;
+```
+- Retrieves a reference to the input field for entering a new To-Do list name.
+- `todoListNamesSubscription`: Holds the subscription for fetching To-Do list names.
+- `todoListNames`: Stores the retrieved list names.
+- `editIndex`: Tracks the index of a list being edited.
+
 
 **Lifecycle Hooks**
 
-1. `ngOnInit`: Called when the component is initialized. It invokes `useOwnService` to fetch to-do list data using the custom `TodoService`.
-   - Optional: You could switch to `useOpenApiService` to use the OpenAPI service instead.
-2. ngOnDestroy: Ensures the subscription is unsubscribed to avoid memory leaks when the component is destroyed.
+`ngOnInit`
+
+```typescript
+ngOnInit(): void {
+  this.refreshList();
+}
+```
+- Calls `refreshList()` to fetch and display the To-Do lists when the component initializes.
+
+`ngOnDestroy`
+```typescript
+ngOnDestroy(): void {
+  if (this.todoListNamesSubscription != undefined) {
+    this.todoListNamesSubscription.unsubscribe();
+  }
+}
+```
+- Unsubscribes from the observable to prevent memory leaks when the component is destroyed.
 
 **Methods**
 
-1. `useOwnService`: Uses the custom `TodoService` to fetch a list of IDs and updates the `todoLists` property.
-2. `useOpenApiService`: Uses the OpenAPI-generated service to fetch the same data.
-3. `onEnterKeyDown`: Navigates to the detail page for a to-do list when the "Enter" key is pressed on a specific list.
+`refreshList()`
+
+- Fetches all To-Do list names from the API and updates `todoListNames`.
+- Logs errors to the console.
+
+`onEnterKeyDownField()`
+
+- Handles pressing the Enter key in the input field.
+- Creates or updates a To-Do list based on `editIndex`.
+- Refreshes the list after API request completion.
+
+`onEnterKeyDownList(listId: string | undefined)`
+
+- Navigates to the `todo-items` page of a selected list when Enter is pressed.
+
+`onDelete(listId: string | undefined)`
+- Deletes a To-Do list and refreshes the list after a successful API call.
+
+`onEdit(index: number)`
+
+- Enables editing mode by setting `editIndex` and populating the input field with the selected list name.
+
+**Summary**
+- **Displays** a list of To-Do lists.
+- **Allows** users to add, edit, delete, and navigate to To-Do lists.
+- **Utilizes** API services to interact with the backend.
+- **Implements** event handling for keypresses and button clicks.
+- **Manages** subscriptions to avoid memory leaks.
+
 
 Add to the `todo-lists.component.html` file the template code:
 
 ```html
 <h4 class="component-title">Todo Lists</h4>
-<p class="sub-para todo-info">
-  Example angular application with Spring Boot Backend and OpenApi generated
-  REST API
-</p>
-<p class="sub-para todo-listinfo">Todo Lists: {{ todoLists.count }}</p>
+<p class="sub-para todo-info">Example angular application with Spring Boot Backend and OpenApi generated REST API</p>
+<p class="sub-para todo-listinfo">Todo Lists: {{ todoListNames.length }}</p>
 
-<section class="container legend">
-  <div class="row" *ngFor="let listId of todoLists.todoItemList; let i = index">
-    <div
-      tabindex="0"
-      (keydown.enter)="onEnterKeyDown(listId)"
-      [routerLink]="['/todoitem/', listId]"
-      class="col-sm-8 py-1 my-1 clickable">
-      List {{ i + 1 }} : {{ listId }}
+
+<div class="container" style="padding-left: 0">
+  <div class="row">
+    <div class="col-sm-9 my-3 pe-0">
+      <input
+        type="text"
+        id="listNameTextField"
+        tabIndex="1"
+        #listNameTextField
+        class="form-control"
+        (keydown.enter)="onEnterKeyDownField()"
+        placeholder="Input list name then tap Enter to add"/>
     </div>
   </div>
+</div>
+<section class="container legend todo-list-name-row">
+  @for (row of todoListNames; track row.listId; let i = $index) {
+  <div class="row">
+    <div class="col-sm-9 py-1 my-1 clickable"
+         [routerLink]="['/todoitem/', row.listId] ">
+        <span
+          tabindex=-1
+          (keydown.enter)="onEnterKeyDownList(row.listId)">
+              List {{ i + 1 }}
+          <span role="link"
+                tabindex="{{ i * 3 + 1 }}">
+                    : {{ row.listName }} &nbsp;
+          </span>
+          <span class="badge">
+                {{ row.count }}
+          </span>
+
+          <!-- eslint-disable -->
+        <span (click)="onDelete(row.listId)" click-stop-propagation
+              (keydown.enter)="onEdit(i)" keydown-stop-propagation
+              role="button"
+              tabindex="{{ i * 3 + 4 }}"
+              class="float-right">
+              <i class="fa fa-trash"></i>
+          </span>
+
+        <span (click)="onEdit(i)" click-stop-propagation
+              (keydown.enter)="onEdit(i)" keydown-stop-propagation
+              role="button"
+              tabindex="{{ i * 3 + 3 }}"
+              class="float-right">
+              <i class="fa fa-edit"></i>
+          </span>
+          <!-- eslint-enable -->
+        <span class="float-right"
+              tabindex=-1
+              [routerLink]="['/todoitem/', row.listId]">
+              {{ row.fromDate | date: 'dd.MM.yyyy' }}
+          @if (row.count && row.count > 0) {
+            -
+          }
+          {{ row.toDate | date: 'dd.MM.yyyy' }}
+          </span>
+        </span>
+    </div>
+  </div>
+  }
 </section>
+
 ```
 
 Instead of using `*ngFor`the new flow syntax with `@for` can be used:
@@ -1486,117 +1768,191 @@ Instead of using `*ngFor`the new flow syntax with `@for` can be used:
 @for (listId of todoLists.todoItemList; track listId; let i = $index) { ... }
 ```
 
-#### Unit Tests for the TodoList component
+**Code Explanation**
+
+Explanation of the Angular Template: 
+This Angular template represents a To-Do List UI that interacts with a Spring Boot 
+backend using an OpenAPI-generated REST API. 
+It dynamically displays a list of to-do lists and provides functionalities for creating, editing, 
+and deleting them.
+
+1. **Header Section**:
+   - Displays a title ("Todo Lists").
+   - Shows a description of the application.
+   - Displays the total number of to-do lists using Angular interpolation ({{ todoListNames.length }}).
+
+2. **Input Field for Creating a New To-Do List**
+    - Provides an input field (<input>) where users can type the name of a new to-do list.
+    - The field triggers the onEnterKeyDownField() method when the Enter key is pressed.
+    - The keydown.enter event triggers onEnterKeyDownField(), which  adds a new list when the Enter key is pressed.
+
+3. **Displaying the To-Do Lists**
+
+    - Uses the @for directive (Angular's new template syntax) to iterate over todoListNames.
+    - Each to-do list (row) is displayed inside a `<div class="row">`.
+    - [routerLink] navigates to a details page for the specific to-do list (/todoitem/{listId}) when clicked.
+
+4. **Delete and Edit Buttons**
+    - Trash icon (fa-trash): Calls onDelete(row.listId) to delete the list.
+    - Edit icon (fa-edit): Calls onEdit(i) to edit the list.
+    - click-stop-propagation prevents event bubbling, so clicking these icons doesn't trigger other parent elements' click events.
+
+#### Unit Tests for the TodoLists component
 
 Add some unit tests to the file `todo-lists.component.spec.ts` file and add the following typescript code:
 
 ```typescript
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+import { AppComponent } from './app.component';
+import { RouterTestingHarness } from '@angular/router/testing';
+import { TodoListsComponent } from './todo-lists/todo-lists.component';
+import { RouterModule } from '@angular/router';
+import {ApiModule, BASE_PATH, TodoItemControllerService, TodoItemListsDTO, TodoListNameDTO} from './openapi-gen';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { importProvidersFrom } from '@angular/core';
+import { environment } from '../environments/environment';
+import {HttpTestingController, provideHttpClientTesting, TestRequest} from '@angular/common/http/testing';
 
-import { TodoListsComponent } from './todo-lists.component';
-import { TodoItemControllerService } from '../openapi-gen';
-import { Router } from '@angular/router';
-import { TodoService } from '../services/todo.service';
-import {
-  provideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http';
-import { of, throwError } from 'rxjs';
-
-describe('TodoListsComponent Test with spy', () => {
-  let component: TodoListsComponent;
-  let fixture: ComponentFixture<TodoListsComponent>;
-  let todoService: jasmine.SpyObj<TodoService>;
-  let router: jasmine.SpyObj<Router>;
+describe('AppComponent', () => {
+  let httpMock: HttpTestingController;
+  let baseUrl: string;
 
   beforeEach(async () => {
-    const todoServiceSpy = jasmine.createSpyObj('TodoService', ['getListIDs']);
-    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     await TestBed.configureTestingModule({
-      imports: [TodoListsComponent],
+      imports: [
+        AppComponent,
+        RouterModule.forRoot([
+          { path: 'home', component: TodoListsComponent },
+          { path: '', component: TodoListsComponent },
+        ]),
+      ],
       providers: [
-        provideHttpClient(withInterceptorsFromDi()),
         TodoItemControllerService,
-        { provide: TodoService, useValue: todoServiceSpy },
-        { provide: Router, useValue: routerSpy },
+        provideHttpClient(withInterceptorsFromDi()),
+        importProvidersFrom(ApiModule),
+        {
+          provide: BASE_PATH,
+          useValue: environment.API_BASE_PATH,
+        },
+        provideHttpClientTesting(),
       ],
     }).compileComponents();
-
-    fixture = TestBed.createComponent(TodoListsComponent);
-    component = fixture.componentInstance;
-    todoService = TestBed.inject(TodoService) as jasmine.SpyObj<TodoService>;
-    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    httpMock = TestBed.inject(HttpTestingController);
+    baseUrl = environment.API_BASE_PATH;
   });
 
   afterEach(() => {
-    if (component['subscription']) {
-      component['subscription'].unsubscribe();
-    }
+    httpMock.verify();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('should create the app', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    expect(app).toBeTruthy();
   });
 
-  it('should fetch todo lists and update the todoLists property', () => {
-    const mockData = { todoItemList: ['list1', 'list2'], count: 2 };
-    todoService.getListIDs.and.returnValue(of(mockData));
-
-    component.useOwnService();
-    expect(todoService.getListIDs).toHaveBeenCalled();
-    expect(component.todoLists).toEqual(mockData);
+  it(`should have as title 'todo-angular'`, () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    expect(app.title).toEqual('todo-angular');
   });
 
-  it('should handle errors when fetching todo lists', () => {
-    spyOn(console, 'log');
-    todoService.getListIDs.and.returnValue(
-      throwError(() => new Error('Error fetching data'))
-    );
-
-    component.useOwnService();
-    expect(todoService.getListIDs).toHaveBeenCalled();
-    expect(console.log).toHaveBeenCalledWith(new Error('Error fetching data'));
+  it('should render title', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement;
+    expect(compiled.querySelector('.navbar-brand').textContent).toContain('Todo App');
   });
 
-  it('should navigate to the correct route when onEnterKeyDown is called', () => {
-    const listId = 'list1';
-    component.onEnterKeyDown(listId);
-    expect(router.navigate).toHaveBeenCalledWith(['/todoitem/', listId]);
-  });
+  it('should navigate to home and display TodoListsComponent', async () => {
+    const harness = await RouterTestingHarness.create();
+    // Navigate to the route to get your component
+    const activatedComponent = await harness.navigateByUrl('/', TodoListsComponent);
+    const reqListNames = httpMock.expectOne(baseUrl + '/api/v1/todolist-names');
+    expect(reqListNames.request.method).toEqual('GET');
 
-  it('should unsubscribe on destroy', () => {
-    const mockSubscription = jasmine.createSpyObj('Subscription', [
-      'unsubscribe',
-    ]);
-    component['subscription'] = mockSubscription;
+    const todoList: TodoItemListsDTO = {
+      count: 2,
+      todoItemList: ['083e8820-0186-4c68-af01-af2ced91805a', '1da5ba97-4365-4560-bb23-2335f099288e'],
+    };
+    const todoListNames: TodoListNameDTO[] = [
+      {
+        count: 3,
+        listId: "da2c63f8-b414-46fb-8ae9-c54c1e5c0f00",
+        fromDate: "2025-03-11T08:27:45.741982Z",
+        toDate: "2025-03-16T08:27:45.741990Z",
+        listName: "To-Do List for business"
+      },
+      {
+        count: 3,
+        listId: "2f9c96e1-51ab-47b5-aec9-30980eef61c0",
+        fromDate: "2025-03-11T08:27:45.750231Z",
+        toDate: "2025-03-16T08:27:45.750234Z",
+        listName: "To-Do List for homework"
+      }
+    ];
 
-    component.ngOnDestroy();
-    expect(mockSubscription.unsubscribe).toHaveBeenCalled();
+    reqListNames.flush(todoListNames);
+
+    // await new Promise(resolve => setTimeout(resolve, 500)); // 500 ms
+    expect(activatedComponent.todoListNames).toBe(todoListNames);
   });
 });
+
 ```
 
 **Explanation of the unit test**
 
-1. **Test Initialization:**
 
-  - `TestBed` is used to configure the testing environment.
-  - Mocks or spies are created for `TodoService` and `Router`.
+Here’s an explanation of your unit test:
 
-2. **Test Cases**:
+**Overview**
+The test suite verifies the behavior of the TodoListsComponent, an Angular component that manages to-do lists. It uses Jasmine as the testing framework and Angular's TestBed for setting up the test environment.
 
-  - **Component Creation**: Ensures the component is instantiated correctly.
-  - **Data Fetching**: Tests the `useOwnService` method for proper API calls and state updates.
-  - **Error Handling**: Verifies error handling logic by mocking an error response.
-  - **Navigation**: Confirms the `onEnterKeyDown` method navigates to the expected route.
-  - **Subscription Cleanup**: Checks that `ngOnDestroy` unsubscribes from active subscriptions.
+**Test Setup**
 
-3. **Mock Services**:
+- Mock Services: TodoListNameControllerService: Handles CRUD operations on to-do lists.
+- Router: Used for navigation.
 
-  - The `TodoService`'s `getListIDs` method is mocked to return observable values (of for success, `throwError` for failure).
-  - The Router's navigate method is mocked to track navigation calls.
+These services are replaced with Jasmine spies (jasmine.createSpyObj), allowing us to track method calls and return mock responses.
 
-#### Alternative Unit Tests for the TodoList component
+- Component Initialization: TestBed.configureTestingModule() is used to declare and provide dependencies.
+- createComponent(TodoListsComponent) initializes the component.
+
+**Test Cases**
+
+1. **Component Creation:**
+
+- Ensures the component initializes successfully.
+
+2. **Fetching To-Do List Names (ngOnInit):**
+
+- Mocks the getAllTodoListNames() method to return a sample list.
+- Calls ngOnInit() and verifies that todoListNames contains the expected data.
+
+3. **Adding a New To-Do List (onEnterKeyDownField):**
+
+  - Mocks the text field input.
+  - Mocks createTodoListName() to return a successful response.
+  - Calls onEnterKeyDownField() and verifies the service method was called.
+
+4. **Editing an Existing To-Do List (onEnterKeyDownField):**
+
+- Sets an editIndex to simulate editing.
+- Mocks updateTodoListName() with a response.
+- Calls onEnterKeyDownField() and verifies the update request was sent.
+
+5. **Navigating to a To-Do List (onEnterKeyDownList):**
+
+- Calls onEnterKeyDownList() and verifies Router.navigate() was triggered.
+
+6. **Deleting a To-Do List (onDelete):**
+
+- Mocks deleteTodoListName() with a response.
+- Calls onDelete() and verifies that the method was called with the correct ID.
+
+
+#### Alternative Unit Tests for the TodoLists component
 
 The code tests the `TodoListsComponent of an Angular application using the
 Angular TestBed and the HTTP testing utilities provided by Angular.
@@ -1609,19 +1965,15 @@ Create the file `todo-lists-httpmock.component.spec.ts` file and add the followi
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TodoListsComponent } from './todo-lists.component';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
-import {
-  provideHttpClient,
-  withInterceptorsFromDi,
-} from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import {
   ApiModule,
   BASE_PATH,
   TodoItemControllerService,
   TodoItemListsDTO,
+  TodoListName,
+  TodoListNameDTO
 } from '../openapi-gen';
 import { importProvidersFrom } from '@angular/core';
 import { environment } from '../../environments/environment';
@@ -1655,24 +2007,40 @@ describe('TodoListsComponent Test with http mock', () => {
   });
 
   it('should  display TodoListsComponent with 3 items', async () => {
-    const req = httpMock.expectOne(baseUrl + '/api/v1/listids');
+    const req = httpMock.expectOne(baseUrl + '/api/v1/todolist-names');
     expect(req.request.method).toEqual('GET');
     // Then we set the fake data to be returned by the mock
-    const todoList: TodoItemListsDTO = {
-      count: 3,
-      todoItemList: [
-        '083e8820-0186-4c68-af01-af2ced91805a',
-        '1da5ba97-4365-4560-bb23-2335f099288e',
-        '1da5ea4a-fa71-4192-a17d-35d8ae8167ef',
-      ],
-    };
+    const todoList: TodoListNameDTO[] = [
+      {
+        "count": 3,
+        "listId": "da2c63f8-b414-46fb-8ae9-c54c1e5c0f00",
+        "fromDate": "2025-03-11T08:27:45.741982Z",
+        "toDate": "2025-03-16T08:27:45.741990Z",
+        "listName": "To-Do List for business"
+      },
+      {
+        "count": 3,
+        "listId": "2f9c96e1-51ab-47b5-aec9-30980eef61c0",
+        "fromDate": "2025-03-11T08:27:45.750231Z",
+        "toDate": "2025-03-16T08:27:45.750234Z",
+        "listName": "To-Do List for homework"
+      },
+      {
+        "count": 3,
+        "listId": "2e45aace-3823-413e-a145-0cab9cc7a115",
+        "fromDate": "2025-03-11T08:27:45.753923Z",
+        "toDate": "2025-03-16T08:27:45.753927Z",
+        "listName": "To-Do List for private"
+      }
+    ]
+
     req.flush(todoList);
     // await new Promise(resolve => setTimeout(resolve, 500)); // 500 ms
-    console.log('TodoListComponent.todoLists.count', component.todoLists.count);
-    expect(component.todoLists.count).toBe(todoList.count);
-    expect(component.todoLists.todoItemList).toBe(todoList.todoItemList);
+    console.log('TodoListComponent.todoLists.count', component.todoListNames.length);
+
   });
 });
+
 ```
 
 We can run the test through:
@@ -1903,6 +2271,7 @@ We can run the test through:
 npm run test
 ```
 
+
 ## Create the TodoItems component
 
 We want to display a list with TodoItems.
@@ -1970,29 +2339,21 @@ Add to the `todo-items.component.scss` file the css rules:
 Add to the `todo-items.component.ts` file the typescript code:
 
 ```typescript
-import {
-  Component,
-  ElementRef,
-  OnInit,
-  ViewChild,
-  OnDestroy,
-} from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TodoItem, TodoItemControllerService } from '../openapi-gen';
 import { ActivatedRoute } from '@angular/router';
 import { parseIsoDateStrToDate } from '../shared/utils';
-import { NgFor, NgStyle } from '@angular/common';
+import {DatePipe, NgStyle} from '@angular/common';
 
 @Component({
   selector: 'app-todo-items',
   templateUrl: './todo-items.component.html',
   styleUrls: ['./todo-items.component.scss'],
-  imports: [NgFor, NgStyle],
+  imports: [NgStyle, DatePipe],
 })
 export class TodoItemsComponent implements OnInit, OnDestroy {
-  @ViewChild('taskNameTextField', { static: false }) taskNameTextField:
-    | ElementRef<HTMLInputElement>
-    | undefined;
+  @ViewChild('taskNameTextField', { static: false }) taskNameTextField: ElementRef<HTMLInputElement> | undefined;
   private routeSubscription: Subscription | undefined;
   private subscription: Subscription | undefined;
   listId = '';
@@ -2039,8 +2400,7 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
 
   onEdit(index: number) {
     if (this.taskNameTextField !== undefined) {
-      this.taskNameTextField.nativeElement.value =
-        this.todoItems[index].taskName;
+      this.taskNameTextField.nativeElement.value = this.todoItems[index].taskName;
       this.editIndex = index;
     }
   }
@@ -2055,21 +2415,17 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
   }
 
   refreshList(listId: string) {
-    this.subscription = this.todoItemControllerService
-      .getItem(listId)
-      .subscribe({
-        next: data => {
-          this.todoItems = data;
-          this.todoItems.forEach(
-            item => (item.createdAt = parseIsoDateStrToDate(item.createdAt))
-          );
-          if (this.taskNameTextField !== undefined) {
-            this.taskNameTextField.nativeElement.focus();
-            this.taskNameTextField.nativeElement.select();
-          }
-        },
-        error: err => console.log(err),
-      });
+    this.subscription = this.todoItemControllerService.getItemsOfOneList(listId).subscribe({
+      next: data => {
+        this.todoItems = data;
+        this.todoItems.forEach(item => (item.createdAt = parseIsoDateStrToDate(item.createdAt)));
+        if (this.taskNameTextField !== undefined) {
+          this.taskNameTextField.nativeElement.focus();
+          this.taskNameTextField.nativeElement.select();
+        }
+      },
+      error: err => console.log(err),
+    });
   }
 
   onEnterKeyDown() {
@@ -2078,12 +2434,10 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
       if (taskName.length > 0) {
         if (this.editIndex >= 0) {
           this.todoItems[this.editIndex].taskName = taskName;
-          this.todoItemControllerService
-            .editTodoItem(this.todoItems[this.editIndex])
-            .subscribe({
-              next: () => this.refreshList(this.listId),
-              error: err => console.log(err),
-            });
+          this.todoItemControllerService.editTodoItem(this.todoItems[this.editIndex]).subscribe({
+            next: () => this.refreshList(this.listId),
+            error: err => console.log(err),
+          });
 
           this.editIndex = -1;
         } else {
@@ -2102,6 +2456,7 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
     }
   }
 }
+
 ```
 
 **Explanation of Angular 19 TodoItemsComponent**
@@ -2195,49 +2550,53 @@ Add to the `todo-items.component.html` file the template code:
       <input
         type="text"
         id="taskNameTextField"
-        tabindex="1"
+        tabIndex="1"
         #taskNameTextField
         class="form-control"
         (keydown.enter)="onEnterKeyDown()"
-        placeholder="Input task name then tap Enter to add" />
+        placeholder="Input task name then tap Enter to add"/>
     </div>
   </div>
 </div>
 <section class="container legend">
-  <div class="row" *ngFor="let todoItem of todoItems; let i = index">
+  @for (todoItem of todoItems; track i; let i = $index) {
+  <div class="row">
     <div class="col-sm-9 py-1 my-1 clickable">
       <input
         [checked]="todoItem.done"
         (click)="onDone(todoItem.itemId)"
         class="form-check-input"
-        tabindex="{{ i * 3 + 2 }}"
-        type="checkbox" />
-      &nbsp;<span
-        [ngStyle]="{ 'text-decoration': todoItem.done ? 'line-through' : 'none' }">
-        {{ todoItem.taskName }}</span
-      >
+        tabIndex="{{ i * 3 + 2 }}"
+        type="checkbox"/>
+      &nbsp;
+      <span [ngStyle]="{ 'text-decoration': todoItem.done ? 'line-through' : 'none' }">
+          {{ todoItem.taskName }}
+        </span>
       <!-- eslint-disable -->
-      <span
-        (click)="onDelete(todoItem.itemId)"
-        (keydown)="onEdit(i)"
-        role="button"
-        tabIndex="{{ i * 3 + 4 }}"
-        class="cmd-buttons">
-        <i class="fa fa-trash"></i>
-      </span>
+      <span (click)="onDelete(todoItem.itemId)"
+            (keydown.enter)="onEdit(i)"
+            role="button"
+            tabIndex="{{ i * 3 + 4 }}"
+            class="cmd-buttons">
+          <i class="fa fa-trash"></i>
+        </span>
 
-      <span
-        (click)="onEdit(i)"
-        (keydown)="onEdit(i)"
-        role="button"
-        tabIndex="{{ i * 3 + 3 }}"
-        class="cmd-buttons">
-        <i class="fa fa-edit"></i>
-      </span>
+      <span (click)="onEdit(i)"
+            (keydown)="onEdit(i)"
+            role="button"
+            tabIndex="{{ i * 3 + 3 }}"
+            class="cmd-buttons">
+          <i class="fa fa-edit"></i>
+        </span>
       <!-- eslint-enable -->
+      <span class="cmd-buttons">
+          {{todoItem.createdAt | date: 'dd.MM.yyyy'}}
+        </span>
     </div>
   </div>
+  }
 </section>
+
 ```
 
 Instead of using `*ngFor`the new flow syntax with `@for` can be used:
@@ -2539,10 +2898,7 @@ Add to the `app.component.html` file the template code:
     <div [routerLink]="['/home']" class="navbar-brand">
       <img alt="todo-logo" src="/todo.svg" width="50px" /> Todo App
     </div>
-    <button
-      class="navbar-toggler"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbar">
+    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar">
       <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -2558,35 +2914,19 @@ Add to the `app.component.html` file the template code:
           <a class="nav-link" [routerLink]="['/temp']">Temp C</a>
         </li>
         <li class="nav-item">
-          <a
-            class="nav-link"
-            href="https://github.com/mbachmann/spring-boot-todo-app"
-            target="_blank"
-            >Github Backend</a
+          <a class="nav-link" href="https://github.com/mbachmann/spring-boot-todo-app" target="_blank"
+          >Github Backend</a
           >
         </li>
         <li class="nav-item">
-          <a
-            class="nav-link"
-            href="https://github.com/mbachmann/todo-angular-19-standalone.git"
-            target="_blank"
-            >Github Angular 19</a
+          <a class="nav-link" href="https://github.com/mbachmann/todo-angular-19-standalone.git" target="_blank"
+          >Github Angular 19</a
           >
         </li>
       </ul>
       <form class="form-inline ms-auto">
-        <button
-          class="btn btn-secondary"
-          type="button"
-          [routerLink]="['/signup']">
-          Signup
-        </button>
-        <button
-          class="btn btn-primary ms-1"
-          type="button"
-          [routerLink]="['/login']">
-          Login
-        </button>
+        <button class="btn btn-secondary" type="button" [routerLink]="['/signup']">Signup</button>
+        <button class="btn btn-primary ms-1" type="button" [routerLink]="['/login']">Login</button>
       </form>
     </div>
   </nav>
@@ -2596,8 +2936,7 @@ Add to the `app.component.html` file the template code:
   </main>
 
   <footer class="fixed-bottom px-3 mt-4 bg-light">
-    <section
-      class="container d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
+    <section class="container d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
       <!-- Left -->
       <div class="me-5 d-none d-lg-block">
         <span>Get connected with us on social networks:</span>
@@ -2606,28 +2945,16 @@ Add to the `app.component.html` file the template code:
 
       <!-- Right -->
       <div>
-        <a
-          href="https://www.youtube.com/channel/UCGLcphLMTcUNZRIRGUVu8rg"
-          target="_blank"
-          class="me-4 text-reset">
-          <i class="fa-brands  fa-youtube"></i>
+        <a href="https://www.youtube.com/channel/UCGLcphLMTcUNZRIRGUVu8rg" target="_blank" class="me-4 text-reset" tabindex=-1>
+          <i class="fa-brands fa-youtube"></i>
         </a>
-        <a
-          href="https://x.com/mbachmann4"
-          target="_blank"
-          class="me-4 text-reset">
+        <a href="https://x.com/mbachmann4" target="_blank" class="me-4 text-reset" tabindex=-1>
           <i class="fa-brands fa-x-twitter"></i>
         </a>
-        <a
-          href="https://www.linkedin.com/in/matthias-bachmann-b3809541/"
-          target="_blank"
-          class="me-4 text-reset">
-          <i class="fa-brands  fa-linkedin"></i>
+        <a href="https://www.linkedin.com/in/matthias-bachmann-b3809541/" target="_blank" class="me-4 text-reset" tabindex=-1>
+          <i class="fa-brands fa-linkedin"></i>
         </a>
-        <a
-          href="https://github.com/mbachmann"
-          target="_blank"
-          class="me-4 text-reset">
+        <a href="https://github.com/mbachmann" target="_blank" class="me-4 text-reset" tabindex=-1>
           <i class="fa-brands fa-github"></i>
         </a>
       </div>
@@ -2636,6 +2963,7 @@ Add to the `app.component.html` file the template code:
     <!-- Section: Social media -->
   </footer>
 </div>
+
 ```
 
 **Code Explanation**
@@ -2810,7 +3138,7 @@ Please replace the code below with the content of the `styles.scss` file:
 @use '@fortawesome/fontawesome-free/scss/fontawesome';
 
 body {
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.58;
   background: #6699ff;
   background: -webkit-linear-gradient(to left, #336699, #228899);
@@ -3318,7 +3646,17 @@ Copy the content to the file `todo.svg`.
           x="100.9" y="35.1"/></g></svg>
 ```
 
-### Create a Docker Container, Run and Publish to Docker
+## Improve the TodoListsComponent
+
+The TodoListsComponent is a list of todo items. 
+The user can add, rename, delete and update the lists.
+
+
+
+
+
+
+## Create a Docker Container, Run and Publish to Docker
 
 Create a distribution of the todo-angular app with
 
