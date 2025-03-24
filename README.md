@@ -25,6 +25,7 @@
 - [Run the App with a docker-compose.yml file](#run-the-app-with-a-docker-compose-file)
 - [Create a Dockerfile](#create-a-dockerfile)
 - [Create a docker-compose file](#create-a-docker-composeyml-file)
+- [Create a template driven form (Signup) Form](#create-a-template-driven-form-signup-form)
 
 ## Preview
 
@@ -2132,7 +2133,7 @@ export class AppComponent {}
 
 We can start the application and should see the following.
 
-![todo-list-display.png](readme/todo-list-display.png)
+![todo-lists.png](readme/todo-lists.png)
 
 #### Unit Test for the App component
 
@@ -2994,7 +2995,7 @@ The Angular directives (`[routerLink]`, `[routerLinkActive]`) enable routing to 
 3. **Main Content**: Placeholder for dynamic content controlled by Angular's router.
 4. **Footer**: Contains social media links and additional information.
 
-### Unit Test of AppComponent
+#### Unit Test of AppComponent
 
 This unit test file is for an Angular application and tests the behavior of the `AppComponent`.
 
@@ -3646,15 +3647,456 @@ Copy the content to the file `todo.svg`.
           x="100.9" y="35.1"/></g></svg>
 ```
 
-## Improve the TodoListsComponent
+## Create a template driven form (Signup) Form
 
-The TodoListsComponent is a list of todo items. 
-The user can add, rename, delete and update the lists.
+A sign-up form shall get created with the method of template driven forms.
+
+![signup-form.png](readme/signup-form.png)
+
+The form shall contain the following fields:
+
+- First Name
+- Last Name
+- Email
+- Password
+- Language
+
+In case of missing input or short password an error message shall get displayed:
+
+![signup-form-errors.png](readme/signup-form-errors.png)
+
+Before we start we create the component we need a new model file for signup.
+The file shall get created in the folder `src/app/models` with the name `signup.model.ts`:
+
+```typescript
+export class Signup {
+  constructor(public firstName: string = '',
+              public lastName: string = '',
+              public email: string = '',
+              public password: string = '',
+              public language: string = '') {
+  }
+}
+``` 
+
+### Signup Component class
+
+The Component gets created with the following command:
+
+```shell
+ng generate component signup
+```
+
+The typescript class has the following content:
+
+File: `signup.component.ts`
+```typescript
+import { Component, ViewChild } from '@angular/core';
+import { Signup } from '../model/signup';
+import { FormsModule, NgForm } from '@angular/forms';
+import { NgIf, NgFor, JsonPipe } from '@angular/common';
+
+@Component({
+  selector: 'app-signup',
+  templateUrl: './signup.component.html',
+  styleUrls: ['./signup.component.scss'],
+  imports: [FormsModule, NgIf, NgFor, JsonPipe],
+})
+export class SignupComponent {
+  model: Signup = new Signup();
+  @ViewChild('f', { static: true }) form!: NgForm;
+  langs: string[] = ['English', 'French', 'German'];
+  onSubmit(form: NgForm) {
+    if (form.valid) {
+      console.log('Form Submitted!');
+      form.reset();
+    }
+  }
+}
+
+```
+
+**Explanation of SignupComponent in Angular**
+
+**Overview**
+The `SignupComponent` is an Angular component responsible for handling user signups through a form. It utilizes Angular forms, built-in directives, and dependency injection to manage user input and form validation.
+-
+
+**Properties and Methods**
+
+- **`model: Signup = new Signup();`** - Creates an instance of the `Signup` model to bind form data.
+- **`@ViewChild('f', { static: true }) form!: NgForm;`** - Retrieves a reference to the form (`#f`) in the template.
+- **`langs`** - A list of selectable languages for the form.
+
+
+**Form Submission Method**
+
+- **`onSubmit(form: NgForm)`** - Handles form submission.
+- **`if (form.valid)`** - Ensures the form is valid before proceeding.
+- **`console.log("Form Submitted!")`** - Logs a message when the form is successfully submitted.
+- **`form.reset();`** - Resets the form after submission.
+
+
+**Conclusion**
+The `SignupComponent` demonstrates how to use template-driven forms in Angular, including form validation, event handling, and resetting forms after submission. This component is designed for simple user registration with language selection.
+
+### Signup HTML file
+
+The html file has the following content:
+
+File: `signup.component.html`
+```html
+<h4 class="component-title">Signup</h4>
+<div class="row">
+  <form novalidate
+        (ngSubmit)="onSubmit(f)"
+        #f="ngForm">
+
+    <fieldset ngModelGroup="name">
+      <div class="row form-group mt-3">
+        <div class="col-sm-3">
+          <label for="firstName" class="fs-6 col-form-label text-black-50">First Name</label>
+        </div>
+        <div class="col-sm-6">
+          <input type="text"
+                 id="firstName"
+                 autocomplete="on"
+                 class="form-control"
+                 name="firstName"
+                 [(ngModel)]="model.firstName"
+                 required
+                 #firstName="ngModel">
+          <div class="form-control-feedback text-danger "
+               *ngIf="firstName.errors && (firstName.dirty || firstName.touched)">
+            <p *ngIf="firstName.errors?.['required']"><small>First name is
+              required</small></p>
+          </div>
+        </div>
+      </div>
+      <div class="row form-group mt-2">
+        <div class="col-sm-3">
+          <label for="lastName" class="fs-6 col-form-label text-black-50">Last Name</label>
+        </div>
+        <div class="col-sm-6">
+          <input type="text"
+                 id="lastName"
+                 autocomplete="on"
+                 class="form-control"
+                 name="lastName"
+                 [(ngModel)]="model.lastName"
+                 required
+                 #lastName="ngModel">
+          <div class="form-control-feedback text-danger"
+               *ngIf="lastName.errors && (lastName.dirty || lastName.touched)">
+            <p *ngIf="lastName.errors?.['required']"><small>Last name is required</small></p>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+    <div class="row form-group mt-2">
+      <div class="col-sm-3">
+        <label for="email" class="fs-6 col-form-label text-black-50">Email</label>
+      </div>
+      <div class="col-sm-6">
+        <input type="email"
+               id="email"
+               autocomplete="on"
+               class="form-control"
+               name="email"
+               [(ngModel)]="model.email"
+               required
+               pattern="[^ @]*@[^ @]*"
+               #email="ngModel">
+        <div class="form-control-feedback text-danger"
+             *ngIf="email.errors && (email.dirty || email.touched)">
+          <p id="email-error-required" *ngIf="email.errors?.['required']"><small>Email is required</small></p>
+          <p id="email-error-at-least" *ngIf="email.errors?.['pattern']"><small>Email must contain at least the &#64;
+            character</small></p>
+        </div>
+      </div>
+
+    </div>
+    <div class="row form-group mt-2">
+      <div class="col-sm-3">
+        <label for="password" class="fs-6 col-form-label text-black-50">Password</label>
+      </div>
+      <div class="col-sm-6">
+        <input type="password"
+               id="password"
+               autocomplete="on"
+               class="form-control"
+               name="password"
+               [(ngModel)]="model.password"
+               required
+               minlength="8"
+               #password="ngModel">
+        <div class="form-control-feedback text-danger"
+             *ngIf="password.errors && (password.dirty || password.touched)">
+          <p id="password-error-required" *ngIf="password.errors?.['required']"><small>Password is required</small></p>
+          <p id="password-error-at-least" *ngIf="password.errors?.['minlength']"><small>Password must be at least 8
+            characters long</small></p>
+        </div>
+      </div>
+    </div>
+    <div class="row form-group mt-2">
+      <div class="col-sm-3">
+        <label for="language" class="fs-6 col-form-label text-black-50">Language</label>
+      </div>
+      <div class="col-sm-6">
+        <select class="form-control"
+                id="language"
+                name="language"
+                [(ngModel)]="model.language">
+          <option value="">Please select a language</option>
+          <option *ngFor="let lang of langs"
+                  [value]="lang">{{lang}}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="row form-group mt-4">
+      <div class="col-sm-3"><label></label></div>
+      <div class="col-sm-6">
+        <button type="submit"
+                class="btn btn-primary float-end"
+                [disabled]="f.invalid">Submit
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+<p>From Form</p>
+<div class="row mt-4">
+  <pre><small>{{f.value | json}}</small></pre>
+</div>
+
+<p>From Model</p>
+<div class="row mt-4">
+  <pre><small>{{model | json}}</small></pre>
+</div>
+```
+
+**Explanation of signup.component.html**
+
+**Overview**
+The `signup.component.html` file defines the structure of a user signup form in an Angular application. The form is implemented using Angular's **template-driven forms** approach with `ngModel` for two-way data binding. It includes input fields for user details and provides validation feedback.
+
+**Form Structure**
+- The form is enclosed in a `<form>` element with `novalidate` to disable default HTML5 validation.
+- The `(ngSubmit)` event is bound to the `onSubmit(f)` function, where `f` is a reference to the form using `#f="ngForm"`.
+
+**Fieldset for Name Group**
+The first section groups **First Name** and **Last Name** using `ngModelGroup="name"` to logically structure these fields.
+
+**First Name Input**
+- Uses `[(ngModel)]="model.firstName"` for two-way binding.
+- The `required` attribute ensures the field is mandatory.
+- Uses `#firstName="ngModel"` to track form control state.
+- Displays an error message when the field is touched or dirty and left empty.
+
+**Last Name Input**
+- Similar to the First Name field, with `[(ngModel)]="model.lastName"`.
+- Provides a validation message when required input is missing.
+
+**Email Field**
+- Uses `type="email"` and `[(ngModel)]="model.email"`.
+- `required` ensures the field must be filled.
+- `pattern="[^ @]*@[^ @]*"` enforces a valid email format.
+- Displays validation messages for missing or incorrectly formatted email input.
+
+**Password Field**
+- Uses `type="password"` and `[(ngModel)]="model.password"`.
+- `required` makes it mandatory.
+- `minlength="8"` ensures the password has at least 8 characters.
+- Displays error messages for missing input or insufficient length.
+
+**Language Selection Dropdown**
+- Uses a `<select>` element with `[(ngModel)]="model.language"`.
+- The `<option>` elements are dynamically generated using `*ngFor="let lang of langs"`.
+- Provides a default placeholder option.
+
+**Error Handling**
+The form provides real-time error handling and validation feedback using Angular's `ngModel` directives and form control properties.
+- **Dirty and Touched Validation**: Errors are only displayed when a field is either modified (`dirty`) or loses focus (`touched`).
+- **Validation Messages**:
+  - **First Name & Last Name**: Display "First name is required" or "Last name is required" if the fields are empty.
+  - **Email**: Shows "Email is required" if left blank and "Email must contain at least the @ character" if invalid.
+  - **Password**: Displays "Password is required" if empty and "Password must be at least 8 characters long" if too short.
+- **Error Styling**: Error messages are wrapped in `<div class="form-control-feedback text-danger">` for visibility.
+
+**Submit Button**
+- A `<button>` of type `submit`.
+- The `[disabled]="f.invalid"` binding disables submission when form validation fails.
+
+**Displaying Form Data**
+- Two `<pre>` elements display the current form data using `{{ f.value | json }}` and `{{ model | json }}`.
+- `f.value` represents the actual form values, while `model` represents the bound model.
+
+This setup ensures a user-friendly signup experience with real-time validation feedback and structured data handling.
+
+### Add the route
+
+Add the following code to the file app.routes.ts:
+
+```typescript
+{
+  path: 'signup',
+    component: SignupComponent,
+},
+```
 
 
 
+### Signup Unit Test
+
+The unit test for the signup component shall get created with the following content:
+
+File: `signup.component.spec.ts`
+```typescript
+import {ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
+
+import {SignupComponent} from './signup.component';
+import {FormsModule} from "@angular/forms";
+import {DebugElement, importProvidersFrom} from "@angular/core";
+import {By} from "@angular/platform-browser";
+
+describe('SignupComponent', () => {
+  let component: SignupComponent;
+  let fixture: ComponentFixture<SignupComponent>;
+
+  let submitButton: DebugElement;
+  let firstNameInput: DebugElement;
+  let lastNameInput: DebugElement;
+  let emailInput: DebugElement;
+  let passwordInput: DebugElement;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [SignupComponent],
+      providers: [importProvidersFrom(FormsModule),]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(SignupComponent);
+    component = fixture.componentInstance;
+    // fixture.detectChanges();
+
+    submitButton = fixture.debugElement.query(By.css('button[type="submit"]'));
+    firstNameInput = fixture.debugElement.query(By.css('input[name="firstName"]'));
+    lastNameInput = fixture.debugElement.query(By.css('input[name="lastName"]'));
+    emailInput = fixture.debugElement.query(By.css('input[name="email"]'));
+    passwordInput = fixture.debugElement.query(By.css('input[name="password"]'));
+  });
 
 
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should have an initial empty model', () => {
+    fixture.detectChanges();
+    expect(component.model).toBeDefined();
+  });
+
+  it('should enable submit button when form is valid', () => {
+    firstNameInput.nativeElement.value = 'John';
+    lastNameInput.nativeElement.value = 'Doe';
+    emailInput.nativeElement.value = 'john@example.com';
+    passwordInput.nativeElement.value = 'password123';
+    fixture.detectChanges();
+    expect(submitButton.nativeElement.disabled).toBeFalse();
+  });
+
+  it('should reset form after submission', fakeAsync(() => {
+    spyOn(component.form, 'reset');
+    component.model.firstName = 'John';
+    component.model.lastName = 'Doe';
+    component.model.email = 'john@example.com';
+    component.model.password = 'password123';
+    fixture.detectChanges()
+    tick(1);
+    component.onSubmit(component.form);
+    tick(1);
+    fixture.detectChanges()
+
+    expect(component.form.reset).toHaveBeenCalled();
+  }));
+
+  it('should display correct JSON output', fakeAsync(() => {
+    component.model.firstName = 'John';
+    component.model.lastName = 'Doe';
+    component.model.email = 'john@example.com';
+    component.model.password = 'password123';
+    component.model.language = 'English';
+    fixture.detectChanges();
+    tick(1);
+    fixture.detectChanges();
+    tick(1);
+    const jsonOutput = fixture.debugElement.query(By.css('pre small'));
+    const displayedJson = JSON.parse(jsonOutput.nativeElement.textContent);
+
+    expect(displayedJson).toEqual({
+      name: { firstName: 'John', lastName: 'Doe' },
+      email: 'john@example.com',
+      password: 'password123',
+      language: 'English'
+    });
+  }));
+
+  it('should display error message when first name is empty', fakeAsync(() => {
+    triggerValidation(firstNameInput, '');
+    const errorMsg = fixture.debugElement.query(By.css('.form-group:first-child .form-control-feedback'));
+    expect(errorMsg.nativeElement.textContent).toContain('First name is required');
+  }));
+
+  it('should display error message when last name is empty', fakeAsync(() => {
+    triggerValidation(lastNameInput, '');
+    const errorMsg = fixture.debugElement.query(By.css('.form-group:nth-child(2) .form-control-feedback'));
+    expect(errorMsg.nativeElement.textContent).toContain('Last name is required');
+  }));
+
+  it('should display error message when email is invalid', fakeAsync(() => {
+    triggerValidation(emailInput, 'invalidemail');
+    const errorMsg = fixture.debugElement.query(By.css('#email-error-at-least'));
+    expect(errorMsg.nativeElement.textContent).toContain('Email must contain at least the @ character');
+  }));
+
+  it('should display error message when email is empty', fakeAsync(() => {
+    triggerValidation(emailInput, '');
+    const errorMsg = fixture.debugElement.query(By.css('#email-error-required'));
+    expect(errorMsg.nativeElement.textContent).toContain('Email is required');
+  }));
+
+  it('should display error message when password is to short', fakeAsync(() => {
+    triggerValidation(passwordInput, 'werwe');
+    const errorMsg = fixture.debugElement.query(By.css('#password-error-at-least'));
+    expect(errorMsg.nativeElement.textContent).toContain('Password must be at least 8 characters long');
+  }));
+
+  it('should display error message when password is empty', fakeAsync(() => {
+    triggerValidation(passwordInput, '');
+    const errorMsg = fixture.debugElement.query(By.css('#password-error-required'));
+    expect(errorMsg.nativeElement.textContent).toContain('Password is required');
+  }));
+
+  function triggerValidation(input: DebugElement, value: string) {
+
+    input.nativeElement.dispatchEvent(new Event('focus'));
+    tick(1);
+    fixture.detectChanges();
+    tick(1);
+    input.nativeElement.value = value;
+    tick(1);
+    input.nativeElement.dispatchEvent(new Event('input'));
+    tick(1);
+    fixture.detectChanges();
+    input.nativeElement.dispatchEvent(new Event('blur'));
+    tick(1);
+    fixture.detectChanges();
+  }
+
+
+});
+```
 
 ## Create a Docker Container, Run and Publish to Docker
 

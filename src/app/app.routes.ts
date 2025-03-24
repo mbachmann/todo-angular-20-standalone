@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { TodoListsComponent } from './todo-lists/todo-lists.component';
 import { TodoItemsComponent } from './todo-items/todo-items.component';
 import { MyFirstComponent } from './my-first/my-first.component';
+import { SignupComponent } from './signup/signup.component';
 
 export const routes: Routes = [
   {
@@ -20,5 +21,9 @@ export const routes: Routes = [
   {
     path: 'myfirst',
     component: MyFirstComponent,
+  },
+  {
+    path: 'signup',
+    component: SignupComponent,
   },
 ];
