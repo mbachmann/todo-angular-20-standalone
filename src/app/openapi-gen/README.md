@@ -196,7 +196,7 @@ import { environment } from '../environments/environment';
     AppComponent
   ],
   imports: [ ],
-  providers: [{ provide: BASE_PATH, useValue: environment.API_BASE_PATH }],
+  providers: [{ provide: BASE_PATH, useValue: environment._API_BASE_PATH_ }],
   bootstrap: [ AppComponent ]
 })
 export class AppModule { }

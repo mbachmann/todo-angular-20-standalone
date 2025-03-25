@@ -54,7 +54,7 @@ describe('TodoItemControllerService', () => {
         importProvidersFrom(ApiModule),
         {
           provide: BASE_PATH,
-          useValue: environment.API_BASE_PATH,
+          useValue: environment._API_BASE_PATH_,
         },
       ],
     });

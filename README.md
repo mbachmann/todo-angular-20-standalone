@@ -443,7 +443,7 @@ Add the url to the backend to the files `enviroments/enviroment.ts` and `envirom
 ```typescript
 export const environment = {
   production: true,
-  API_BASE_PATH: 'https://todo-h2.united-portal.com',
+  _API_BASE_PATH_: 'https://todo-h2.united-portal.com',
 };
 ```
 
@@ -452,7 +452,7 @@ export const environment = {
 ```typescript
 export const environment = {
   production: false,
-  API_BASE_PATH: 'https://todo-h2.united-portal.com',
+  _API_BASE_PATH_: 'https://todo-h2.united-portal.com',
 };
 ```
 
@@ -483,7 +483,7 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(ApiModule),
     {
       provide: BASE_PATH,
-      useValue: environment.API_BASE_PATH,
+      useValue: environment._API_BASE_PATH_,
     },
     provideHttpClient(withInterceptorsFromDi()),
   ],
@@ -1208,7 +1208,7 @@ import { TodoItemListsDTO } from '../openapi-gen';
 export class TodoService {
   private baseUrl: string;
   constructor(private http: HttpClient) {
-    this.baseUrl = environment.API_BASE_PATH;
+    this.baseUrl = environment._API_BASE_PATH_;
   }
 
   getListIDs(): Observable<TodoItemListsDTO> {
@@ -1257,7 +1257,7 @@ describe('TodoService with real Backend', () => {
         importProvidersFrom(ApiModule),
         {
           provide: BASE_PATH,
-          useValue: environment.API_BASE_PATH,
+          useValue: environment._API_BASE_PATH_,
         },
       ],
     });
@@ -1372,7 +1372,7 @@ describe('TodoService with Mock', () => {
         importProvidersFrom(ApiModule),
         {
           provide: BASE_PATH,
-          useValue: environment.API_BASE_PATH,
+          useValue: environment._API_BASE_PATH_,
         },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
@@ -1381,7 +1381,7 @@ describe('TodoService with Mock', () => {
     ownTodoService = TestBed.inject(TodoService);
     openApiTodoService = TestBed.inject(TodoItemControllerService);
     httpMock = TestBed.inject(HttpTestingController);
-    baseUrl = environment.API_BASE_PATH;
+    baseUrl = environment._API_BASE_PATH_;
   });
 
   afterEach(() => {
@@ -1858,13 +1858,13 @@ describe('AppComponent', () => {
         importProvidersFrom(ApiModule),
         {
           provide: BASE_PATH,
-          useValue: environment.API_BASE_PATH,
+          useValue: environment._API_BASE_PATH_,
         },
         provideHttpClientTesting(),
       ],
     }).compileComponents();
     httpMock = TestBed.inject(HttpTestingController);
-    baseUrl = environment.API_BASE_PATH;
+    baseUrl = environment._API_BASE_PATH_;
   });
 
   afterEach(() => {
@@ -2017,12 +2017,12 @@ describe('TodoListsComponent Test with http mock', () => {
         TodoItemControllerService,
         provideHttpClient(withInterceptorsFromDi()),
         importProvidersFrom(ApiModule),
-        { provide: BASE_PATH, useValue: environment.API_BASE_PATH },
+        { provide: BASE_PATH, useValue: environment._API_BASE_PATH_ },
         provideHttpClientTesting(),
       ],
     }).compileComponents();
     httpMock = TestBed.inject(HttpTestingController);
-    baseUrl = environment.API_BASE_PATH;
+    baseUrl = environment._API_BASE_PATH_;
     fixture = TestBed.createComponent(TodoListsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -2087,7 +2087,7 @@ The fake `TodoList` contains 3 todoItems with a count of 3.
 
     - `TodoListsComponent` as the component under test.
     - The `TodoItemControllerService` and `ApiModule` for handling HTTP-related operations.
-    - `BASE_PATH` configured with the `API_BASE_PATH` from the environment file.
+    - `BASE_PATH` configured with the `_API_BASE_PATH_` from the environment file.
     - HTTP testing utilities to mock requests and responses.
 
   - After configuring the module, `HttpTestingController` is injected to control and verify HTTP requests during tests.
@@ -2209,13 +2209,13 @@ describe('AppComponent', () => {
         importProvidersFrom(ApiModule),
         {
           provide: BASE_PATH,
-          useValue: environment.API_BASE_PATH,
+          useValue: environment._API_BASE_PATH_,
         },
         provideHttpClientTesting(),
       ],
     }).compileComponents();
     httpMock = TestBed.inject(HttpTestingController);
-    baseUrl = environment.API_BASE_PATH;
+    baseUrl = environment._API_BASE_PATH_;
   });
 
   afterEach(() => {
@@ -3071,13 +3071,13 @@ describe('AppComponent', () => {
         importProvidersFrom(ApiModule),
         {
           provide: BASE_PATH,
-          useValue: environment.API_BASE_PATH,
+          useValue: environment._API_BASE_PATH_,
         },
         provideHttpClientTesting(),
       ],
     }).compileComponents();
     httpMock = TestBed.inject(HttpTestingController);
-    baseUrl = environment.API_BASE_PATH;
+    baseUrl = environment._API_BASE_PATH_;
   });
 
   afterEach(() => {

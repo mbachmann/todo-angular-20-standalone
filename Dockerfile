@@ -46,4 +46,4 @@ EXPOSE 80
 ## Inject environment variables into the project
 
 ## CMD /usr/share/nginx/start.sh
-CMD ["sh", "/usr/share/nginx/start.sh"]
+# CMD ["sh", "/usr/share/nginx/start.sh"]

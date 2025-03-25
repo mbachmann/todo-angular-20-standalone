@@ -20,12 +20,12 @@ describe('TodoListsComponent Test with http mock', () => {
         TodoItemControllerService,
         provideHttpClient(withInterceptorsFromDi()),
         importProvidersFrom(ApiModule),
-        { provide: BASE_PATH, useValue: environment.API_BASE_PATH },
+        { provide: BASE_PATH, useValue: environment._API_BASE_PATH_ },
         provideHttpClientTesting(),
       ],
     }).compileComponents();
     httpMock = TestBed.inject(HttpTestingController);
-    baseUrl = environment.API_BASE_PATH;
+    baseUrl = environment._API_BASE_PATH_;
     fixture = TestBed.createComponent(TodoListsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

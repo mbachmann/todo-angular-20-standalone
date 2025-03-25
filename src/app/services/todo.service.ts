@@ -10,7 +10,7 @@ import { TodoItemListsDTO } from '../openapi-gen';
 export class TodoService {
   private baseUrl: string;
   constructor(private http: HttpClient) {
-    this.baseUrl = environment.API_BASE_PATH;
+    this.baseUrl = environment._API_BASE_PATH_;
   }
 
   getListIDs(): Observable<TodoItemListsDTO> {
