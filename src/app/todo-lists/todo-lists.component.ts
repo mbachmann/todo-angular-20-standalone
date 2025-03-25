@@ -12,12 +12,13 @@ import { DatePipe } from '@angular/common';
 import { ClickStopPropagationDirective } from '../shared/directive/click-stop-propagation.directive';
 import { KeydownStopPropagationDirective } from '../shared/directive/keydown-stop-propagation.directive';
 import { getUUID } from '../shared/utils';
+import { TooltipDirective } from '../shared/directive/tooltip.directive';
 
 @Component({
   selector: 'app-todo-lists',
   templateUrl: './todo-lists.component.html',
   styleUrls: ['./todo-lists.component.scss'],
-  imports: [RouterLink, DatePipe, ClickStopPropagationDirective, KeydownStopPropagationDirective],
+  imports: [RouterLink, DatePipe, ClickStopPropagationDirective, KeydownStopPropagationDirective, TooltipDirective],
 })
 export class TodoListsComponent implements OnInit, OnDestroy {
   @ViewChild('listNameTextField', { static: false }) listNameTextField: ElementRef<HTMLInputElement> | undefined;

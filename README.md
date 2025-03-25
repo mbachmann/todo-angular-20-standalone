@@ -4501,7 +4501,265 @@ This unit test file (`login.component.spec.ts`) ensures that the `LoginComponent
 
 ---
 
+## Create a Driective for a Tool Tip
 
+
+Add the following styles to the global styles in styles.scss:
+
+File styles.scss
+
+```css
+.tooltip-container {
+  text-align: center;
+  z-index: 100;
+  position: fixed;
+  padding: 6px 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: initial;
+  color: white;
+  width: auto;
+  background: #111111ee;
+  box-sizing: border-box;
+  opacity: 0;
+  transform: translate(-50%, -30%);
+  animation: tooltip-slide 0.18s ease-out 0.5s;
+  animation-fill-mode: forwards;
+  pointer-events: none;
+}
+@keyframes tooltip-slide {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -30%);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+```
+
+Create the directive with the help of the cli:
+
+```shell
+ng generate directive shared/directive/tooltip
+```
+
+File tooltip.directice.ts
+
+```typescript
+import { Directive, ElementRef, HostListener, Input, OnDestroy } from '@angular/core';
+
+@Directive({
+  selector: '[appTooltip]',
+  // inputs: ['tooltip', 'delay'],
+})
+export class TooltipDirective implements OnDestroy {
+  @Input() appTooltip = ''; // The text for the tooltip to display
+  @Input() appTooltipDelay: string = '190'; // Optional delay input, in ms
+  private myPopup: any;
+  private timer: any;
+  constructor(private el: ElementRef) {}
+  ngOnDestroy(): void {
+    if (this.myPopup) {
+      this.myPopup.remove();
+    }
+  }
+  @HostListener('mouseenter', ['$event']) onMouseEnter(event: MouseEvent) {
+    this.timer = setTimeout(() => {
+      const x = this.el.nativeElement.getBoundingClientRect().left + this.el.nativeElement.offsetWidth / 2; // Get the middle of the element
+      // x = event.clientX; In case position should be under the mouse
+      console.log('mouse pos', event.clientX, event.clientY);
+      const y = this.el.nativeElement.getBoundingClientRect().top + this.el.nativeElement.offsetHeight + 6; // Get the bottom of the element, plus a little extra
+      this.createTooltipPopup(x, y);
+    }, Number.parseInt(this.appTooltipDelay) );
+  }
+  @HostListener('mouseleave') onMouseLeave() {
+    if (this.timer) clearTimeout(this.timer);
+    if (this.myPopup) {
+      this.myPopup.remove();
+    }
+  }
+  private createTooltipPopup(x: number, y: number) {
+    const popup = document.createElement('div');
+    popup.innerHTML = this.appTooltip;
+    popup.setAttribute('class', 'tooltip-container');
+    popup.style.top = y.toString() + 'px';
+    popup.style.left = x.toString() + 'px';
+    document.body.appendChild(popup);
+    this.myPopup = popup;
+    setTimeout(() => {
+      if (this.myPopup) this.myPopup.remove();
+    }, 5000); // Remove tooltip after 5 seconds
+  }
+}
+
+```
+
+The tooltip will appear in the middle of the Host element. 
+If the tooltip should appear at a different position, you can compute the x and y coordinates differently.
+
+**Explanation of Angular `TooltipDirective`**
+
+**Overview**
+The `TooltipDirective` is a custom Angular directive that adds tooltip functionality to elements. When a user hovers over an element with this directive, a tooltip appears, displaying the provided text. The tooltip disappears when the mouse leaves the element.
+
+**Directive Definition (`@Directive`)**
+- The directive is decorated with `@Directive`, using the selector `[tooltip]`.
+- The `inputs` array allows `tooltip` (text to display) and `delay` (time before tooltip appears) to be set via attribute bindings.
+
+**Class Properties and Constructor**
+- **`appTooltip` (`@Input`)**: Holds the tooltip text.
+- **`appTooltipDelay` (`@Input`)**: An optional delay (default: `190ms`) before the tooltip appears.
+- **`myPopup`**: Stores the tooltip element created in the DOM.
+- **`timer`**: Manages the delay before showing the tooltip.
+- **`constructor(private el: ElementRef)`**: Injects `ElementRef` to access the host element.
+
+**Lifecycle Hook (`ngOnDestroy`)**
+- If the directive is destroyed (e.g., the element is removed), the tooltip is also removed to prevent memory leaks.
+
+**Event Listeners (`@HostListener`)**
+1. **`onMouseEnter(event: MouseEvent)`**
+  - When the mouse enters the element, a timeout (`setTimeout`) is set using `delay`.
+  - The tooltip position is calculated based on the element's position.
+  - `createTooltipPopup(x, y)` is called to display the tooltip.
+
+2. **`onMouseLeave()`**
+  - If the user moves the mouse away, the tooltip is removed immediately.
+  - Any pending timeout is cleared to prevent the tooltip from showing after the mouse has left.
+
+3. **Tooltip Creation (`createTooltipPopup`)**
+- A `div` is dynamically created and styled as a tooltip container.
+- It is positioned based on the element’s dimensions.
+- The tooltip is appended to `document.body`.
+- It is removed automatically after `5 seconds` if not dismissed earlier.
+
+**Conclusion**
+
+This directive efficiently adds tooltips to elements without requiring external libraries. It ensures proper lifecycle management and prevents unnecessary DOM elements from lingering.
+
+For using the directive add the directive tooltip and delay to the HTML template.
+
+```typescript
+[appTooltip]="'This is a Todo List'" appTooltipDelay="200"
+```
+
+To ensure the `tooltip` in  _todo-lists_ is visible, we need to add it to the file `todo-lists.component.html`.
+
+File `todo-lists.component.html`
+```html
+<div class="row">
+  <div
+    class="col-sm-9 py-1 my-1 clickable"
+    [routerLink]="['/todoitem/', row.listId]"
+    [appTooltip]="'This is a Todo List'"
+    appTooltipDelay="200"
+  >
+
+  ...
+  ...
+  </div>  
+</div>
+```
+
+Add the import to the file todo-lists.component.ts`:
+
+```typescript
+  imports: [RouterLink, DatePipe, ClickStopPropagationDirective, KeydownStopPropagationDirective, TooltipDirective],
+```
+
+### Unit Test the Tooltip Directive
+
+File: `tooltip.directive.spec.ts`
+```typescript
+import { TooltipDirective } from './tooltip.directive';
+import { Component, DebugElement } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+
+@Component({
+  imports: [TooltipDirective],
+  template: ` <button id="test-button" [appTooltip]="'test'">test</button> `,
+})
+class TestTooltipDirectiveComponent {}
+
+describe('TooltipDirective', () => {
+  // let component: TestTooltipDirectiveComponent;
+  let fixture: ComponentFixture<TestTooltipDirectiveComponent>;
+  let des: DebugElement[];
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [TooltipDirective, TestTooltipDirectiveComponent],
+      providers: [],
+    }).compileComponents();
+  });
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TestTooltipDirectiveComponent);
+    // component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    // all elements with an attached TooltipDirective
+    des = fixture.debugElement.queryAll(By.directive(TooltipDirective));
+  });
+
+  it('should one tooltip element', () => {
+    expect(des.length).toBe(1);
+  });
+
+  // attached TooltipDirective should be listed in the button
+  it('should have `TooltipDirective` in 1st <button> providerTokens', () => {
+    expect(des[0].providerTokens).toContain(TooltipDirective);
+  });
+
+  // attached TooltipDirective can be injected
+  it('can inject `TooltipDirective` in 1st <button>', () => {
+    const dir = des[0].injector.get(TooltipDirective);
+    expect(dir).toBeTruthy();
+  });
+});
+
+```
+
+**Explanation of Angular Test Code for TooltipDirective**
+
+**Overview**
+This Angular test file is designed to test a custom directive, `TooltipDirective`, which is applied to a button element. The test suite verifies that the directive is correctly attached and can be injected into components.
+
+**Test Component (`TestTooltipDirectiveComponent`)**
+- A test component is created using the `@Component` decorator.
+- The `TooltipDirective` is imported and applied to a `<button>` element inside the component’s template.
+- The button has an attribute `[tooltip]="'test'"`, which binds the tooltip text to `"test"`.
+
+**Setup (`beforeEach`)**
+- The `TestBed.configureTestingModule` is used to set up the testing module.
+- The `TooltipDirective` and `TestTooltipDirectiveComponent` are included in the `imports` array.
+- `compileComponents()` ensures that the component and directive are compiled before testing.
+- The test component is created, and `fixture.detectChanges()` is called to initialize the view.
+- `des` is assigned all elements in the test component that use the `TooltipDirective`.
+
+**Test Cases**
+
+1. **Checking if the TooltipDirective is Applied**
+  - The test verifies that only one element (the `<button>`) has the `TooltipDirective` applied by checking the length of `des`.
+
+2. **Ensuring the Directive is Listed in the Button’s Provider Tokens**
+  - This test checks if the `TooltipDirective` is included in the provider tokens of the `<button>` element.
+  - `des[0].providerTokens` is used to confirm the directive is present.
+
+3. **Verifying that the TooltipDirective can be Injected**
+  - This test ensures that the `TooltipDirective` can be retrieved from the element’s injector.
+  - `des[0].injector.get(TooltipDirective)` is used to get an instance of the directive.
+  - The test expects the retrieved directive instance to be truthy, confirming successful injection.
+
+**Conclusion**
+
+This test file verifies that the `TooltipDirective` is correctly applied, 
+registered in the button’s providers, and can be injected when needed. 
+It ensures that the directive functions as expected within an Angular application.
+
+---
 
 ## Create a Docker Container, Run and Publish to Docker
 
