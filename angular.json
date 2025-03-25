@@ -40,12 +40,20 @@
             ]
           },
           "configurations": {
+            "optimization": {
+              "scripts": true,
+              "styles": {
+                "minify": true,
+                "inlineCritical": false
+              },
+              "fonts": true
+            },
             "production": {
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "1024kB",
+                  "maximumError": "2MB"
                 },
                 {
                   "type": "anyComponentStyle",

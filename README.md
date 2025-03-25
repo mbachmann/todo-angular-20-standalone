@@ -28,6 +28,7 @@
 - [Create a docker-compose file](#create-a-docker-composeyml-file)
 - [Create a template driven form (Signup) Form](#create-a-template-driven-form-signup-form)
 - [Create a reactive (Login) Form](#create-a-reactive-login-form)
+- [Create a directive for a Tooltip](#create-a-directive-for-a-tool-tip)
 
 ## Preview
 
@@ -4501,7 +4502,7 @@ This unit test file (`login.component.spec.ts`) ensures that the `LoginComponent
 
 ---
 
-## Create a Driective for a Tool Tip
+## Create a Directive for a Tool Tip
 
 
 Add the following styles to the global styles in styles.scss:
