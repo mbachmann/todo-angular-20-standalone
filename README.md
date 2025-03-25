@@ -12,6 +12,7 @@
 - [Install Bootstrap](#install-bootstrap)
 - [Install FontAwesome](#install-fontawesome)
 - [Create a utils file](#create-a-utils-file)
+- [Create stop propagation directives](#create-stop-propagation-directives)
 - [Create the myFirst component](#create-the-myfirst-component)
 - [Create an own Service](#create-an-own-service)
 - [Create the TodoLists component](#create-the-todolists-component)
@@ -26,6 +27,7 @@
 - [Create a Dockerfile](#create-a-dockerfile)
 - [Create a docker-compose file](#create-a-docker-composeyml-file)
 - [Create a template driven form (Signup) Form](#create-a-template-driven-form-signup-form)
+- [Create a reactive (Login) Form](#create-a-reactive-login-form)
 
 ## Preview
 
@@ -59,6 +61,8 @@ Global package:
     npm install -g @angular/cli@latest
 ```
 
+---
+
 ## Create a new project
 
 Create new project with angular-cli:
@@ -86,6 +90,8 @@ ng new todo-angular
 (y/N) N
 ```
 
+---
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
@@ -105,6 +111,8 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+
+---
 
 ## Prepare Intellij for Karma Debugging
 
@@ -127,6 +135,8 @@ Add a Karma configuration:
 Edit the Configuration:
 
 ![karma-configuration.png](readme/karma-configuration.png)
+
+---
 
 ## Install EsLint with Prettier
 
@@ -348,6 +358,8 @@ npm run lint:check
 npm run lint:fix
 ```
 
+---
+
 ## Install the OpenApi Tools
 
 ```sh
@@ -379,6 +391,8 @@ Create a file `openapitools.json` in the root of the project and adjust the vers
   }
 }
 ```
+
+---
 
 ## Generate the Model and the Backend API
 
@@ -530,6 +544,8 @@ Please add below code into `styles.scss` file:
 @use '@fortawesome/fontawesome-free/scss/fontawesome';
 ```
 
+---
+
 ## Create a utils file
 
 Create a folder `src/app/shared`. In this folder create a file `utils.ts`.This file contains a data reviver function,
@@ -574,6 +590,9 @@ export function getUUID() {
   return result;
 }
 ```
+---
+
+## Create stop propagation directives
 
 Create a folder `src/app/shared/directive`. In this folder create the files 
 
@@ -620,6 +639,7 @@ export class KeydownStopPropagationDirective
 
 The directives will be used later for the `TodoListsComponent`.
 
+---
 
 ## Create the MyFirst component
 
@@ -1164,6 +1184,8 @@ We can run the project and see the following result:
 
 The `MyFirstComponent` appears six times. Three times in one row. A click on a _Send Title_ button updates the green box with the related title.
 
+---
+
 ## Create an own Service
 
 ```sh
@@ -1413,6 +1435,8 @@ We can run the test through:
 ```shell
 npm run test
 ```
+
+---
 
 ## Create the TodoLists component
 
@@ -2272,6 +2296,7 @@ We can run the test through:
 npm run test
 ```
 
+---
 
 ## Create the TodoItems component
 
@@ -2826,6 +2851,8 @@ export const routes: Routes = [
 ];
 ```
 
+---
+
 ## Redefine the AppComponent
 
 Add to the `app.component.scss` file the rules:
@@ -3128,6 +3155,8 @@ describe('AppComponent', () => {
 
 - `afterEach`
   - `httpMock.verify()`: Ensures all mocked HTTP requests have been handled to avoid unverified requests.
+
+---
 
 ## Add global styles
 
@@ -3647,6 +3676,8 @@ Copy the content to the file `todo.svg`.
           x="100.9" y="35.1"/></g></svg>
 ```
 
+---
+
 ## Create a template driven form (Signup) Form
 
 A sign-up form shall get created with the method of template driven forms.
@@ -4097,6 +4128,380 @@ describe('SignupComponent', () => {
 
 });
 ```
+
+---
+
+## Create a reactive (Login) Form
+
+A login form shall get created with the method of reactive forms.
+
+![login-form.png](readme/login-form.png)
+
+The form shall contain the following fields:
+
+- Email
+- Password
+
+In case of missing input or short password an error message shall get displayed:
+
+![login-form-errors.png](readme/login-form-errors.png)
+
+The Component gets created with the following command:
+
+```shell
+ng generate component login
+```
+
+The typescript class `login.component.ts` has the following content:
+
+File: `login.component.ts`
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgClass, NgIf } from '@angular/common';
+
+@Component({
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss'],
+  imports: [FormsModule, ReactiveFormsModule, NgClass, NgIf],
+})
+export class LoginComponent implements OnInit {
+  loginForm!: FormGroup;
+  submitted = false;
+
+  constructor(private formBuilder: FormBuilder) {}
+
+  get f() {
+    return this.loginForm.controls;
+  }
+
+  onSubmit() {
+    this.submitted = true;
+    if (this.loginForm.invalid) {
+      return;
+    }
+    if (this.submitted) {
+      alert('Great!! ' + this.loginForm.controls['email'].value);
+    }
+  }
+  ngOnInit() {
+    this.loginForm = this.formBuilder.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]],
+    });
+  }
+}
+```
+
+Here’s your code explanation in Markdown format:
+
+---
+
+**Angular Login Component Explanation**
+
+**Overview**
+The `LoginComponent` is an Angular component responsible for handling user login functionality. It utilizes Angular's reactive forms to validate user inputs and provide a structured form submission process.
+
+
+**Class Properties**
+- **`loginForm!: FormGroup;`** – Stores the form instance using Angular's reactive form approach.
+- **`submitted = false;`** – Tracks whether the form has been submitted.
+
+**Constructor**
+- **`constructor(private formBuilder: FormBuilder) {}`**
+  - Uses Angular's `FormBuilder` service to initialize the form structure.
+
+**Getter Method**
+- **`get f() { return this.loginForm.controls; }`**
+  - Provides easy access to form controls for validation in the template.
+
+**`ngOnInit` Lifecycle Hook**
+
+- **`ngOnInit()`**
+  - Initializes the `loginForm` object using `formBuilder.group()`.
+  - Defines two form fields:
+    - **`email`**: Required and must be a valid email format.
+    - **`password`**: Required.
+
+**`onSubmit` Method**
+
+- **`onSubmit()`**
+  - Sets `submitted` to `true`.
+  - If the form is invalid, it prevents submission.
+  - If valid, it displays an alert with the entered email.
+
+**Functionality Summary**
+1. The form includes email and password fields with validation rules.
+2. When submitted, the form checks for validation errors.
+3. If valid, an alert message displays the email entered by the user.
+
+---
+
+Would you like to add any further details or modifications?
+
+### Login HTML file
+
+The html file `login.component.html` has the following content:
+
+File: `login.component.html`
+```html
+<div class="container">
+  <div class="row">
+    <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+      <div class="card border-0 shadow rounded-3 my-5">
+        <div class="card-body p-4 p-sm-5">
+          <h5 class="card-title text-center mb-5 fw-light fs-5">Sign In</h5>
+          <!-- Sign In Form -->
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <div class="form-floating mb-3">
+              <input
+                type="email"
+                class="form-control"
+                autocomplete="on"
+                id="floatingInput"
+                placeholder="name@example.com"
+                formControlName="email"
+                [ngClass]="{ 'is-invalid': submitted && f['email'].errors }" />
+              <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
+                <div *ngIf="f['email'].errors?.['required']">Email is required</div>
+                <div *ngIf="f['email'].errors?.['email']">Email must be a valid email address</div>
+              </div>
+              <label for="floatingInput">Email address</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input
+                type="password"
+                class="form-control"
+                autocomplete="on"
+                id="floatingPassword"
+                placeholder="Password"
+                formControlName="password"
+                [ngClass]="{ 'is-invalid': submitted && f['password'].errors }" />
+              <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
+                <div *ngIf="f['password'].errors?.['required']">Password is required</div>
+              </div>
+              <label for="floatingPassword">Password</label>
+            </div>
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" value="" id="rememberPasswordCheck" />
+              <label class="form-check-label" for="rememberPasswordCheck"> Remember password </label>
+            </div>
+            <div class="d-grid">
+              <button class="btn btn-lg btn-primary btn-login text-uppercase fw-bold mb-2" type="submit">
+                Sign in
+              </button>
+              <div class="text-center">
+                <a class="small" href="#">Forgot password?</a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+Here’s the explanation in Markdown format:
+
+---
+
+**Angular Login Component Template Explanation**
+
+**Overview**
+This HTML template represents the structure of a login form. It uses Bootstrap classes for styling and Angular features such as `formGroup`, `formControlName`, `ngClass`, and `ngIf` for form handling and validation.
+
+**Container and Layout**
+- The form is wrapped inside a **Bootstrap grid system**:
+  - `container` → Ensures proper spacing and centering.
+  - `row` → Defines a row for layout structure.
+  - `col-sm-9 col-md-7 col-lg-5 mx-auto` → Creates a responsive column that adjusts based on screen size.
+  - `card border-0 shadow rounded-3 my-5` → Styles the login form as a card with a shadow and rounded corners.
+
+**Card and Title**
+- **`card-body p-4 p-sm-5`** → Adds padding to the card's content.
+- **`h5.card-title.text-center.mb-5.fw-light.fs-5`** → Displays "Sign In" as the form title with center alignment and light font styling.
+
+**Login Form Structure**
+The form uses Angular's **Reactive Forms** with `formGroup` and `formControlName` for validation.
+
+**Form Attributes**
+- **`[formGroup]="loginForm"`** → Binds the form to the `loginForm` FormGroup from the component.
+- **`(ngSubmit)="onSubmit()"`** → Calls the `onSubmit()` method when the form is submitted.
+
+- **Email Input Field**
+- **`type="email"`** → Defines the input as an email field.
+- **`formControlName="email"`** → Binds the field to the `email` form control.
+- **`[ngClass]="{ 'is-invalid': submitted && f['email'].errors }"`**
+  - Applies the Bootstrap `is-invalid` class if validation fails after submission.
+  
+- **Validation Messages:**
+  - **`*ngIf="submitted && f['email'].errors?.['required']"`** → Displays "Email is required" if the field is empty.
+  - **`*ngIf="f['email'].errors?.['email']"`** → Displays "Email must be a valid email address" if the email format is incorrect.
+
+**Password Input Field**
+- **`type="password"`** → Defines the password input.
+- **Validation Messages:**
+  - **`*ngIf="submitted && f['password'].errors?.['required']"`** → Displays "Password is required" when the field is empty.
+
+**Remember Password Checkbox**
+- **`<input class="form-check-input" type="checkbox" id="rememberPasswordCheck" />`**
+  - Provides an optional "Remember password" checkbox.
+
+**Sign In Button**
+- **`<button class="btn btn-lg btn-primary btn-login text-uppercase fw-bold mb-2" type="submit">Sign in</button>`**
+  - Styled as a primary Bootstrap button, used to submit the form.
+
+**Forgot Password Link**
+- **`<a class="small" href="#">Forgot password?</a>`**
+  - Provides a link for users to reset their password.
+
+**Functionality Summary**
+1. The form consists of email and password fields with real-time validation.
+2. Validation messages are displayed dynamically based on user input.
+3. A checkbox is available for remembering the password.
+4. The form submits only if all validation checks pass.
+
+
+
+
+### Login Unit Test
+
+The unit test for the login component:
+
+File: `login.component.spec.ts`
+```typescript
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { LoginComponent } from './login.component';
+import { ReactiveFormsModule } from '@angular/forms';
+
+describe('LoginComponent', () => {
+  let component: LoginComponent;
+  let fixture: ComponentFixture<LoginComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule, LoginComponent],
+      providers: [],
+    }).compileComponents();
+  });
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(LoginComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should initialize form with empty values', () => {
+    expect(component.loginForm.value).toEqual({ email: '', password: '' });
+  });
+
+  it('should invalidate the form when fields are empty', () => {
+    component.onSubmit();
+    expect(component.loginForm.invalid).toBeTruthy();
+  });
+
+  it('should submit form when valid', () => {
+    spyOn(window, 'alert');
+    component.loginForm.setValue({ email: 'test@example.com', password: 'password123' });
+    component.onSubmit();
+    expect(component.loginForm.valid).toBeTruthy();
+    expect(component.submitted).toBeTruthy();
+    expect(window.alert).toHaveBeenCalledWith('Great!! test@example.com');
+  });
+
+  it('should validate email field correctly', () => {
+    const emailControl = component.loginForm.controls['email'];
+    emailControl.setValue('invalid-email');
+    expect(emailControl.invalid).toBeTruthy();
+    expect(emailControl.errors?.['email']).toBeTruthy();
+  });
+
+  it('should validate password field correctly', () => {
+    const passwordControl = component.loginForm.controls['password'];
+    passwordControl.setValue('');
+    expect(passwordControl.invalid).toBeTruthy();
+    expect(passwordControl.errors?.['required']).toBeTruthy();
+  });
+});
+```
+
+Here’s the detailed Markdown explanation for the unit test file:
+
+---
+
+**Unit Test Explanation for LoginComponent**
+
+**Overview**
+This unit test file (`login.component.spec.ts`) ensures that the `LoginComponent` behaves as expected. It verifies form initialization, validation, and submission logic using Angular's testing utilities.
+
+**Test Dependencies and Setup**
+**Before Each Test (`beforeEach` Blocks)**
+- **`async beforeEach` Block:**
+  - Calls `TestBed.configureTestingModule` to set up the test module.
+  - Imports `ReactiveFormsModule` and declares `LoginComponent`.
+  - Compiles the component’s template and styles asynchronously.
+
+- **Synchronous `beforeEach` Block:**
+  - Creates the component instance using `TestBed.createComponent(LoginComponent)`.
+  - Assigns the component instance to `component`.
+  - Calls `fixture.detectChanges()` to apply changes and initialize the component.
+
+
+**Test Cases**
+
+**1. Component Creation**
+- **`it('should create', () => { ... })`**
+  - Ensures that the component is successfully created.
+  - Uses `expect(component).toBeTruthy();` to verify existence.
+
+**2. Form Initialization**
+- **`it('should initialize form with empty values', () => { ... })`**
+  - Checks that `loginForm` initializes with empty email and password fields.
+  - Uses `expect(component.loginForm.value).toEqual({ email: '', password: '' });`
+
+**3. Form Validation - Empty Fields**
+- **`it('should invalidate the form when fields are empty', () => { ... })`**
+  - Calls `onSubmit()` without filling the form.
+  - Uses `expect(component.loginForm.invalid).toBeTruthy();` to check if the form is invalid.
+
+**4. Valid Form Submission**
+- **`it('should submit form when valid', () => { ... })`**
+  - Mocks the `window.alert` function using `spyOn(window, 'alert');`.
+  - Sets valid email and password using `component.loginForm.setValue(...)`.
+  - Calls `onSubmit()` and verifies:
+    - The form is valid: `expect(component.loginForm.valid).toBeTruthy();`
+    - The `submitted` flag is set to `true`.
+    - The alert is displayed with the email value.
+
+**5. Email Validation**
+- **`it('should validate email field correctly', () => { ... })`**
+  - Assigns an invalid email (`'invalid-email'`) to the email field.
+  - Checks if `emailControl.invalid` is `true`.
+  - Verifies the presence of an `email` validation error.
+
+**6. Password Validation**
+- **`it('should validate password field correctly', () => { ... })`**
+  - Assigns an empty value to the password field.
+  - Checks if `passwordControl.invalid` is `true`.
+  - Verifies the presence of a `required` validation error.
+
+  
+**Summary**
+- Ensures the `LoginComponent` initializes correctly.
+- Validates form fields and displays errors when needed.
+- Confirms that the form submits successfully when valid.
+- Uses spies to mock external dependencies (`alert`).
+
+---
+
+
 
 ## Create a Docker Container, Run and Publish to Docker
 
