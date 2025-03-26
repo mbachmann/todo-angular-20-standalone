@@ -443,7 +443,7 @@ Add the url to the backend to the files `enviroments/enviroment.ts` and `envirom
 ```typescript
 export const environment = {
   production: true,
-  _API_BASE_PATH_: 'https://todo-h2.united-portal.com',
+  API_BASE_PATH: '_API_BASE_PATH',
 };
 ```
 
@@ -452,8 +452,28 @@ export const environment = {
 ```typescript
 export const environment = {
   production: false,
-  _API_BASE_PATH_: 'https://todo-h2.united-portal.com',
+  API_BASE_PATH: 'https://todo-h2.united-portal.com',
 };
+```
+
+Add in the `angular.json` file the `fileReplacement` for the development environment:
+
+```json
+"configurations": {
+  ...
+  ...
+  ...
+  "test": {
+    ...
+    ...
+    "fileReplacements": [
+      {
+        "replace": "src/environments/environment.ts",
+        "with": "src/environments/environment.development.ts"
+      }
+    ]
+  }
+}
 ```
 
 <br>
@@ -483,7 +503,7 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(ApiModule),
     {
       provide: BASE_PATH,
-      useValue: environment._API_BASE_PATH_,
+      useValue: environment.API_BASE_PATH,
     },
     provideHttpClient(withInterceptorsFromDi()),
   ],
@@ -1208,7 +1228,7 @@ import { TodoItemListsDTO } from '../openapi-gen';
 export class TodoService {
   private baseUrl: string;
   constructor(private http: HttpClient) {
-    this.baseUrl = environment._API_BASE_PATH_;
+    this.baseUrl = environment.API_BASE_PATH;
   }
 
   getListIDs(): Observable<TodoItemListsDTO> {
@@ -1257,7 +1277,7 @@ describe('TodoService with real Backend', () => {
         importProvidersFrom(ApiModule),
         {
           provide: BASE_PATH,
-          useValue: environment._API_BASE_PATH_,
+          useValue: environment.API_BASE_PATH,
         },
       ],
     });
@@ -1372,7 +1392,7 @@ describe('TodoService with Mock', () => {
         importProvidersFrom(ApiModule),
         {
           provide: BASE_PATH,
-          useValue: environment._API_BASE_PATH_,
+          useValue: environment.API_BASE_PATH,
         },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
@@ -1381,7 +1401,7 @@ describe('TodoService with Mock', () => {
     ownTodoService = TestBed.inject(TodoService);
     openApiTodoService = TestBed.inject(TodoItemControllerService);
     httpMock = TestBed.inject(HttpTestingController);
-    baseUrl = environment._API_BASE_PATH_;
+    baseUrl = environment.API_BASE_PATH;
   });
 
   afterEach(() => {
@@ -1858,13 +1878,13 @@ describe('AppComponent', () => {
         importProvidersFrom(ApiModule),
         {
           provide: BASE_PATH,
-          useValue: environment._API_BASE_PATH_,
+          useValue: environment.API_BASE_PATH,
         },
         provideHttpClientTesting(),
       ],
     }).compileComponents();
     httpMock = TestBed.inject(HttpTestingController);
-    baseUrl = environment._API_BASE_PATH_;
+    baseUrl = environment.API_BASE_PATH;
   });
 
   afterEach(() => {
@@ -2017,12 +2037,12 @@ describe('TodoListsComponent Test with http mock', () => {
         TodoItemControllerService,
         provideHttpClient(withInterceptorsFromDi()),
         importProvidersFrom(ApiModule),
-        { provide: BASE_PATH, useValue: environment._API_BASE_PATH_ },
+        { provide: BASE_PATH, useValue: environment.API_BASE_PATH },
         provideHttpClientTesting(),
       ],
     }).compileComponents();
     httpMock = TestBed.inject(HttpTestingController);
-    baseUrl = environment._API_BASE_PATH_;
+    baseUrl = environment.API_BASE_PATH;
     fixture = TestBed.createComponent(TodoListsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -2087,7 +2107,7 @@ The fake `TodoList` contains 3 todoItems with a count of 3.
 
     - `TodoListsComponent` as the component under test.
     - The `TodoItemControllerService` and `ApiModule` for handling HTTP-related operations.
-    - `BASE_PATH` configured with the `_API_BASE_PATH_` from the environment file.
+    - `BASE_PATH` configured with the `API_BASE_PATH` from the environment file.
     - HTTP testing utilities to mock requests and responses.
 
   - After configuring the module, `HttpTestingController` is injected to control and verify HTTP requests during tests.
@@ -2209,13 +2229,13 @@ describe('AppComponent', () => {
         importProvidersFrom(ApiModule),
         {
           provide: BASE_PATH,
-          useValue: environment._API_BASE_PATH_,
+          useValue: environment.API_BASE_PATH,
         },
         provideHttpClientTesting(),
       ],
     }).compileComponents();
     httpMock = TestBed.inject(HttpTestingController);
-    baseUrl = environment._API_BASE_PATH_;
+    baseUrl = environment.API_BASE_PATH;
   });
 
   afterEach(() => {
@@ -3071,13 +3091,13 @@ describe('AppComponent', () => {
         importProvidersFrom(ApiModule),
         {
           provide: BASE_PATH,
-          useValue: environment._API_BASE_PATH_,
+          useValue: environment.API_BASE_PATH,
         },
         provideHttpClientTesting(),
       ],
     }).compileComponents();
     httpMock = TestBed.inject(HttpTestingController);
-    baseUrl = environment._API_BASE_PATH_;
+    baseUrl = environment.API_BASE_PATH;
   });
 
   afterEach(() => {
@@ -4851,7 +4871,7 @@ $  docker compose up
 or with specific docker-compose file (e.g. on linux with a traefik reverse proxy)
 
 ```
-$  docker compose -f docker-compose-traefik.yml up
+$  docker compose -f docker-compose-traefik-v3.yml up
 ```
 
 <br/>
@@ -4904,44 +4924,102 @@ server {
 
 <br/>
 
-**Option 1: For intel based architecture Dockerfile**
+
+Create a Dockerfile in the root folder of the project:
 
 ```dockerfile
-FROM nginx:1.13.3
+### STAGE 1: Build ###
 
-VOLUME /var/cache/nginx
+# We label our stage as 'builder'
+FROM node:22-alpine AS builder
+
+RUN apk add --no-cache python3 g++ make
+
+COPY package.json package-lock.json ./
+
+## Storing node modules on a separate layer will prevent unnecessary npm installs at each build
+RUN npm ci && mkdir /ng-app && mv ./node_modules ./ng-app/
+
+## Move to /ng-app (eq: cd /ng-app)
+WORKDIR /ng-app
+
+# Copy everything from host to /ng-app in the container
+COPY . .
+ARG configuration=production
+## Build the angular app in production mode and store the artifacts in dist folder
+ARG NG_ENV=production
+RUN npm run build
+
+### STAGE 2: Setup ###
+
+FROM nginx:1.27.4-alpine
 
 ## Copy our default nginx config
 COPY nginx/default.conf /etc/nginx/conf.d/
 
-
+## Remove default nginx website
 RUN rm -rf /usr/share/nginx/html/*
 
-COPY  dist/todo-angular/browser /usr/share/nginx/html
+## Copy script used to inject environment variables into the project
+COPY start.sh /usr/share/nginx/start.sh
 
-CMD ["nginx", "-g", "daemon off;"]
+## From 'builder' stage copy over the artifacts in dist folder to default nginx public folder
+COPY --from=builder /ng-app/dist/todo-angular-19/browser /usr/share/nginx/html
+
+# Fix permissions for runtime
+RUN chmod 777 /var/log/nginx /usr/share/nginx/html
+RUN sed -i 's/\r$//' /usr/share/nginx/start.sh
+RUN chmod +x /usr/share/nginx/start.sh
+
+EXPOSE 80
+
+## Inject environment variables into the project
+
+## CMD /usr/share/nginx/start.sh
+CMD ["sh", "/usr/share/nginx/start.sh"]
 
 ```
 
-**Option 2: For arm64v8 based architecture Dockerfile.arm**
+For cross building the docker images we create 2 build files:
 
-```dockerfile
+- build.sh
+- build-arm.sh
 
-FROM arm64v8/nginx:1.25.3
+File `build.sh`
 
-VOLUME /var/cache/nginx
+```shell
+#!/bin/sh
 
-## Copy our default nginx config
-COPY nginx/default.conf /etc/nginx/conf.d/
-
-
-RUN rm -rf /usr/share/nginx/html/*
-
-COPY  dist/todo-angular/browser /usr/share/nginx/html
-
-CMD ["nginx", "-g", "daemon off;"]
-
+docker buildx build --platform linux/amd64 -t uportal/todo-angular -f Dockerfile .
 ```
+
+
+File `build-arm.sh`
+
+```shell
+#!/bin/sh
+
+
+docker buildx build --platform linux/arm64 -t uportal/todo-angular -f Dockerfile .
+```
+
+In order to inject environment variables into the project, 
+we create a start.sh file in the root folder of the project.
+
+
+ File `start.sh`
+```shell
+#!/bin/sh
+
+# replace static values with environment-variables
+if [ -n $API_BASE_PATH ]; then
+    find /usr/share/nginx/html -type f -name "*.js" -exec  sed -i "s~_API_BASE_PATH_~$API_BASE_PATH~g" {} \;
+fi
+
+
+
+nginx -g "daemon off;"
+````
 
 <br/>
 
@@ -4951,16 +5029,21 @@ Replace **uportal** with your **dockerhub id**.
 
 <br/>
 
+File: `docker-compose.yml`
+
 ```yaml
-version: '3'
 
 services:
   todo-angular:
     image: uportal/todo-angular:latest
 
-    restart: always
+    restart: unless-stopped
     ports:
-      - 4000:80
+      - "4000:80"
+    environment:
+      API_BASE_PATH: https://todo-h2.united-portal.com
+
+
 ```
 
 <br/>
@@ -4971,37 +5054,14 @@ Traefik is a reverse proxy on linux. There is a version 1.x and 2.x for the yaml
 
 [https://doc.traefik.io/traefik/](https://doc.traefik.io/traefik/)
 
-**For traefik version 1.x**
-
-```yaml
-version: '2'
-
-networks:
-  proxy:
-    external: true
-
-services:
-  todo-angular:
-    image: uportal/todo-angular:latest
-    labels:
-      - 'traefik.backend=todo-angular'
-      - 'traefik.frontend.rule=Host:todo-angular.united-portal.com'
-      - 'traefik.docker.network=proxy'
-      - 'traefik.port=80'
-      - 'traefik.enable=true'
-
-    restart: always
-    ports:
-      - 4000:80
-    networks:
-      - proxy
-```
 
 **For traefik version 2.x**
 
-```yaml
-version: '2'
+Please adapt your url: "traefik.http.routers.blog.rule=Host(`YOUR URL`)"
 
+File: `docker-compose-traefik-v2.yml`
+
+```yaml
 networks:
   proxy:
     external: true
@@ -5019,4 +5079,39 @@ services:
       - 4000:80
     networks:
       - proxy
+```
+
+**For traefik version 3.x**
+
+Please adapt your url: "traefik.http.routers.todo-angular.rule=Host(`YOUR URL`)".
+Please check your traefik external networt name.
+
+File: `docker-compose-traefik-v3.yml`
+
+```yaml
+networks:
+  proxy:
+    external: true
+
+services:
+
+  todo-angular:
+    image: uportal/todo-angular:latest
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.todo-angular.rule=Host(`todo-angular.united-portal.com`)"
+      - "traefik.http.routers.todo-angular.tls=true"
+      - "traefik.http.routers.todo-angular.tls.certresolver=lets-encrypt"
+      - "traefik.http.routers.todo-angular.entrypoints=websecure"
+      - "traefik.http.services.todo-angular.loadbalancer.server.port=80"
+    restart: unless-stopped
+    ports:
+      - 4000:80
+    networks:
+      - proxy
+
+    environment:
+      API_BASE_PATH: https://todo-h2.united-portal.com
+
+
 ```

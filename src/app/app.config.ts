@@ -15,7 +15,7 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(ApiModule, BrowserModule, FormsModule),
     {
       provide: BASE_PATH,
-      useValue: environment._API_BASE_PATH_,
+      useValue: environment.API_BASE_PATH,
     },
     provideHttpClient(withInterceptorsFromDi()),
   ],

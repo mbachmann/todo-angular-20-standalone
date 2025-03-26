@@ -28,13 +28,13 @@ describe('AppComponent', () => {
         importProvidersFrom(ApiModule),
         {
           provide: BASE_PATH,
-          useValue: environment._API_BASE_PATH_,
+          useValue: environment.API_BASE_PATH,
         },
         provideHttpClientTesting(),
       ],
     }).compileComponents();
     httpMock = TestBed.inject(HttpTestingController);
-    baseUrl = environment._API_BASE_PATH_;
+    baseUrl = environment.API_BASE_PATH;
   });
 
   afterEach(() => {

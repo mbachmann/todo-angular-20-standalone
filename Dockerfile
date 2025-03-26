@@ -15,9 +15,9 @@ WORKDIR /ng-app
 
 # Copy everything from host to /ng-app in the container
 COPY . .
-# ARG configuration=production
+ARG configuration=production
 ## Build the angular app in production mode and store the artifacts in dist folder
-# ARG NG_ENV=production
+ARG NG_ENV=production
 RUN npm run build
 
 ### STAGE 2: Setup ###
@@ -46,4 +46,4 @@ EXPOSE 80
 ## Inject environment variables into the project
 
 ## CMD /usr/share/nginx/start.sh
-# CMD ["sh", "/usr/share/nginx/start.sh"]
+CMD ["sh", "/usr/share/nginx/start.sh"]

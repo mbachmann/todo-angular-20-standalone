@@ -21,7 +21,7 @@ describe('TodoService with Mock', () => {
         importProvidersFrom(ApiModule),
         {
           provide: BASE_PATH,
-          useValue: environment._API_BASE_PATH_,
+          useValue: environment.API_BASE_PATH,
         },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
@@ -30,7 +30,7 @@ describe('TodoService with Mock', () => {
     ownTodoService = TestBed.inject(TodoService);
     openApiTodoService = TestBed.inject(TodoItemControllerService);
     httpMock = TestBed.inject(HttpTestingController);
-    baseUrl = environment._API_BASE_PATH_;
+    baseUrl = environment.API_BASE_PATH;
   });
 
   afterEach(() => {
