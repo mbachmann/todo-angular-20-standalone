@@ -5,30 +5,37 @@
 ## Content
 
 - [Create a new Project](#create-a-new-project)
-- [Prepare Intellij for Karma Debugging](#prepare-intellij-for-karma-debugging)
-- [Install EsLint with Prettier](#install-eslint-with-prettier)
-- [Install the OpenApi Tools](#install-the-openapi-tools)
-- [Generate the Model and the Backend API](#generate-the-model-and-the-backend-api)
-- [Install Bootstrap](#install-bootstrap)
-- [Install FontAwesome](#install-fontawesome)
+  - [Prepare Intellij for Karma Debugging](#prepare-intellij-for-karma-debugging)
+  - [Install EsLint with Prettier](#install-eslint-with-prettier)
+  - [Install the OpenApi Tools](#install-the-openapi-tools)
+  - [Generate the Model and the Backend API](#generate-the-model-and-the-backend-api)
+  - [Install Bootstrap](#install-bootstrap)
+  - [Install FontAwesome](#install-fontawesome)
+
 - [Create a utils file](#create-a-utils-file)
-- [Create stop propagation directives](#create-stop-propagation-directives)
+  - [Create stop propagation directives](#create-stop-propagation-directives)
+
 - [Create the myFirst component](#create-the-myfirst-component)
-- [Create an own Service](#create-an-own-service)
+  - [Create an own Service](#create-an-own-service)
+  
 - [Create the TodoLists component](#create-the-todolists-component)
-- [Display the TodoLists component through the router](#display-the-todolists-component-through-the-router)
-- [Create the TodoItems component](#create-the-todoitems-component)
-- [Add the Routings for the TodoItemComponent](#add-the-routings-for-todoitemscomponent)
+  - [Display the TodoLists component through the router](#display-the-todolists-component-through-the-router)
+  - [Create the TodoItems component](#create-the-todoitems-component)
+  - [Add the Routings for the TodoItemComponent](#add-the-routings-for-todoitemscomponent)
+  
 - [Define the AppComponent](#redefine-the-appcomponent)
-- [Add global styles](#add-global-styles)
-- [Add the image todo.svg](#add-the-image-todosvg-to-the-public-folder)
+  - [Add global styles](#add-global-styles)
+  - [Add the image todo.svg](#add-the-image-todosvg-to-the-public-folder)
+
+- [Create a Template driven Signup-Form](#create-a-template-driven-form-signup-form)
+  - [Create a reactive Login-Form](#create-a-reactive-login-form)
+  - [Create a Directive for a Tool Tip](#create-a-directive-for-a-tool-tip)
+
 - [Create a Docker Container](#create-a-docker-container-run-and-publish-to-docker)
-- [Run the App with a docker-compose.yml file](#run-the-app-with-a-docker-compose-file)
-- [Create a Dockerfile](#create-a-dockerfile)
-- [Create a docker-compose file](#create-a-docker-composeyml-file)
-- [Create a template driven form (Signup) Form](#create-a-template-driven-form-signup-form)
-- [Create a reactive (Login) Form](#create-a-reactive-login-form)
-- [Create a directive for a Tooltip](#create-a-directive-for-a-tool-tip)
+  - [Run the App with a docker-compose.yml file](#run-the-app-with-a-docker-compose-file)
+  - [Create a Dockerfile](#create-a-dockerfile)
+  - [Create a docker-compose file](#create-a-docker-composeyml-file)
+
 
 ## Preview
 
@@ -4215,9 +4222,6 @@ export class LoginComponent implements OnInit {
 }
 ```
 
-Here’s your code explanation in Markdown format:
-
----
 
 **Angular Login Component Explanation**
 
@@ -4323,10 +4327,6 @@ File: `login.component.html`
   </div>
 </div>
 ```
-
-Here’s the explanation in Markdown format:
-
----
 
 **Angular Login Component Template Explanation**
 
@@ -4453,9 +4453,6 @@ describe('LoginComponent', () => {
 });
 ```
 
-Here’s the detailed Markdown explanation for the unit test file:
-
----
 
 **Unit Test Explanation for LoginComponent**
 
@@ -4782,6 +4779,293 @@ It ensures that the directive functions as expected within an Angular applicatio
 
 ---
 
+## Create a Temp Conversion Pipe
+
+A pipe will be used to convert temperatures between degrees Celsius and Fahrenheit, and vice versa.
+The pipe will then be tested in the `tempConversion` component.
+
+
+![temp-conversion.png](readme/temp-conversion.png)
+
+We will generate the pipe itself and the component to set the pipe. This will result in the following new files::
+
+![temp-conversion-structure.png](readme/temp-conversion-structure.png)
+
+### The Pipe Class
+
+Let's create the pipe first:
+
+```shell
+ng generate pipe shared/pipe/tempConverter
+```
+
+The pipe is named `tempConverter`. The class implements the interface Pipe `transform()`, 
+resulting in a methode transform. The method accepts two arguments:
+
+- value: the temperature in Fahrenheit or Celcius
+- unit: one of `C` or `F`
+
+The conversion is using the well-known formulas for Fahrenheit->Celcius and Celcius->Fahrenheit.
+
+File: temp-converter.pipe.ts
+
+```typescript
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({ name: 'tempConverter' })
+export class TempConverterPipe implements PipeTransform {
+  transform(value: number, unit: string) {
+    // console.log(value, unit)
+    if (value !== undefined && !isNaN(value)) {
+      if (unit === 'C') {
+        const temperature = (value - 32) / 1.8;
+        return temperature.toFixed(2);
+      } else if (unit === 'F') {
+        const temperature = value * 1.8 + 32;
+        return temperature.toFixed(2);
+      }
+    }
+    return;
+  }
+}
+```
+
+### The unit test of the pipe
+
+File: temp-converter.pipe.spec.ts
+
+```typescript
+import { TempConverterPipe } from './temp-converter.pipe';
+
+describe('TempConverterPipe', () => {
+  it('create an instance', () => {
+    const pipe = new TempConverterPipe();
+    expect(pipe).toBeTruthy();
+  });
+
+  it('transforms "0 degrees" to "-17.78 Fahrenheit" ', () => {
+    const pipe = new TempConverterPipe();
+    expect(pipe.transform(32, 'C')).toBe('0.00');
+  });
+
+  it('transforms "32 Fahrenheit" to "0 degrees" ', () => {
+    const pipe = new TempConverterPipe();
+    expect(pipe.transform(0, 'F')).toBe('32.00');
+  });
+});
+
+```
+
+The unit test is calling the transform method with `C` and `F`unit.
+
+### The Test component Temp-Conversion-Pipe-Component for the Pipe tempConversion
+
+Let's create the component:
+
+```shell
+ng generate component tempConversion 
+```
+
+File: temp-conversion.component.ts
+
+```typescript
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { TempConverterPipe } from '../shared/pipe/temp-converter.pipe';
+
+@Component({
+  selector: 'app-temp-conversion',
+  templateUrl: './temp-conversion.component.html',
+  styleUrls: ['./temp-conversion.component.scss'],
+  imports: [FormsModule, TempConverterPipe],
+})
+export class TempConversionComponent {
+  title = 'Angular Custom Pipe Example';
+  celsius = 0;
+  fahrenheit = 0;
+}
+
+```
+
+### The HTML Template for Temp-Conversion-Pipe-Component
+
+File: temp-conversion.component.html
+
+```html
+<section class="container legend">
+<div class="row mt-3">
+  <h4>Fahrenheit to Celsius</h4>
+</div>
+<div class="row align-items-center">
+<div class="col-sm-2">
+  <label for="fahrenheitToCelsius" class="col-form-label">Fahrenheit</label>
+  </div>
+  <div class="col-sm-3">
+<input type="text" id="fahrenheitToCelsius" class="form-control" [(ngModel)]="fahrenheit" />
+  </div>
+  <div class="col-sm-5">
+<span id="fahrenheitToCelsiusDisplay">Celsius : {{ fahrenheit | tempConverter: 'C' }} </span>
+</div>
+</div>
+<div class="row mt-3">
+  <h4>Celsius to Fahrenheit</h4>
+</div>
+<div class="row align-items-center">
+<div class="col-sm-2">
+  <label for="celsiusToFahrenheit" class="col-form-label">Celsius</label>
+  </div>
+  <div class="col-sm-3">
+<input type="text" id="celsiusToFahrenheit" class="form-control" [(ngModel)]="celsius" />
+  </div>
+  <div class="col-sm-5">
+<span id="celsiusToFahrenheitDisplay">Fahrenheit : {{ celsius | tempConverter: 'F' }} </span>
+</div>
+</div>
+</section>
+```
+
+**Purpose of the Template**  
+The provided HTML template defines a user interface for temperature conversion between 
+Fahrenheit and Celsius using Angular's two-way data binding and a custom pipe for conversion logic.
+
+**Layout and Structure**  
+The UI is organized using Bootstrap classes for responsive layout. 
+Each conversion direction (Fahrenheit to Celsius and Celsius to Fahrenheit) is encapsulated within a `row`, 
+with proper spacing (`mt-3`) for visual separation. 
+Labels, inputs, and result displays are laid out using Bootstrap’s 
+grid system to ensure alignment and responsiveness.
+
+**Fahrenheit to Celsius Section**  
+This section begins with a heading to label the conversion type. 
+A labeled input field allows the user to enter a Fahrenheit value. 
+The value entered in this input is bound bidirectionally to a component property 
+named `fahrenheit` using Angular's `ngModel` directive. 
+A span element is used to display the result of the conversion. 
+It utilizes the custom pipe `tempConverter` with `'C'` as the argument, 
+instructing the pipe to convert the value to Celsius.
+
+**Celsius to Fahrenheit Section**  
+Following the same structure, this section handles conversion from Celsius to Fahrenheit. 
+The input field is bound to a `celsius` property, 
+and the result is displayed using the `tempConverter` pipe with `'F'` as the argument.
+
+**Data Binding and Pipe Usage**  
+The use of `[(ngModel)]` enables real-time data synchronization between the input 
+fields and component properties, allowing instant updates to the conversion 
+result as the user types. 
+The `tempConverter` pipe processes the input value and returns the converted 
+temperature based on the specified direction (`'C'` for Celsius, `'F'` for Fahrenheit).
+
+**Conclusion**  
+This component provides a clean and interactive interface for bi-directional 
+temperature conversion, leveraging Angular's template syntax, pipes, 
+and reactive capabilities to deliver a seamless user experience.
+
+### Unit Test for the Temp-Conversion-Pipe-Component
+
+File: temp-conversion.component.spec.ts
+
+```typescript
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { TempConversionComponent } from './temp-conversion.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { TempConverterPipe } from '../shared/pipe/temp-converter.pipe';
+
+describe('TempConversionComponent', () => {
+  let component: TempConversionComponent;
+  let fixture: ComponentFixture<TempConversionComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule, FormsModule, TempConversionComponent, TempConverterPipe],
+      providers: [],
+    }).compileComponents();
+  });
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TempConversionComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should convert "32 Fahrenheit" to "0 degrees"', () => {
+    // get the name's input and display elements from the DOM
+    const hostElement: HTMLElement = fixture.nativeElement!;
+    const nameInput: HTMLInputElement = hostElement.querySelector('#fahrenheitToCelsius')!;
+    const nameDisplay: HTMLElement = hostElement.querySelector('#fahrenheitToCelsiusDisplay')!;
+
+    // simulate user entering a new name into the input box
+    nameInput.value = '32';
+
+    // Dispatch a DOM event so that Angular learns of input value change.
+    nameInput.dispatchEvent(new Event('input'));
+
+    // Tell Angular to update the display binding through the title pipe
+    fixture.detectChanges();
+
+    expect(nameDisplay.textContent).toBe('Celsius : 0.00 ');
+  });
+
+  it('should convert "0 degrees" to "32 Fahrenheit"', () => {
+    // get the name's input and display elements from the DOM
+    const hostElement: HTMLElement = fixture.nativeElement!;
+    const nameInput: HTMLInputElement = hostElement.querySelector('#celsiusToFahrenheit')!;
+    const nameDisplay: HTMLElement = hostElement.querySelector('#celsiusToFahrenheitDisplay')!;
+
+    // simulate user entering a new name into the input box
+    nameInput.value = '0';
+
+    // Dispatch a DOM event so that Angular learns of input value change.
+    nameInput.dispatchEvent(new Event('input'));
+
+    // Tell Angular to update the display binding through the title pipe
+    fixture.detectChanges();
+
+    expect(nameDisplay.textContent).toBe('Fahrenheit : 32.00 ');
+  });
+});
+
+```
+
+**Purpose of the Test Suite**  
+The test suite is designed to validate the functionality of a temperature conversion component 
+in an Angular application. It checks whether the component is created successfully 
+and verifies the correct behavior of Fahrenheit to Celsius and Celsius to Fahrenheit conversions.
+
+
+**Component Initialization**  
+Before any tests run, the Angular testing module is configured to include the necessary imports and declarations. 
+The component is compiled, instantiated, and the fixture is initialized. 
+This setup ensures that the component is ready for interaction and that the DOM 
+is rendered appropriately for test inspection.
+
+**Test for Component Creation**  
+The first test verifies the component is instantiated properly. 
+If the component instance exists and is truthy, it confirms successful creation and basic setup.
+
+**Fahrenheit to Celsius Conversion Test**  
+This test simulates a user entering "32" into an input field meant for Fahrenheit values. 
+The DOM is queried to find the relevant input and display elements. 
+After programmatically entering the value and dispatching an input event, Angular is prompted to detect changes. 
+The test then asserts that the displayed Celsius value is correctly converted to "0.00".
+
+**Celsius to Fahrenheit Conversion Test**  
+This test mirrors the previous one but in the opposite direction. 
+It inputs "0" into the Celsius field, triggers the input event, 
+and refreshes Angular’s change detection. It confirms that the corresponding Fahrenheit output is displayed as "32.00", 
+ensuring bidirectional conversion accuracy.
+
+**Conclusion**  
+These tests ensure the temperature conversion logic functions correctly and that 
+user inputs are properly processed and displayed in the UI through Angular bindings and custom pipes.
+
+---
+
 ## Create a Docker Container, Run and Publish to Docker
 
 Create a distribution of the todo-angular app with
@@ -4794,8 +5078,14 @@ ng build
 
 **For intel architecture:**
 
+A preconfigured shell script includes the build command:
+
+```shell
+./build.sh
 ```
-$  docker build --platform linux/amd64 -t uportal/todo-angular .
+
+```shell
+$  docker buildx build --platform linux/amd64 -t uportal/todo-angular -f Dockerfile .
 
 $  docker run --platform linux/amd64 -p 4000:4000 --rm -it  uportal/todo-angular
 ```
@@ -4806,8 +5096,14 @@ $  docker run --platform linux/amd64 -p 4000:4000 --rm -it  uportal/todo-angular
 
 **For arm64v8 architecture (e.g. MAC Mx):** [https://hub.docker.com/r/arm64v8/nginx/](https://hub.docker.com/r/arm64v8/nginx/)
 
+A preconfigured shell script includes the build command:
+
+```shell
+./build-arm.sh
 ```
-$  docker build -f Dockerfile.arm --platform linux/arm64v8 -t uportal/todo-angular .
+
+```
+$  docker buildx build --platform linux/arm64 -t uportal/todo-angular -f Dockerfile .
 
 $  docker run --platform linux/arm64v8 -p 4000:80 --rm -it  uportal/todo-angular
 ```
