@@ -1,6 +1,6 @@
-# Todo Angular based on angular 19.x.x standalone
+# Todo Angular based on angular 20.x.x standalone
 
-[https://github.com/mbachmann/todo-angular-19-standalone.git](https://github.com/mbachmann/todo-angular-19-standalone.git)
+[https://github.com/mbachmann/todo-angular-20-standalone.git](https://github.com/mbachmann/todo-angular-20-standalone.git)
 
 ## Content
 
@@ -45,7 +45,7 @@
 
 ## Prerequisites
 
-Both the CLI and generated project have dependencies that require Node 18.19.1 or higher, together with NPM 10.7.0 or higher.
+Both the CLI and generated project have dependencies that require Node 20.19 or higher, together with NPM 10.7.0 or higher.
 
 The related Spring Boot Backend can be found here: [https://github.com/mbachmann/spring-boot-todo-app](https://github.com/mbachmann/spring-boot-todo-app)
 
@@ -2353,7 +2353,7 @@ We can generate a new `TodoItem` Component:
 ng generate component TodoItems
 ```
 
-This Angular 19 component, TodoItemsComponent, is designed to manage a todo list.
+This Angular 20 component, TodoItemsComponent, is designed to manage a todo list.
 It interacts with a service to perform CRUD operations,
 allowing the user to view, add, edit, and delete todo items.
 
@@ -2513,7 +2513,7 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
 
 ```
 
-**Explanation of Angular 19 TodoItemsComponent**
+**Explanation of Angular 20 TodoItemsComponent**
 
 In `ngOnInit` is a `route.params` subscription to get the `listID` from the route URL:
 
@@ -2975,8 +2975,8 @@ Add to the `app.component.html` file the template code:
           >
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/mbachmann/todo-angular-19-standalone.git" target="_blank"
-          >Github Angular 19</a
+          <a class="nav-link" href="https://github.com/mbachmann/todo-angular-20-standalone.git" target="_blank"
+          >Github Angular 20</a
           >
         </li>
       </ul>
@@ -5289,7 +5289,7 @@ RUN rm -rf /usr/share/nginx/html/*
 COPY start.sh /usr/share/nginx/start.sh
 
 ## From 'builder' stage copy over the artifacts in dist folder to default nginx public folder
-COPY --from=builder /ng-app/dist/todo-angular-19/browser /usr/share/nginx/html
+COPY --from=builder /ng-app/dist/todo-angular-20/browser /usr/share/nginx/html
 
 # Fix permissions for runtime
 RUN chmod 777 /var/log/nginx /usr/share/nginx/html

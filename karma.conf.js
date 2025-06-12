@@ -10,7 +10,7 @@ module.exports = function (config) {
       require('karma-chrome-launcher'),
       require('karma-jasmine-html-reporter'),
       require('karma-coverage'),
-      
+
     ],
     client: {
       jasmine: {
@@ -24,7 +24,7 @@ module.exports = function (config) {
       suppressAll: true, // removes the duplicated traces
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, './coverage/todo-angular-19'),
+      dir: require('path').join(__dirname, './coverage/todo-angular-20-standalone'),
       subdir: '.',
       reporters: [{ type: 'html' }, { type: 'text-summary' }],
     },
