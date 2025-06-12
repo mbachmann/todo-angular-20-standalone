@@ -38,8 +38,8 @@
     "@angular/compiler-cli": "^19.2.14",
     "@openapitools/openapi-generator-cli": "^2.15.3",
     "@types/jasmine": "~5.1.7",
-    "angular-eslint": "19.0.2",
-    "eslint": "^9.16.0",
+    "angular-eslint": "19.8.0",
+    "eslint": "^9.28.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "jasmine-core": "~5.6.0",
@@ -50,7 +50,7 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "prettier": "^3.4.2",
     "prettier-eslint": "^16.3.0",
-    "typescript": "~5.6.2",
-    "typescript-eslint": "8.18.0"
+    "typescript": "~5.8.2",
+    "typescript-eslint": "8.33.1"
   }
 }
