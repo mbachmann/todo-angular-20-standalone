@@ -17,9 +17,7 @@
             required
             #firstName="ngModel" />
           @if (firstName.errors && (firstName.dirty || firstName.touched)) {
-            <div
-              class="form-control-feedback text-danger"
-              >
+            <div class="form-control-feedback text-danger">
               @if (firstName.hasError('required')) {
                 <p><small>First name is required</small></p>
               }
@@ -42,9 +40,7 @@
             required
             #lastName="ngModel" />
           @if (lastName.errors && (lastName.dirty || lastName.touched)) {
-            <div
-              class="form-control-feedback text-danger"
-              >
+            <div class="form-control-feedback text-danger">
               @if (lastName.hasError('required')) {
                 <p><small>Last name is required</small></p>
               }

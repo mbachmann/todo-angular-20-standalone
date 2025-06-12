@@ -5,6 +5,7 @@
 ## Content
 
 - [Create a new Project](#create-a-new-project)
+
   - [Prepare Intellij for Karma Debugging](#prepare-intellij-for-karma-debugging)
   - [Install EsLint with Prettier](#install-eslint-with-prettier)
   - [Install the OpenApi Tools](#install-the-openapi-tools)
@@ -13,21 +14,22 @@
   - [Install FontAwesome](#install-fontawesome)
 
 - [Create a utils file](#create-a-utils-file)
+
   - [Create stop propagation directives](#create-stop-propagation-directives)
 
 - [Create the myFirst component](#create-the-myfirst-component)
   - [Create an own Service](#create-an-own-service)
-  
 - [Create the TodoLists component](#create-the-todolists-component)
   - [Display the TodoLists component through the router](#display-the-todolists-component-through-the-router)
   - [Create the TodoItems component](#create-the-todoitems-component)
   - [Add the Routings for the TodoItemComponent](#add-the-routings-for-todoitemscomponent)
-  
 - [Define the AppComponent](#redefine-the-appcomponent)
+
   - [Add global styles](#add-global-styles)
   - [Add the image todo.svg](#add-the-image-todosvg-to-the-public-folder)
 
 - [Create a Template driven Signup-Form](#create-a-template-driven-form-signup-form)
+
   - [Create a reactive Login-Form](#create-a-reactive-login-form)
   - [Create a Directive for a Tool Tip](#create-a-directive-for-a-tool-tip)
 
@@ -35,7 +37,6 @@
   - [Run the App with a docker-compose.yml file](#run-the-app-with-a-docker-compose-file)
   - [Create a Dockerfile](#create-a-dockerfile)
   - [Create a docker-compose file](#create-a-docker-composeyml-file)
-
 
 ## Preview
 
@@ -592,7 +593,7 @@ export function parseIsoDateStrToDate(value: any) {
 
 export function getUUID() {
   let result = '';
-  let hexcodes = "0123456789abcdef".split("");
+  let hexcodes = '0123456789abcdef'.split('');
 
   for (let index = 0; index < 32; index++) {
     let value = Math.floor(Math.random() * 16);
@@ -606,7 +607,7 @@ export function getUUID() {
         result += '-';
         break;
       case 16:
-        value = value & 3 | 8;
+        value = (value & 3) | 8;
         result += '-';
         break;
       case 20:
@@ -618,11 +619,12 @@ export function getUUID() {
   return result;
 }
 ```
+
 ---
 
 ## Create stop propagation directives
 
-Create a folder `src/app/shared/directive`. In this folder create the files 
+Create a folder `src/app/shared/directive`. In this folder create the files
 
 - `click-stop-propagation.directive.ts` and
 - `keydown-stop-propagation.directive.ts`
@@ -632,16 +634,14 @@ The directive can be used in the HTML template to stop the propagation of the cl
 **click-stop-propagation.directive.ts**
 
 ```typescript
-import {Directive, HostListener} from "@angular/core";
+import { Directive, HostListener } from '@angular/core';
 
 @Directive({
-  selector: "[click-stop-propagation]"
+  selector: '[click-stop-propagation]',
 })
-export class ClickStopPropagation
-{
-  @HostListener("click", ["$event"])
-  public onClick(event: any): void
-  {
+export class ClickStopPropagation {
+  @HostListener('click', ['$event'])
+  public onClick(event: any): void {
     event.stopPropagation();
   }
 }
@@ -650,16 +650,14 @@ export class ClickStopPropagation
 **keydown-stop-propagation.directive.ts**
 
 ```typescript
-import {Directive, HostListener} from "@angular/core";
+import { Directive, HostListener } from '@angular/core';
 
 @Directive({
-  selector: "[keydown-stop-propagation]"
+  selector: '[keydown-stop-propagation]',
 })
-export class KeydownStopPropagationDirective
-{
-  @HostListener("keydown", ["$event"])
-  public onKeydown(event: any): void
-  {
+export class KeydownStopPropagationDirective {
+  @HostListener('keydown', ['$event'])
+  public onKeydown(event: any): void {
     event.stopPropagation();
   }
 }
@@ -1478,7 +1476,6 @@ The `TodoListsComponent` is responsible for:
 
 ![todo-lists.png](readme/todo-lists.png)
 
-
 **Key Features**
 
 - **Service Abstraction**: Allows switching between custom service and OpenAPI service for fetching data.
@@ -1490,7 +1487,7 @@ The `TodoListsComponent` is responsible for:
 ng generate component TodoLists
 ```
 
-The backend is providing us with the following api endpoints: 
+The backend is providing us with the following api endpoints:
 
 - `GET /api/v1/listnames`: Fetches all to-do list names.
 - `POST /api/v1/listnames`: Creates a new to-do list.
@@ -1498,10 +1495,7 @@ The backend is providing us with the following api endpoints:
 - `DELETE /api/v1/listnames/{listId}`: Deletes a to-do list.
 - `GET /api/v1/listitems/{listId}`: Fetches all to-do items for a specific list.
 
-
 The `TodoListsComponent` will use the `TodoListNameControllerService` to interact with the backend.
-
-
 
 Add to the `todo-lists.component.scss` file the rules:
 
@@ -1535,44 +1529,55 @@ Add to the `todo-lists.component.scss` file the rules:
   border-radius: 5px;
 }
 
-
 .form-control {
   font-size: 16px;
   padding-left: 15px;
   outline: none;
   border: 1px solid #e8e8e8;
 }
-
-
 ```
 
 Add to the `todo-lists.component.ts` file the typescript code:
 
 ```typescript
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {Subscription} from 'rxjs';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { Subscription } from 'rxjs';
 import {
   TodoItem,
   TodoItemControllerService,
-  TodoItemListsDTO, TodoListName,
+  TodoItemListsDTO,
+  TodoListName,
   TodoListNameControllerService,
-  TodoListNameDTO
+  TodoListNameDTO,
 } from '../openapi-gen';
-import {TodoService} from '../services/todo.service';
-import {Router, RouterLink} from '@angular/router';
-import {DatePipe} from '@angular/common';
-import {ClickStopPropagation} from '../shared/directive/click-stop-propagation.directive';
-import {KeydownStopPropagationDirective} from '../shared/directive/keydown-stop-propagation.directive';
-import {getUUID} from '../shared/utils';
+import { TodoService } from '../services/todo.service';
+import { Router, RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
+import { ClickStopPropagation } from '../shared/directive/click-stop-propagation.directive';
+import { KeydownStopPropagationDirective } from '../shared/directive/keydown-stop-propagation.directive';
+import { getUUID } from '../shared/utils';
 
 @Component({
   selector: 'app-todo-lists',
   templateUrl: './todo-lists.component.html',
   styleUrls: ['./todo-lists.component.scss'],
-  imports: [RouterLink, DatePipe, ClickStopPropagation, KeydownStopPropagationDirective],
+  imports: [
+    RouterLink,
+    DatePipe,
+    ClickStopPropagation,
+    KeydownStopPropagationDirective,
+  ],
 })
 export class TodoListsComponent implements OnInit, OnDestroy {
-  @ViewChild('listNameTextField', { static: false }) listNameTextField: ElementRef<HTMLInputElement> | undefined;
+  @ViewChild('listNameTextField', { static: false }) listNameTextField:
+    | ElementRef<HTMLInputElement>
+    | undefined;
   private todoListNamesSubscription: Subscription | undefined;
   todoListNames: TodoListNameDTO[] = [];
   editIndex = -1;
@@ -1582,11 +1587,9 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     private readonly todoListNameControllerService: TodoListNameControllerService,
     private readonly todoService: TodoService,
     private readonly router: Router
-  ) {
-  }
+  ) {}
 
   ngOnDestroy(): void {
-
     if (this.todoListNamesSubscription != undefined) {
       this.todoListNamesSubscription.unsubscribe();
     }
@@ -1597,11 +1600,12 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   }
 
   refreshList(): void {
-
-    this.todoListNamesSubscription = this.todoListNameControllerService.getAllTodoListNames().subscribe({
-      next: data => (this.todoListNames = data),
-      error: err => console.log(err),
-    });
+    this.todoListNamesSubscription = this.todoListNameControllerService
+      .getAllTodoListNames()
+      .subscribe({
+        next: data => (this.todoListNames = data),
+        error: err => console.log(err),
+      });
   }
 
   onEnterKeyDownField() {
@@ -1620,7 +1624,10 @@ export class TodoListsComponent implements OnInit, OnDestroy {
     };
 
     const request$ = isEditing
-      ? this.todoListNameControllerService.updateTodoListName(todoListName.id, todoListName)
+      ? this.todoListNameControllerService.updateTodoListName(
+          todoListName.id,
+          todoListName
+        )
       : this.todoListNameControllerService.createTodoListName(todoListName);
 
     request$.subscribe({
@@ -1646,14 +1653,17 @@ export class TodoListsComponent implements OnInit, OnDestroy {
   }
 
   onEdit(index: number) {
-    if (this.listNameTextField !== undefined && this.todoListNames[index] !== undefined && this.todoListNames[index].listName !== undefined) {
-      this.listNameTextField.nativeElement.value = this.todoListNames[index].listName;
+    if (
+      this.listNameTextField !== undefined &&
+      this.todoListNames[index] !== undefined &&
+      this.todoListNames[index].listName !== undefined
+    ) {
+      this.listNameTextField.nativeElement.value =
+        this.todoListNames[index].listName;
       this.editIndex = index;
     }
   }
-
 }
-
 ```
 
 **TodoListsComponent Explanation**
@@ -1664,6 +1674,7 @@ The `TodoListsComponent` is an Angular component responsible for managing and di
 **Imports**
 
 The component imports various Angular and custom dependencies:
+
 - **Core Angular Modules:** `Component`, `ElementRef`, `OnDestroy`, `OnInit`, `ViewChild`.
 - **RxJS:** `Subscription` for managing observable subscriptions.
 - **OpenAPI Generated Services:** `TodoItemControllerService`, `TodoListNameControllerService`, DTOs for interacting with the backend.
@@ -1679,15 +1690,16 @@ The component imports various Angular and custom dependencies:
 - Declares imported modules and directives.
 
 **Class Properties**
+
 ```typescript
 @ViewChild('listNameTextField', { static: false })
 listNameTextField: ElementRef<HTMLInputElement> | undefined;
 ```
+
 - Retrieves a reference to the input field for entering a new To-Do list name.
 - `todoListNamesSubscription`: Holds the subscription for fetching To-Do list names.
 - `todoListNames`: Stores the retrieved list names.
 - `editIndex`: Tracks the index of a list being edited.
-
 
 **Lifecycle Hooks**
 
@@ -1698,9 +1710,11 @@ ngOnInit(): void {
   this.refreshList();
 }
 ```
+
 - Calls `refreshList()` to fetch and display the To-Do lists when the component initializes.
 
 `ngOnDestroy`
+
 ```typescript
 ngOnDestroy(): void {
   if (this.todoListNamesSubscription != undefined) {
@@ -1708,6 +1722,7 @@ ngOnDestroy(): void {
   }
 }
 ```
+
 - Unsubscribes from the observable to prevent memory leaks when the component is destroyed.
 
 **Methods**
@@ -1728,6 +1743,7 @@ ngOnDestroy(): void {
 - Navigates to the `todo-items` page of a selected list when Enter is pressed.
 
 `onDelete(listId: string | undefined)`
+
 - Deletes a To-Do list and refreshes the list after a successful API call.
 
 `onEdit(index: number)`
@@ -1735,20 +1751,22 @@ ngOnDestroy(): void {
 - Enables editing mode by setting `editIndex` and populating the input field with the selected list name.
 
 **Summary**
+
 - **Displays** a list of To-Do lists.
 - **Allows** users to add, edit, delete, and navigate to To-Do lists.
 - **Utilizes** API services to interact with the backend.
 - **Implements** event handling for keypresses and button clicks.
 - **Manages** subscriptions to avoid memory leaks.
 
-
 Add to the `todo-lists.component.html` file the template code:
 
 ```html
 <h4 class="component-title">Todo Lists</h4>
-<p class="sub-para todo-info">Example angular application with Spring Boot Backend and OpenApi generated REST API</p>
+<p class="sub-para todo-info">
+  Example angular application with Spring Boot Backend and OpenApi generated
+  REST API
+</p>
 <p class="sub-para todo-listinfo">Todo Lists: {{ todoListNames.length }}</p>
-
 
 <div class="container" style="padding-left: 0">
   <div class="row">
@@ -1756,63 +1774,62 @@ Add to the `todo-lists.component.html` file the template code:
       <input
         type="text"
         id="listNameTextField"
-        tabIndex="1"
+        tabindex="1"
         #listNameTextField
         class="form-control"
         (keydown.enter)="onEnterKeyDownField()"
-        placeholder="Input list name then tap Enter to add"/>
+        placeholder="Input list name then tap Enter to add" />
     </div>
   </div>
 </div>
 <section class="container legend todo-list-name-row">
   @for (row of todoListNames; track row.listId; let i = $index) {
   <div class="row">
-    <div class="col-sm-9 py-1 my-1 clickable"
-         [routerLink]="['/todoitem/', row.listId] ">
-        <span
-          tabindex=-1
-          (keydown.enter)="onEnterKeyDownList(row.listId)">
-              List {{ i + 1 }}
-          <span role="link"
-                tabindex="{{ i * 3 + 1 }}">
-                    : {{ row.listName }} &nbsp;
-          </span>
-          <span class="badge">
-                {{ row.count }}
-          </span>
-
-          <!-- eslint-disable -->
-        <span (click)="onDelete(row.listId)" clickStopPropagation
-              (keydown.enter)="onEdit(i)" keydownStopPropagation
-              role="button"
-              tabindex="{{ i * 3 + 4 }}"
-              class="float-right">
-              <i class="fa fa-trash"></i>
-          </span>
-
-        <span (click)="onEdit(i)" clickStopPropagation
-              (keydown.enter)="onEdit(i)" keydownStopPropagation
-              role="button"
-              tabindex="{{ i * 3 + 3 }}"
-              class="float-right">
-              <i class="fa fa-edit"></i>
-          </span>
-          <!-- eslint-enable -->
-        <span class="float-right"
-              tabindex=-1
-              [routerLink]="['/todoitem/', row.listId]">
-              {{ row.fromDate | date: 'dd.MM.yyyy' }}
-          @if (row.count && row.count > 0) {
-            -
-          }
-          {{ row.toDate | date: 'dd.MM.yyyy' }}
-          </span>
+    <div
+      class="col-sm-9 py-1 my-1 clickable"
+      [routerLink]="['/todoitem/', row.listId] ">
+      <span tabindex="-1" (keydown.enter)="onEnterKeyDownList(row.listId)">
+        List {{ i + 1 }}
+        <span role="link" tabindex="{{ i * 3 + 1 }}">
+          : {{ row.listName }} &nbsp;
         </span>
+        <span class="badge"> {{ row.count }} </span>
+
+        <!-- eslint-disable -->
+        <span
+          (click)="onDelete(row.listId)"
+          clickStopPropagation
+          (keydown.enter)="onEdit(i)"
+          keydownStopPropagation
+          role="button"
+          tabindex="{{ i * 3 + 4 }}"
+          class="float-right">
+          <i class="fa fa-trash"></i>
+        </span>
+
+        <span
+          (click)="onEdit(i)"
+          clickStopPropagation
+          (keydown.enter)="onEdit(i)"
+          keydownStopPropagation
+          role="button"
+          tabindex="{{ i * 3 + 3 }}"
+          class="float-right">
+          <i class="fa fa-edit"></i>
+        </span>
+        <!-- eslint-enable -->
+        <span
+          class="float-right"
+          tabindex="-1"
+          [routerLink]="['/todoitem/', row.listId]">
+          {{ row.fromDate | date: 'dd.MM.yyyy' }} @if (row.count && row.count >
+          0) { - } {{ row.toDate | date: 'dd.MM.yyyy' }}
+        </span>
+      </span>
     </div>
   </div>
   }
 </section>
-
 ```
 
 Instead of using `*ngFor`the new flow syntax with `@for` can be used:
@@ -1823,32 +1840,34 @@ Instead of using `*ngFor`the new flow syntax with `@for` can be used:
 
 **Code Explanation**
 
-Explanation of the Angular Template: 
-This Angular template represents a To-Do List UI that interacts with a Spring Boot 
-backend using an OpenAPI-generated REST API. 
-It dynamically displays a list of to-do lists and provides functionalities for creating, editing, 
+Explanation of the Angular Template:
+This Angular template represents a To-Do List UI that interacts with a Spring Boot
+backend using an OpenAPI-generated REST API.
+It dynamically displays a list of to-do lists and provides functionalities for creating, editing,
 and deleting them.
 
 1. **Header Section**:
+
    - Displays a title ("Todo Lists").
    - Shows a description of the application.
    - Displays the total number of to-do lists using Angular interpolation ({{ todoListNames.length }}).
 
 2. **Input Field for Creating a New To-Do List**
-    - Provides an input field (<input>) where users can type the name of a new to-do list.
-    - The field triggers the onEnterKeyDownField() method when the Enter key is pressed.
-    - The keydown.enter event triggers onEnterKeyDownField(), which  adds a new list when the Enter key is pressed.
+
+   - Provides an input field (<input>) where users can type the name of a new to-do list.
+   - The field triggers the onEnterKeyDownField() method when the Enter key is pressed.
+   - The keydown.enter event triggers onEnterKeyDownField(), which adds a new list when the Enter key is pressed.
 
 3. **Displaying the To-Do Lists**
 
-    - Uses the @for directive (Angular's new template syntax) to iterate over todoListNames.
-    - Each to-do list (row) is displayed inside a `<div class="row">`.
-    - [routerLink] navigates to a details page for the specific to-do list (/todoitem/{listId}) when clicked.
+   - Uses the @for directive (Angular's new template syntax) to iterate over todoListNames.
+   - Each to-do list (row) is displayed inside a `<div class="row">`.
+   - [routerLink] navigates to a details page for the specific to-do list (/todoitem/{listId}) when clicked.
 
 4. **Delete and Edit Buttons**
-    - Trash icon (fa-trash): Calls onDelete(row.listId) to delete the list.
-    - Edit icon (fa-edit): Calls onEdit(i) to edit the list.
-    - click-stop-propagation prevents event bubbling, so clicking these icons doesn't trigger other parent elements' click events.
+   - Trash icon (fa-trash): Calls onDelete(row.listId) to delete the list.
+   - Edit icon (fa-edit): Calls onEdit(i) to edit the list.
+   - click-stop-propagation prevents event bubbling, so clicking these icons doesn't trigger other parent elements' click events.
 
 #### Unit Tests for the TodoLists component
 
@@ -1860,11 +1879,24 @@ import { AppComponent } from './app.component';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { TodoListsComponent } from './todo-lists/todo-lists.component';
 import { RouterModule } from '@angular/router';
-import {ApiModule, BASE_PATH, TodoItemControllerService, TodoItemListsDTO, TodoListNameDTO} from './openapi-gen';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import {
+  ApiModule,
+  BASE_PATH,
+  TodoItemControllerService,
+  TodoItemListsDTO,
+  TodoListNameDTO,
+} from './openapi-gen';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
 import { importProvidersFrom } from '@angular/core';
 import { environment } from '../environments/environment';
-import {HttpTestingController, provideHttpClientTesting, TestRequest} from '@angular/common/http/testing';
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+  TestRequest,
+} from '@angular/common/http/testing';
 
 describe('AppComponent', () => {
   let httpMock: HttpTestingController;
@@ -1914,35 +1946,43 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.navbar-brand').textContent).toContain('Todo App');
+    expect(compiled.querySelector('.navbar-brand').textContent).toContain(
+      'Todo App'
+    );
   });
 
   it('should navigate to home and display TodoListsComponent', async () => {
     const harness = await RouterTestingHarness.create();
     // Navigate to the route to get your component
-    const activatedComponent = await harness.navigateByUrl('/', TodoListsComponent);
+    const activatedComponent = await harness.navigateByUrl(
+      '/',
+      TodoListsComponent
+    );
     const reqListNames = httpMock.expectOne(baseUrl + '/api/v1/todolist-names');
     expect(reqListNames.request.method).toEqual('GET');
 
     const todoList: TodoItemListsDTO = {
       count: 2,
-      todoItemList: ['083e8820-0186-4c68-af01-af2ced91805a', '1da5ba97-4365-4560-bb23-2335f099288e'],
+      todoItemList: [
+        '083e8820-0186-4c68-af01-af2ced91805a',
+        '1da5ba97-4365-4560-bb23-2335f099288e',
+      ],
     };
     const todoListNames: TodoListNameDTO[] = [
       {
         count: 3,
-        listId: "da2c63f8-b414-46fb-8ae9-c54c1e5c0f00",
-        fromDate: "2025-03-11T08:27:45.741982Z",
-        toDate: "2025-03-16T08:27:45.741990Z",
-        listName: "To-Do List for business"
+        listId: 'da2c63f8-b414-46fb-8ae9-c54c1e5c0f00',
+        fromDate: '2025-03-11T08:27:45.741982Z',
+        toDate: '2025-03-16T08:27:45.741990Z',
+        listName: 'To-Do List for business',
       },
       {
         count: 3,
-        listId: "2f9c96e1-51ab-47b5-aec9-30980eef61c0",
-        fromDate: "2025-03-11T08:27:45.750231Z",
-        toDate: "2025-03-16T08:27:45.750234Z",
-        listName: "To-Do List for homework"
-      }
+        listId: '2f9c96e1-51ab-47b5-aec9-30980eef61c0',
+        fromDate: '2025-03-11T08:27:45.750231Z',
+        toDate: '2025-03-16T08:27:45.750234Z',
+        listName: 'To-Do List for homework',
+      },
     ];
 
     reqListNames.flush(todoListNames);
@@ -1951,11 +1991,9 @@ describe('AppComponent', () => {
     expect(activatedComponent.todoListNames).toBe(todoListNames);
   });
 });
-
 ```
 
 **Explanation of the unit test**
-
 
 Here’s an explanation of your unit test:
 
@@ -1985,9 +2023,9 @@ These services are replaced with Jasmine spies (jasmine.createSpyObj), allowing 
 
 3. **Adding a New To-Do List (onEnterKeyDownField):**
 
-  - Mocks the text field input.
-  - Mocks createTodoListName() to return a successful response.
-  - Calls onEnterKeyDownField() and verifies the service method was called.
+- Mocks the text field input.
+- Mocks createTodoListName() to return a successful response.
+- Calls onEnterKeyDownField() and verifies the service method was called.
 
 4. **Editing an Existing To-Do List (onEnterKeyDownField):**
 
@@ -2004,7 +2042,6 @@ These services are replaced with Jasmine spies (jasmine.createSpyObj), allowing 
 - Mocks deleteTodoListName() with a response.
 - Calls onDelete() and verifies that the method was called with the correct ID.
 
-
 #### Alternative Unit Tests for the TodoLists component
 
 The code tests the `TodoListsComponent of an Angular application using the
@@ -2018,15 +2055,21 @@ Create the file `todo-lists-httpmock.component.spec.ts` file and add the followi
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TodoListsComponent } from './todo-lists.component';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
+import {
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
 import {
   ApiModule,
   BASE_PATH,
   TodoItemControllerService,
   TodoItemListsDTO,
   TodoListName,
-  TodoListNameDTO
+  TodoListNameDTO,
 } from '../openapi-gen';
 import { importProvidersFrom } from '@angular/core';
 import { environment } from '../../environments/environment';
@@ -2065,35 +2108,36 @@ describe('TodoListsComponent Test with http mock', () => {
     // Then we set the fake data to be returned by the mock
     const todoList: TodoListNameDTO[] = [
       {
-        "count": 3,
-        "listId": "da2c63f8-b414-46fb-8ae9-c54c1e5c0f00",
-        "fromDate": "2025-03-11T08:27:45.741982Z",
-        "toDate": "2025-03-16T08:27:45.741990Z",
-        "listName": "To-Do List for business"
+        count: 3,
+        listId: 'da2c63f8-b414-46fb-8ae9-c54c1e5c0f00',
+        fromDate: '2025-03-11T08:27:45.741982Z',
+        toDate: '2025-03-16T08:27:45.741990Z',
+        listName: 'To-Do List for business',
       },
       {
-        "count": 3,
-        "listId": "2f9c96e1-51ab-47b5-aec9-30980eef61c0",
-        "fromDate": "2025-03-11T08:27:45.750231Z",
-        "toDate": "2025-03-16T08:27:45.750234Z",
-        "listName": "To-Do List for homework"
+        count: 3,
+        listId: '2f9c96e1-51ab-47b5-aec9-30980eef61c0',
+        fromDate: '2025-03-11T08:27:45.750231Z',
+        toDate: '2025-03-16T08:27:45.750234Z',
+        listName: 'To-Do List for homework',
       },
       {
-        "count": 3,
-        "listId": "2e45aace-3823-413e-a145-0cab9cc7a115",
-        "fromDate": "2025-03-11T08:27:45.753923Z",
-        "toDate": "2025-03-16T08:27:45.753927Z",
-        "listName": "To-Do List for private"
-      }
-    ]
+        count: 3,
+        listId: '2e45aace-3823-413e-a145-0cab9cc7a115',
+        fromDate: '2025-03-11T08:27:45.753923Z',
+        toDate: '2025-03-16T08:27:45.753927Z',
+        listName: 'To-Do List for private',
+      },
+    ];
 
     req.flush(todoList);
     // await new Promise(resolve => setTimeout(resolve, 500)); // 500 ms
-    console.log('TodoListComponent.todoLists.count', component.todoListNames.length);
-
+    console.log(
+      'TodoListComponent.todoLists.count',
+      component.todoListNames.length
+    );
   });
 });
-
 ```
 
 We can run the test through:
@@ -2110,28 +2154,28 @@ The fake `TodoList` contains 3 todoItems with a count of 3.
 
 1. **Setup**
 
-  - `TestBed.configureTestingModule` sets up the test environment with:
+- `TestBed.configureTestingModule` sets up the test environment with:
 
-    - `TodoListsComponent` as the component under test.
-    - The `TodoItemControllerService` and `ApiModule` for handling HTTP-related operations.
-    - `BASE_PATH` configured with the `API_BASE_PATH` from the environment file.
-    - HTTP testing utilities to mock requests and responses.
+  - `TodoListsComponent` as the component under test.
+  - The `TodoItemControllerService` and `ApiModule` for handling HTTP-related operations.
+  - `BASE_PATH` configured with the `API_BASE_PATH` from the environment file.
+  - HTTP testing utilities to mock requests and responses.
 
-  - After configuring the module, `HttpTestingController` is injected to control and verify HTTP requests during tests.
+- After configuring the module, `HttpTestingController` is injected to control and verify HTTP requests during tests.
 
-  - A `ComponentFixture` for the `TodoListsComponent` is created, allowing interaction with the component instance and DOM.
+- A `ComponentFixture` for the `TodoListsComponent` is created, allowing interaction with the component instance and DOM.
 
 2. **Test 1: Component Creation**
 
-  - The first test case simply verifies that the component is created and initialized without errors.
+- The first test case simply verifies that the component is created and initialized without errors.
 
 3. **Test 2: Mocking HTTP Requests**
 
-  - A GET request to `/api/v1/listids` is expected. This is verified using `httpMock.expectOne`.
-  - The mock response (`todoList`) is defined and returned using `req.flush(todoList)`.
-  - Assertions check:
-    - The number of todo items (count) in the component matches the mock response.
-    - The todo item IDs in the component match the mock response.
+- A GET request to `/api/v1/listids` is expected. This is verified using `httpMock.expectOne`.
+- The mock response (`todoList`) is defined and returned using `req.flush(todoList)`.
+- Assertions check:
+  - The number of todo items (count) in the component matches the mock response.
+  - The todo item IDs in the component match the mock response.
 
 ## Display the TodoLists Component through the Router
 
@@ -2295,28 +2339,28 @@ Here's a detailed explanation of the code:
 
 1. **Test Setup**
 
-  - **Imports**:
+- **Imports**:
 
-    - `AppComponent`: The component under test.
-    - `RouterModule.forRoot`: Sets up routing with two routes (`/home` and `/`), both pointing to `TodoListsComponent`.
+  - `AppComponent`: The component under test.
+  - `RouterModule.forRoot`: Sets up routing with two routes (`/home` and `/`), both pointing to `TodoListsComponent`.
 
-  - **Providers**:
+- **Providers**:
 
-    - `TodoItemControllerService`: Service for interacting with the API.
-    - `provideHttpClient(withInterceptorsFromDi())`: Configures the HTTP client with interceptors.
-    - `importProvidersFrom(ApiModule)`: Imports the `ApiModule` for API integration.
-    - `BASE_PATH`: Provides the base API path from the environment configuration.
-    - `provideHttpClientTesting()`: Sets up HTTP client testing utilities.
+  - `TodoItemControllerService`: Service for interacting with the API.
+  - `provideHttpClient(withInterceptorsFromDi())`: Configures the HTTP client with interceptors.
+  - `importProvidersFrom(ApiModule)`: Imports the `ApiModule` for API integration.
+  - `BASE_PATH`: Provides the base API path from the environment configuration.
+  - `provideHttpClientTesting()`: Sets up HTTP client testing utilities.
 
 2. **Test Cases**
 
-  - **App Creation Test**
-  - **Navigation and API Interaction Test**
-    - Tests routing to `/` and API response handling in `TodoListsComponent`.
-    - **Step 1: Navigate to Route**. `RouterTestingHarness`: Simulates routing and retrieves the component rendered at a route (`TodoListsComponent` for `/`).
-    - **Step 2: Mock API Request**. Expects a GET request to `/api/v1/listids`. Asserts the request method is GET.
-    - **Step 3: Provide Fake API Response**. Provides mock response data (`todoList`) to the intercepted API request.
-    - **Step 4: Validate Component Data**. Logs and verifies that the `TodoListsComponent` correctly receives and handles the API response data.
+- **App Creation Test**
+- **Navigation and API Interaction Test**
+  - Tests routing to `/` and API response handling in `TodoListsComponent`.
+  - **Step 1: Navigate to Route**. `RouterTestingHarness`: Simulates routing and retrieves the component rendered at a route (`TodoListsComponent` for `/`).
+  - **Step 2: Mock API Request**. Expects a GET request to `/api/v1/listids`. Asserts the request method is GET.
+  - **Step 3: Provide Fake API Response**. Provides mock response data (`todoList`) to the intercepted API request.
+  - **Step 4: Validate Component Data**. Logs and verifies that the `TodoListsComponent` correctly receives and handles the API response data.
 
 We can run the test through:
 
@@ -2393,12 +2437,18 @@ Add to the `todo-items.component.scss` file the css rules:
 Add to the `todo-items.component.ts` file the typescript code:
 
 ```typescript
-import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  OnDestroy,
+} from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TodoItem, TodoItemControllerService } from '../openapi-gen';
 import { ActivatedRoute } from '@angular/router';
 import { parseIsoDateStrToDate } from '../shared/utils';
-import {DatePipe, NgStyle} from '@angular/common';
+import { DatePipe, NgStyle } from '@angular/common';
 
 @Component({
   selector: 'app-todo-items',
@@ -2407,7 +2457,9 @@ import {DatePipe, NgStyle} from '@angular/common';
   imports: [NgStyle, DatePipe],
 })
 export class TodoItemsComponent implements OnInit, OnDestroy {
-  @ViewChild('taskNameTextField', { static: false }) taskNameTextField: ElementRef<HTMLInputElement> | undefined;
+  @ViewChild('taskNameTextField', { static: false }) taskNameTextField:
+    | ElementRef<HTMLInputElement>
+    | undefined;
   private routeSubscription: Subscription | undefined;
   private subscription: Subscription | undefined;
   listId = '';
@@ -2454,7 +2506,8 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
 
   onEdit(index: number) {
     if (this.taskNameTextField !== undefined) {
-      this.taskNameTextField.nativeElement.value = this.todoItems[index].taskName;
+      this.taskNameTextField.nativeElement.value =
+        this.todoItems[index].taskName;
       this.editIndex = index;
     }
   }
@@ -2469,17 +2522,21 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
   }
 
   refreshList(listId: string) {
-    this.subscription = this.todoItemControllerService.getItemsOfOneList(listId).subscribe({
-      next: data => {
-        this.todoItems = data;
-        this.todoItems.forEach(item => (item.createdAt = parseIsoDateStrToDate(item.createdAt)));
-        if (this.taskNameTextField !== undefined) {
-          this.taskNameTextField.nativeElement.focus();
-          this.taskNameTextField.nativeElement.select();
-        }
-      },
-      error: err => console.log(err),
-    });
+    this.subscription = this.todoItemControllerService
+      .getItemsOfOneList(listId)
+      .subscribe({
+        next: data => {
+          this.todoItems = data;
+          this.todoItems.forEach(
+            item => (item.createdAt = parseIsoDateStrToDate(item.createdAt))
+          );
+          if (this.taskNameTextField !== undefined) {
+            this.taskNameTextField.nativeElement.focus();
+            this.taskNameTextField.nativeElement.select();
+          }
+        },
+        error: err => console.log(err),
+      });
   }
 
   onEnterKeyDown() {
@@ -2488,10 +2545,12 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
       if (taskName.length > 0) {
         if (this.editIndex >= 0) {
           this.todoItems[this.editIndex].taskName = taskName;
-          this.todoItemControllerService.editTodoItem(this.todoItems[this.editIndex]).subscribe({
-            next: () => this.refreshList(this.listId),
-            error: err => console.log(err),
-          });
+          this.todoItemControllerService
+            .editTodoItem(this.todoItems[this.editIndex])
+            .subscribe({
+              next: () => this.refreshList(this.listId),
+              error: err => console.log(err),
+            });
 
           this.editIndex = -1;
         } else {
@@ -2510,7 +2569,6 @@ export class TodoItemsComponent implements OnInit, OnDestroy {
     }
   }
 }
-
 ```
 
 **Explanation of Angular 20 TodoItemsComponent**
@@ -2528,65 +2586,65 @@ In `ngOnInit` is a `route.params` subscription to get the `listID` from the rout
 
 1. **Component Lifecycle Hooks**
 
-  - ngOnInit
+- ngOnInit
 
-    - Subscribes to route parameters to retrieve the listId.
-    - Calls refreshList() to fetch the todo items for the list.
+  - Subscribes to route parameters to retrieve the listId.
+  - Calls refreshList() to fetch the todo items for the list.
 
-  - ngOnDestroy
+- ngOnDestroy
 
-    - Ensures subscriptions are unsubscribed to prevent memory leaks.
+  - Ensures subscriptions are unsubscribed to prevent memory leaks.
 
 2. **Properties**
 
-  - `taskNameTextField`
+- `taskNameTextField`
 
-    - A reference to the input field for adding/editing tasks.
+  - A reference to the input field for adding/editing tasks.
 
-  - Subscriptions (`routeSubscription`, `subscription`)
+- Subscriptions (`routeSubscription`, `subscription`)
 
-    - Used to manage observables for route changes and service calls.
+  - Used to manage observables for route changes and service calls.
 
-  - `listId`
+- `listId`
 
-    - Stores the current todo list's ID
+  - Stores the current todo list's ID
 
-  - `todoItems`
+- `todoItems`
 
-    - Holds the array of todo items fetched from the service.
+  - Holds the array of todo items fetched from the service.
 
-  - `editIndex`
+- `editIndex`
 
-    - Tracks the index of the item being edited.
+  - Tracks the index of the item being edited.
 
 3. **Methods**
 
-  - `refreshList(listId: string)`
+- `refreshList(listId: string)`
 
-    - Fetches the todo items for the given listId.
-    - Converts item creation dates to JavaScript Date objects using parseIsoDateStrToDate.
+  - Fetches the todo items for the given listId.
+  - Converts item creation dates to JavaScript Date objects using parseIsoDateStrToDate.
 
-  - `onEnterKeyDown()`
+- `onEnterKeyDown()`
 
-    - Handles adding or editing tasks when the Enter key is pressed.
-    - Creates a new task if no item is being edited.
-    - Updates an existing task if editIndex is set.
+  - Handles adding or editing tasks when the Enter key is pressed.
+  - Creates a new task if no item is being edited.
+  - Updates an existing task if editIndex is set.
 
-  - `onEdit(index: number)`
+- `onEdit(index: number)`
 
-    - Prepares a task for editing by populating the input field with the task name and setting editIndex.
+  - Prepares a task for editing by populating the input field with the task name and setting editIndex.
 
-  - `onDelete(itemId: number | undefined)`
+- `onDelete(itemId: number | undefined)`
 
-    - Deletes the task with the given ID by calling the service.
+  - Deletes the task with the given ID by calling the service.
 
-  - `onDone(itemId: number | undefined)`
+- `onDone(itemId: number | undefined)`
 
-    - Toggles the "done" state of a task by calling the service.
+  - Toggles the "done" state of a task by calling the service.
 
-  - `getListId(id: number): string | undefined`
+- `getListId(id: number): string | undefined`
 
-    - Retrieves the listId of the first todo item, or an empty string if the list is empty.
+  - Retrieves the listId of the first todo item, or an empty string if the list is empty.
 
 #### TodoItems HTML file
 
@@ -2604,11 +2662,11 @@ Add to the `todo-items.component.html` file the template code:
       <input
         type="text"
         id="taskNameTextField"
-        tabIndex="1"
+        tabindex="1"
         #taskNameTextField
         class="form-control"
         (keydown.enter)="onEnterKeyDown()"
-        placeholder="Input task name then tap Enter to add"/>
+        placeholder="Input task name then tap Enter to add" />
     </div>
   </div>
 </div>
@@ -2620,37 +2678,39 @@ Add to the `todo-items.component.html` file the template code:
         [checked]="todoItem.done"
         (click)="onDone(todoItem.itemId)"
         class="form-check-input"
-        tabIndex="{{ i * 3 + 2 }}"
-        type="checkbox"/>
+        tabindex="{{ i * 3 + 2 }}"
+        type="checkbox" />
       &nbsp;
-      <span [ngStyle]="{ 'text-decoration': todoItem.done ? 'line-through' : 'none' }">
-          {{ todoItem.taskName }}
-        </span>
+      <span
+        [ngStyle]="{ 'text-decoration': todoItem.done ? 'line-through' : 'none' }">
+        {{ todoItem.taskName }}
+      </span>
       <!-- eslint-disable -->
-      <span (click)="onDelete(todoItem.itemId)"
-            (keydown.enter)="onEdit(i)"
-            role="button"
-            tabIndex="{{ i * 3 + 4 }}"
-            class="cmd-buttons">
-          <i class="fa fa-trash"></i>
-        </span>
+      <span
+        (click)="onDelete(todoItem.itemId)"
+        (keydown.enter)="onEdit(i)"
+        role="button"
+        tabIndex="{{ i * 3 + 4 }}"
+        class="cmd-buttons">
+        <i class="fa fa-trash"></i>
+      </span>
 
-      <span (click)="onEdit(i)"
-            (keydown)="onEdit(i)"
-            role="button"
-            tabIndex="{{ i * 3 + 3 }}"
-            class="cmd-buttons">
-          <i class="fa fa-edit"></i>
-        </span>
+      <span
+        (click)="onEdit(i)"
+        (keydown)="onEdit(i)"
+        role="button"
+        tabIndex="{{ i * 3 + 3 }}"
+        class="cmd-buttons">
+        <i class="fa fa-edit"></i>
+      </span>
       <!-- eslint-enable -->
       <span class="cmd-buttons">
-          {{todoItem.createdAt | date: 'dd.MM.yyyy'}}
-        </span>
+        {{todoItem.createdAt | date: 'dd.MM.yyyy'}}
+      </span>
     </div>
   </div>
   }
 </section>
-
 ```
 
 Instead of using `*ngFor`the new flow syntax with `@for` can be used:
@@ -2954,7 +3014,10 @@ Add to the `app.component.html` file the template code:
     <div [routerLink]="['/home']" class="navbar-brand">
       <img alt="todo-logo" src="/todo.svg" width="50px" /> Todo App
     </div>
-    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar">
+    <button
+      class="navbar-toggler"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbar">
       <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -2970,19 +3033,35 @@ Add to the `app.component.html` file the template code:
           <a class="nav-link" [routerLink]="['/temp']">Temp C</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/mbachmann/spring-boot-todo-app" target="_blank"
-          >Github Backend</a
+          <a
+            class="nav-link"
+            href="https://github.com/mbachmann/spring-boot-todo-app"
+            target="_blank"
+            >Github Backend</a
           >
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/mbachmann/todo-angular-20-standalone.git" target="_blank"
-          >Github Angular 20</a
+          <a
+            class="nav-link"
+            href="https://github.com/mbachmann/todo-angular-20-standalone.git"
+            target="_blank"
+            >Github Angular 20</a
           >
         </li>
       </ul>
       <form class="form-inline ms-auto">
-        <button class="btn btn-secondary" type="button" [routerLink]="['/signup']">Signup</button>
-        <button class="btn btn-primary ms-1" type="button" [routerLink]="['/login']">Login</button>
+        <button
+          class="btn btn-secondary"
+          type="button"
+          [routerLink]="['/signup']">
+          Signup
+        </button>
+        <button
+          class="btn btn-primary ms-1"
+          type="button"
+          [routerLink]="['/login']">
+          Login
+        </button>
       </form>
     </div>
   </nav>
@@ -2992,7 +3071,8 @@ Add to the `app.component.html` file the template code:
   </main>
 
   <footer class="fixed-bottom px-3 mt-4 bg-light">
-    <section class="container d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
+    <section
+      class="container d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
       <!-- Left -->
       <div class="me-5 d-none d-lg-block">
         <span>Get connected with us on social networks:</span>
@@ -3001,16 +3081,32 @@ Add to the `app.component.html` file the template code:
 
       <!-- Right -->
       <div>
-        <a href="https://www.youtube.com/channel/UCGLcphLMTcUNZRIRGUVu8rg" target="_blank" class="me-4 text-reset" tabindex=-1>
+        <a
+          href="https://www.youtube.com/channel/UCGLcphLMTcUNZRIRGUVu8rg"
+          target="_blank"
+          class="me-4 text-reset"
+          tabindex="-1">
           <i class="fa-brands fa-youtube"></i>
         </a>
-        <a href="https://x.com/mbachmann4" target="_blank" class="me-4 text-reset" tabindex=-1>
+        <a
+          href="https://x.com/mbachmann4"
+          target="_blank"
+          class="me-4 text-reset"
+          tabindex="-1">
           <i class="fa-brands fa-x-twitter"></i>
         </a>
-        <a href="https://www.linkedin.com/in/matthias-bachmann-b3809541/" target="_blank" class="me-4 text-reset" tabindex=-1>
+        <a
+          href="https://www.linkedin.com/in/matthias-bachmann-b3809541/"
+          target="_blank"
+          class="me-4 text-reset"
+          tabindex="-1">
           <i class="fa-brands fa-linkedin"></i>
         </a>
-        <a href="https://github.com/mbachmann" target="_blank" class="me-4 text-reset" tabindex=-1>
+        <a
+          href="https://github.com/mbachmann"
+          target="_blank"
+          class="me-4 text-reset"
+          tabindex="-1">
           <i class="fa-brands fa-github"></i>
         </a>
       </div>
@@ -3019,7 +3115,6 @@ Add to the `app.component.html` file the template code:
     <!-- Section: Social media -->
   </footer>
 </div>
-
 ```
 
 **Code Explanation**
@@ -3729,14 +3824,15 @@ The file shall get created in the folder `src/app/models` with the name `signup.
 
 ```typescript
 export class Signup {
-  constructor(public firstName: string = '',
-              public lastName: string = '',
-              public email: string = '',
-              public password: string = '',
-              public language: string = '') {
-  }
+  constructor(
+    public firstName: string = '',
+    public lastName: string = '',
+    public email: string = '',
+    public password: string = '',
+    public language: string = ''
+  ) {}
 }
-``` 
+```
 
 ### Signup Component class
 
@@ -3749,6 +3845,7 @@ ng generate component signup
 The typescript class has the following content:
 
 File: `signup.component.ts`
+
 ```typescript
 import { Component, ViewChild } from '@angular/core';
 import { Signup } from '../model/signup';
@@ -3772,21 +3869,18 @@ export class SignupComponent {
     }
   }
 }
-
 ```
 
 **Explanation of SignupComponent in Angular**
 
 **Overview**
 The `SignupComponent` is an Angular component responsible for handling user signups through a form. It utilizes Angular forms, built-in directives, and dependency injection to manage user input and form validation.
--
 
-**Properties and Methods**
+- **Properties and Methods**
 
 - **`model: Signup = new Signup();`** - Creates an instance of the `Signup` model to bind form data.
 - **`@ViewChild('f', { static: true }) form!: NgForm;`** - Retrieves a reference to the form (`#f`) in the template.
 - **`langs`** - A list of selectable languages for the form.
-
 
 **Form Submission Method**
 
@@ -3794,7 +3888,6 @@ The `SignupComponent` is an Angular component responsible for handling user sign
 - **`if (form.valid)`** - Ensures the form is valid before proceeding.
 - **`console.log("Form Submitted!")`** - Logs a message when the form is successfully submitted.
 - **`form.reset();`** - Resets the form after submission.
-
 
 **Conclusion**
 The `SignupComponent` demonstrates how to use template-driven forms in Angular, including form validation, event handling, and resetting forms after submission. This component is designed for simple user registration with language selection.
@@ -3804,6 +3897,7 @@ The `SignupComponent` demonstrates how to use template-driven forms in Angular, 
 The html file has the following content:
 
 File: `signup.component.html`
+
 ```html
 <h4 class="component-title">Signup</h4>
 <div class="row">
@@ -3811,7 +3905,9 @@ File: `signup.component.html`
     <fieldset ngModelGroup="name">
       <div class="row form-group mt-3">
         <div class="col-sm-3">
-          <label for="firstName" class="fs-6 col-form-label text-black-50">First Name</label>
+          <label for="firstName" class="fs-6 col-form-label text-black-50"
+            >First Name</label
+          >
         </div>
         <div class="col-sm-6">
           <input
@@ -3824,9 +3920,7 @@ File: `signup.component.html`
             required
             #firstName="ngModel" />
           @if (firstName.errors && (firstName.dirty || firstName.touched)) {
-          <div
-            class="form-control-feedback text-danger"
-          >
+          <div class="form-control-feedback text-danger">
             @if (firstName.hasError('required')) {
             <p><small>First name is required</small></p>
             }
@@ -3836,7 +3930,9 @@ File: `signup.component.html`
       </div>
       <div class="row form-group mt-2">
         <div class="col-sm-3">
-          <label for="lastName" class="fs-6 col-form-label text-black-50">Last Name</label>
+          <label for="lastName" class="fs-6 col-form-label text-black-50"
+            >Last Name</label
+          >
         </div>
         <div class="col-sm-6">
           <input
@@ -3849,9 +3945,7 @@ File: `signup.component.html`
             required
             #lastName="ngModel" />
           @if (lastName.errors && (lastName.dirty || lastName.touched)) {
-          <div
-            class="form-control-feedback text-danger"
-          >
+          <div class="form-control-feedback text-danger">
             @if (lastName.hasError('required')) {
             <p><small>Last name is required</small></p>
             }
@@ -3862,7 +3956,9 @@ File: `signup.component.html`
     </fieldset>
     <div class="row form-group mt-2">
       <div class="col-sm-3">
-        <label for="email" class="fs-6 col-form-label text-black-50">Email</label>
+        <label for="email" class="fs-6 col-form-label text-black-50"
+          >Email</label
+        >
       </div>
       <div class="col-sm-6">
         <input
@@ -3879,8 +3975,7 @@ File: `signup.component.html`
         <div class="form-control-feedback text-danger">
           @if (email.hasError('required')) {
           <p id="email-error-required"><small>Email is required</small></p>
-          }
-          @if (email.hasError('pattern')) {
+          } @if (email.hasError('pattern')) {
           <p id="email-error-at-least">
             <small>Email must contain at least the &#64; character</small>
           </p>
@@ -3891,7 +3986,9 @@ File: `signup.component.html`
     </div>
     <div class="row form-group mt-2">
       <div class="col-sm-3">
-        <label for="password" class="fs-6 col-form-label text-black-50">Password</label>
+        <label for="password" class="fs-6 col-form-label text-black-50"
+          >Password</label
+        >
       </div>
       <div class="col-sm-6">
         <input
@@ -3907,9 +4004,10 @@ File: `signup.component.html`
         @if (password.errors && (password.dirty || password.touched)) {
         <div class="form-control-feedback text-danger">
           @if (password.hasError('required')) {
-          <p id="password-error-required"><small>Password is required</small></p>
-          }
-          @if (password.hasError('minlength')) {
+          <p id="password-error-required">
+            <small>Password is required</small>
+          </p>
+          } @if (password.hasError('minlength')) {
           <p id="password-error-at-least">
             <small>Password must be at least 8 characters long</small>
           </p>
@@ -3920,10 +4018,16 @@ File: `signup.component.html`
     </div>
     <div class="row form-group mt-2">
       <div class="col-sm-3">
-        <label for="language" class="fs-6 col-form-label text-black-50">Language</label>
+        <label for="language" class="fs-6 col-form-label text-black-50"
+          >Language</label
+        >
       </div>
       <div class="col-sm-6">
-        <select class="form-control" id="language" name="language" [(ngModel)]="model.language">
+        <select
+          class="form-control"
+          id="language"
+          name="language"
+          [(ngModel)]="model.language">
           <option value="">Please select a language</option>
           @for (lang of langs; track lang) {
           <option [value]="lang">{{ lang }}</option>
@@ -3934,7 +4038,12 @@ File: `signup.component.html`
     <div class="row form-group mt-4">
       <div class="col-sm-3"></div>
       <div class="col-sm-6">
-        <button type="submit" class="btn btn-primary float-end" [disabled]="f.invalid">Submit</button>
+        <button
+          type="submit"
+          class="btn btn-primary float-end"
+          [disabled]="f.invalid">
+          Submit
+        </button>
       </div>
     </div>
   </form>
@@ -3948,7 +4057,6 @@ File: `signup.component.html`
 <div class="row mt-4">
   <pre><small>{{model | json}}</small></pre>
 </div>
-
 ```
 
 **Explanation of signup.component.html**
@@ -3957,6 +4065,7 @@ File: `signup.component.html`
 The `signup.component.html` file defines the structure of a user signup form in an Angular application. The form is implemented using Angular's **template-driven forms** approach with `ngModel` for two-way data binding. It includes input fields for user details and provides validation feedback.
 
 **Form Structure**
+
 - The form is enclosed in a `<form>` element with `novalidate` to disable default HTML5 validation.
 - The `(ngSubmit)` event is bound to the `onSubmit(f)` function, where `f` is a reference to the form using `#f="ngForm"`.
 
@@ -3964,34 +4073,40 @@ The `signup.component.html` file defines the structure of a user signup form in 
 The first section groups **First Name** and **Last Name** using `ngModelGroup="name"` to logically structure these fields.
 
 **First Name Input**
+
 - Uses `[(ngModel)]="model.firstName"` for two-way binding.
 - The `required` attribute ensures the field is mandatory.
 - Uses `#firstName="ngModel"` to track form control state.
 - Displays an error message when the field is touched or dirty and left empty.
 
 **Last Name Input**
+
 - Similar to the First Name field, with `[(ngModel)]="model.lastName"`.
 - Provides a validation message when required input is missing.
 
 **Email Field**
+
 - Uses `type="email"` and `[(ngModel)]="model.email"`.
 - `required` ensures the field must be filled.
 - `pattern="[^ @]*@[^ @]*"` enforces a valid email format.
 - Displays validation messages for missing or incorrectly formatted email input.
 
 **Password Field**
+
 - Uses `type="password"` and `[(ngModel)]="model.password"`.
 - `required` makes it mandatory.
 - `minlength="8"` ensures the password has at least 8 characters.
 - Displays error messages for missing input or insufficient length.
 
 **Language Selection Dropdown**
+
 - Uses a `<select>` element with `[(ngModel)]="model.language"`.
 - The `<option>` elements are dynamically generated using `*ngFor="let lang of langs"`.
 - Provides a default placeholder option.
 
 **Error Handling**
 The form provides real-time error handling and validation feedback using Angular's `ngModel` directives and form control properties.
+
 - **Dirty and Touched Validation**: Errors are only displayed when a field is either modified (`dirty`) or loses focus (`touched`).
 - **Validation Messages**:
   - **First Name & Last Name**: Display "First name is required" or "Last name is required" if the fields are empty.
@@ -4000,10 +4115,12 @@ The form provides real-time error handling and validation feedback using Angular
 - **Error Styling**: Error messages are wrapped in `<div class="form-control-feedback text-danger">` for visibility.
 
 **Submit Button**
+
 - A `<button>` of type `submit`.
 - The `[disabled]="f.invalid"` binding disables submission when form validation fails.
 
 **Displaying Form Data**
+
 - Two `<pre>` elements display the current form data using `{{ f.value | json }}` and `{{ model | json }}`.
 - `f.value` represents the actual form values, while `model` represents the bound model.
 
@@ -4020,20 +4137,24 @@ Add the following code to the file app.routes.ts:
 },
 ```
 
-
-
 ### Signup Unit Test
 
 The unit test for the signup component shall get created with the following content:
 
 File: `signup.component.spec.ts`
-```typescript
-import {ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
 
-import {SignupComponent} from './signup.component';
-import {FormsModule} from "@angular/forms";
-import {DebugElement, importProvidersFrom} from "@angular/core";
-import {By} from "@angular/platform-browser";
+```typescript
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+
+import { SignupComponent } from './signup.component';
+import { FormsModule } from '@angular/forms';
+import { DebugElement, importProvidersFrom } from '@angular/core';
+import { By } from '@angular/platform-browser';
 
 describe('SignupComponent', () => {
   let component: SignupComponent;
@@ -4048,7 +4169,7 @@ describe('SignupComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [SignupComponent],
-      providers: [importProvidersFrom(FormsModule),]
+      providers: [importProvidersFrom(FormsModule)],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SignupComponent);
@@ -4056,12 +4177,17 @@ describe('SignupComponent', () => {
     // fixture.detectChanges();
 
     submitButton = fixture.debugElement.query(By.css('button[type="submit"]'));
-    firstNameInput = fixture.debugElement.query(By.css('input[name="firstName"]'));
-    lastNameInput = fixture.debugElement.query(By.css('input[name="lastName"]'));
+    firstNameInput = fixture.debugElement.query(
+      By.css('input[name="firstName"]')
+    );
+    lastNameInput = fixture.debugElement.query(
+      By.css('input[name="lastName"]')
+    );
     emailInput = fixture.debugElement.query(By.css('input[name="email"]'));
-    passwordInput = fixture.debugElement.query(By.css('input[name="password"]'));
+    passwordInput = fixture.debugElement.query(
+      By.css('input[name="password"]')
+    );
   });
-
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -4087,11 +4213,11 @@ describe('SignupComponent', () => {
     component.model.lastName = 'Doe';
     component.model.email = 'john@example.com';
     component.model.password = 'password123';
-    fixture.detectChanges()
+    fixture.detectChanges();
     tick(1);
     component.onSubmit(component.form);
     tick(1);
-    fixture.detectChanges()
+    fixture.detectChanges();
 
     expect(component.form.reset).toHaveBeenCalled();
   }));
@@ -4113,48 +4239,69 @@ describe('SignupComponent', () => {
       name: { firstName: 'John', lastName: 'Doe' },
       email: 'john@example.com',
       password: 'password123',
-      language: 'English'
+      language: 'English',
     });
   }));
 
   it('should display error message when first name is empty', fakeAsync(() => {
     triggerValidation(firstNameInput, '');
-    const errorMsg = fixture.debugElement.query(By.css('.form-group:first-child .form-control-feedback'));
-    expect(errorMsg.nativeElement.textContent).toContain('First name is required');
+    const errorMsg = fixture.debugElement.query(
+      By.css('.form-group:first-child .form-control-feedback')
+    );
+    expect(errorMsg.nativeElement.textContent).toContain(
+      'First name is required'
+    );
   }));
 
   it('should display error message when last name is empty', fakeAsync(() => {
     triggerValidation(lastNameInput, '');
-    const errorMsg = fixture.debugElement.query(By.css('.form-group:nth-child(2) .form-control-feedback'));
-    expect(errorMsg.nativeElement.textContent).toContain('Last name is required');
+    const errorMsg = fixture.debugElement.query(
+      By.css('.form-group:nth-child(2) .form-control-feedback')
+    );
+    expect(errorMsg.nativeElement.textContent).toContain(
+      'Last name is required'
+    );
   }));
 
   it('should display error message when email is invalid', fakeAsync(() => {
     triggerValidation(emailInput, 'invalidemail');
-    const errorMsg = fixture.debugElement.query(By.css('#email-error-at-least'));
-    expect(errorMsg.nativeElement.textContent).toContain('Email must contain at least the @ character');
+    const errorMsg = fixture.debugElement.query(
+      By.css('#email-error-at-least')
+    );
+    expect(errorMsg.nativeElement.textContent).toContain(
+      'Email must contain at least the @ character'
+    );
   }));
 
   it('should display error message when email is empty', fakeAsync(() => {
     triggerValidation(emailInput, '');
-    const errorMsg = fixture.debugElement.query(By.css('#email-error-required'));
+    const errorMsg = fixture.debugElement.query(
+      By.css('#email-error-required')
+    );
     expect(errorMsg.nativeElement.textContent).toContain('Email is required');
   }));
 
   it('should display error message when password is to short', fakeAsync(() => {
     triggerValidation(passwordInput, 'werwe');
-    const errorMsg = fixture.debugElement.query(By.css('#password-error-at-least'));
-    expect(errorMsg.nativeElement.textContent).toContain('Password must be at least 8 characters long');
+    const errorMsg = fixture.debugElement.query(
+      By.css('#password-error-at-least')
+    );
+    expect(errorMsg.nativeElement.textContent).toContain(
+      'Password must be at least 8 characters long'
+    );
   }));
 
   it('should display error message when password is empty', fakeAsync(() => {
     triggerValidation(passwordInput, '');
-    const errorMsg = fixture.debugElement.query(By.css('#password-error-required'));
-    expect(errorMsg.nativeElement.textContent).toContain('Password is required');
+    const errorMsg = fixture.debugElement.query(
+      By.css('#password-error-required')
+    );
+    expect(errorMsg.nativeElement.textContent).toContain(
+      'Password is required'
+    );
   }));
 
   function triggerValidation(input: DebugElement, value: string) {
-
     input.nativeElement.dispatchEvent(new Event('focus'));
     tick(1);
     fixture.detectChanges();
@@ -4168,8 +4315,6 @@ describe('SignupComponent', () => {
     tick(1);
     fixture.detectChanges();
   }
-
-
 });
 ```
 
@@ -4199,6 +4344,7 @@ ng generate component login
 The typescript class `login.component.ts` has the following content:
 
 File: `login.component.ts`
+
 ```typescript
 iimport { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -4239,22 +4385,23 @@ export class LoginComponent implements OnInit {
 
 ```
 
-
 **Angular Login Component Explanation**
 
 **Overview**
 The `LoginComponent` is an Angular component responsible for handling user login functionality. It utilizes Angular's reactive forms to validate user inputs and provide a structured form submission process.
 
-
 **Class Properties**
+
 - **`loginForm!: FormGroup;`** – Stores the form instance using Angular's reactive form approach.
 - **`submitted = false;`** – Tracks whether the form has been submitted.
 
 **Constructor**
+
 - **`constructor(private formBuilder: FormBuilder) {}`**
   - Uses Angular's `FormBuilder` service to initialize the form structure.
 
 **Getter Method**
+
 - **`get f() { return this.loginForm.controls; }`**
   - Provides easy access to form controls for validation in the template.
 
@@ -4274,6 +4421,7 @@ The `LoginComponent` is an Angular component responsible for handling user login
   - If valid, it displays an alert with the entered email.
 
 **Functionality Summary**
+
 1. The form includes email and password fields with validation rules.
 2. When submitted, the form checks for validation errors.
 3. If valid, an alert message displays the email entered by the user.
@@ -4287,6 +4435,7 @@ Would you like to add any further details or modifications?
 The html file `login.component.html` has the following content:
 
 File: `login.component.html`
+
 ```html
 <div class="container">
   <div class="row">
@@ -4309,8 +4458,7 @@ File: `login.component.html`
               <div class="invalid-feedback">
                 @if (f['email'].hasError('required')) {
                 <div>Email is required</div>
-                }
-                @if (f['email'].hasError('email')) {
+                } @if (f['email'].hasError('email')) {
                 <div>Email must be a valid email address</div>
                 }
               </div>
@@ -4336,11 +4484,19 @@ File: `login.component.html`
               <label for="floatingPassword">Password</label>
             </div>
             <div class="form-check mb-3">
-              <input class="form-check-input" type="checkbox" value="" id="rememberPasswordCheck" />
-              <label class="form-check-label" for="rememberPasswordCheck"> Remember password </label>
+              <input
+                class="form-check-input"
+                type="checkbox"
+                value=""
+                id="rememberPasswordCheck" />
+              <label class="form-check-label" for="rememberPasswordCheck">
+                Remember password
+              </label>
             </div>
             <div class="d-grid">
-              <button class="btn btn-lg btn-primary btn-login text-uppercase fw-bold mb-2" type="submit">
+              <button
+                class="btn btn-lg btn-primary btn-login text-uppercase fw-bold mb-2"
+                type="submit">
                 Sign in
               </button>
               <div class="text-center">
@@ -4353,7 +4509,6 @@ File: `login.component.html`
     </div>
   </div>
 </div>
-
 ```
 
 **Angular Login Component Template Explanation**
@@ -4362,6 +4517,7 @@ File: `login.component.html`
 This HTML template represents the structure of a login form. It uses Bootstrap classes for styling and Angular features such as `formGroup`, `formControlName`, `ngClass`, and `ngIf` for form handling and validation.
 
 **Container and Layout**
+
 - The form is wrapped inside a **Bootstrap grid system**:
   - `container` → Ensures proper spacing and centering.
   - `row` → Defines a row for layout structure.
@@ -4369,6 +4525,7 @@ This HTML template represents the structure of a login form. It uses Bootstrap c
   - `card border-0 shadow rounded-3 my-5` → Styles the login form as a card with a shadow and rounded corners.
 
 **Card and Title**
+
 - **`card-body p-4 p-sm-5`** → Adds padding to the card's content.
 - **`h5.card-title.text-center.mb-5.fw-light.fs-5`** → Displays "Sign In" as the form title with center alignment and light font styling.
 
@@ -4376,6 +4533,7 @@ This HTML template represents the structure of a login form. It uses Bootstrap c
 The form uses Angular's **Reactive Forms** with `formGroup` and `formControlName` for validation.
 
 **Form Attributes**
+
 - **`[formGroup]="loginForm"`** → Binds the form to the `loginForm` FormGroup from the component.
 - **`(ngSubmit)="onSubmit()"`** → Calls the `onSubmit()` method when the form is submitted.
 
@@ -4384,43 +4542,45 @@ The form uses Angular's **Reactive Forms** with `formGroup` and `formControlName
 - **`formControlName="email"`** → Binds the field to the `email` form control.
 - **`[ngClass]="{ 'is-invalid': submitted && f['email'].errors }"`**
   - Applies the Bootstrap `is-invalid` class if validation fails after submission.
-  
 - **Validation Messages:**
-   (*ngIf is deprecated, use @if instead*)  @if (submitted && f['email'].errors) and @if (f['password'].errors?.['required']) {
+  (_ngIf is deprecated, use @if instead_) @if (submitted && f['email'].errors) and @if (f['password'].errors?.['required']) {
   - **`*ngIf="submitted && f['email'].errors?.['required']"`** → Displays "Email is required" if the field is empty.
   - **`*ngIf="f['email'].errors?.['email']"`** → Displays "Email must be a valid email address" if the email format is incorrect.
 
 **Password Input Field**
+
 - **`type="password"`** → Defines the password input.
 - **Validation Messages:**
   - **`*ngIf="submitted && f['password'].errors?.['required']"`** → Displays "Password is required" when the field is empty.
 
 **Remember Password Checkbox**
+
 - **`<input class="form-check-input" type="checkbox" id="rememberPasswordCheck" />`**
   - Provides an optional "Remember password" checkbox.
 
 **Sign In Button**
+
 - **`<button class="btn btn-lg btn-primary btn-login text-uppercase fw-bold mb-2" type="submit">Sign in</button>`**
   - Styled as a primary Bootstrap button, used to submit the form.
 
 **Forgot Password Link**
+
 - **`<a class="small" href="#">Forgot password?</a>`**
   - Provides a link for users to reset their password.
 
 **Functionality Summary**
+
 1. The form consists of email and password fields with real-time validation.
 2. Validation messages are displayed dynamically based on user input.
 3. A checkbox is available for remembering the password.
 4. The form submits only if all validation checks pass.
-
-
-
 
 ### Login Unit Test
 
 The unit test for the login component:
 
 File: `login.component.spec.ts`
+
 ```typescript
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
@@ -4459,7 +4619,10 @@ describe('LoginComponent', () => {
 
   it('should submit form when valid', () => {
     spyOn(window, 'alert');
-    component.loginForm.setValue({ email: 'test@example.com', password: 'password123' });
+    component.loginForm.setValue({
+      email: 'test@example.com',
+      password: 'password123',
+    });
     component.onSubmit();
     expect(component.loginForm.valid).toBeTruthy();
     expect(component.submitted).toBeTruthy();
@@ -4482,7 +4645,6 @@ describe('LoginComponent', () => {
 });
 ```
 
-
 **Unit Test Explanation for LoginComponent**
 
 **Overview**
@@ -4490,7 +4652,9 @@ This unit test file (`login.component.spec.ts`) ensures that the `LoginComponent
 
 **Test Dependencies and Setup**
 **Before Each Test (`beforeEach` Blocks)**
+
 - **`async beforeEach` Block:**
+
   - Calls `TestBed.configureTestingModule` to set up the test module.
   - Imports `ReactiveFormsModule` and declares `LoginComponent`.
   - Compiles the component’s template and styles asynchronously.
@@ -4500,25 +4664,28 @@ This unit test file (`login.component.spec.ts`) ensures that the `LoginComponent
   - Assigns the component instance to `component`.
   - Calls `fixture.detectChanges()` to apply changes and initialize the component.
 
-
 **Test Cases**
 
 **1. Component Creation**
+
 - **`it('should create', () => { ... })`**
   - Ensures that the component is successfully created.
   - Uses `expect(component).toBeTruthy();` to verify existence.
 
 **2. Form Initialization**
+
 - **`it('should initialize form with empty values', () => { ... })`**
   - Checks that `loginForm` initializes with empty email and password fields.
   - Uses `expect(component.loginForm.value).toEqual({ email: '', password: '' });`
 
 **3. Form Validation - Empty Fields**
+
 - **`it('should invalidate the form when fields are empty', () => { ... })`**
   - Calls `onSubmit()` without filling the form.
   - Uses `expect(component.loginForm.invalid).toBeTruthy();` to check if the form is invalid.
 
 **4. Valid Form Submission**
+
 - **`it('should submit form when valid', () => { ... })`**
   - Mocks the `window.alert` function using `spyOn(window, 'alert');`.
   - Sets valid email and password using `component.loginForm.setValue(...)`.
@@ -4528,19 +4695,21 @@ This unit test file (`login.component.spec.ts`) ensures that the `LoginComponent
     - The alert is displayed with the email value.
 
 **5. Email Validation**
+
 - **`it('should validate email field correctly', () => { ... })`**
   - Assigns an invalid email (`'invalid-email'`) to the email field.
   - Checks if `emailControl.invalid` is `true`.
   - Verifies the presence of an `email` validation error.
 
 **6. Password Validation**
+
 - **`it('should validate password field correctly', () => { ... })`**
   - Assigns an empty value to the password field.
   - Checks if `passwordControl.invalid` is `true`.
   - Verifies the presence of a `required` validation error.
 
-  
 **Summary**
+
 - Ensures the `LoginComponent` initializes correctly.
 - Validates form fields and displays errors when needed.
 - Confirms that the form submits successfully when valid.
@@ -4549,7 +4718,6 @@ This unit test file (`login.component.spec.ts`) ensures that the `LoginComponent
 ---
 
 ## Create a Directive for a Tool Tip
-
 
 Add the following styles to the global styles in styles.scss:
 
@@ -4595,7 +4763,13 @@ ng generate directive shared/directive/tooltip
 File tooltip.directice.ts
 
 ```typescript
-import { Directive, ElementRef, HostListener, Input, OnDestroy } from '@angular/core';
+import {
+  Directive,
+  ElementRef,
+  HostListener,
+  Input,
+  OnDestroy,
+} from '@angular/core';
 
 @Directive({
   selector: '[appTooltip]',
@@ -4614,12 +4788,17 @@ export class TooltipDirective implements OnDestroy {
   }
   @HostListener('mouseenter', ['$event']) onMouseEnter(event: MouseEvent) {
     this.timer = setTimeout(() => {
-      const x = this.el.nativeElement.getBoundingClientRect().left + this.el.nativeElement.offsetWidth / 2; // Get the middle of the element
+      const x =
+        this.el.nativeElement.getBoundingClientRect().left +
+        this.el.nativeElement.offsetWidth / 2; // Get the middle of the element
       // x = event.clientX; In case position should be under the mouse
       console.log('mouse pos', event.clientX, event.clientY);
-      const y = this.el.nativeElement.getBoundingClientRect().top + this.el.nativeElement.offsetHeight + 6; // Get the bottom of the element, plus a little extra
+      const y =
+        this.el.nativeElement.getBoundingClientRect().top +
+        this.el.nativeElement.offsetHeight +
+        6; // Get the bottom of the element, plus a little extra
       this.createTooltipPopup(x, y);
-    }, Number.parseInt(this.appTooltipDelay) );
+    }, Number.parseInt(this.appTooltipDelay));
   }
   @HostListener('mouseleave') onMouseLeave() {
     if (this.timer) clearTimeout(this.timer);
@@ -4640,10 +4819,9 @@ export class TooltipDirective implements OnDestroy {
     }, 5000); // Remove tooltip after 5 seconds
   }
 }
-
 ```
 
-The tooltip will appear in the middle of the Host element. 
+The tooltip will appear in the middle of the Host element.
 If the tooltip should appear at a different position, you can compute the x and y coordinates differently.
 
 **Explanation of Angular `TooltipDirective`**
@@ -4652,10 +4830,12 @@ If the tooltip should appear at a different position, you can compute the x and 
 The `TooltipDirective` is a custom Angular directive that adds tooltip functionality to elements. When a user hovers over an element with this directive, a tooltip appears, displaying the provided text. The tooltip disappears when the mouse leaves the element.
 
 **Directive Definition (`@Directive`)**
+
 - The directive is decorated with `@Directive`, using the selector `[tooltip]`.
 - The `inputs` array allows `tooltip` (text to display) and `delay` (time before tooltip appears) to be set via attribute bindings.
 
 **Class Properties and Constructor**
+
 - **`appTooltip` (`@Input`)**: Holds the tooltip text.
 - **`appTooltipDelay` (`@Input`)**: An optional delay (default: `190ms`) before the tooltip appears.
 - **`myPopup`**: Stores the tooltip element created in the DOM.
@@ -4663,19 +4843,24 @@ The `TooltipDirective` is a custom Angular directive that adds tooltip functiona
 - **`constructor(private el: ElementRef)`**: Injects `ElementRef` to access the host element.
 
 **Lifecycle Hook (`ngOnDestroy`)**
+
 - If the directive is destroyed (e.g., the element is removed), the tooltip is also removed to prevent memory leaks.
 
 **Event Listeners (`@HostListener`)**
+
 1. **`onMouseEnter(event: MouseEvent)`**
-  - When the mouse enters the element, a timeout (`setTimeout`) is set using `delay`.
-  - The tooltip position is calculated based on the element's position.
-  - `createTooltipPopup(x, y)` is called to display the tooltip.
+
+- When the mouse enters the element, a timeout (`setTimeout`) is set using `delay`.
+- The tooltip position is calculated based on the element's position.
+- `createTooltipPopup(x, y)` is called to display the tooltip.
 
 2. **`onMouseLeave()`**
-  - If the user moves the mouse away, the tooltip is removed immediately.
-  - Any pending timeout is cleared to prevent the tooltip from showing after the mouse has left.
+
+- If the user moves the mouse away, the tooltip is removed immediately.
+- Any pending timeout is cleared to prevent the tooltip from showing after the mouse has left.
 
 3. **Tooltip Creation (`createTooltipPopup`)**
+
 - A `div` is dynamically created and styled as a tooltip container.
 - It is positioned based on the element’s dimensions.
 - The tooltip is appended to `document.body`.
@@ -4691,21 +4876,19 @@ For using the directive add the directive tooltip and delay to the HTML template
 [appTooltip]="'This is a Todo List'" appTooltipDelay="200"
 ```
 
-To ensure the `tooltip` in  _todo-lists_ is visible, we need to add it to the file `todo-lists.component.html`.
+To ensure the `tooltip` in _todo-lists_ is visible, we need to add it to the file `todo-lists.component.html`.
 
 File `todo-lists.component.html`
+
 ```html
 <div class="row">
   <div
     class="col-sm-9 py-1 my-1 clickable"
     [routerLink]="['/todoitem/', row.listId]"
     [appTooltip]="'This is a Todo List'"
-    appTooltipDelay="200"
-  >
-
-  ...
-  ...
-  </div>  
+    appTooltipDelay="200">
+    ... ...
+  </div>
 </div>
 ```
 
@@ -4718,6 +4901,7 @@ Add the import to the file todo-lists.component.ts`:
 ### Unit Test the Tooltip Directive
 
 File: `tooltip.directive.spec.ts`
+
 ```typescript
 import { TooltipDirective } from './tooltip.directive';
 import { Component, DebugElement } from '@angular/core';
@@ -4766,7 +4950,6 @@ describe('TooltipDirective', () => {
     expect(dir).toBeTruthy();
   });
 });
-
 ```
 
 **Explanation of Angular Test Code for TooltipDirective**
@@ -4775,11 +4958,13 @@ describe('TooltipDirective', () => {
 This Angular test file is designed to test a custom directive, `TooltipDirective`, which is applied to a button element. The test suite verifies that the directive is correctly attached and can be injected into components.
 
 **Test Component (`TestTooltipDirectiveComponent`)**
+
 - A test component is created using the `@Component` decorator.
 - The `TooltipDirective` is imported and applied to a `<button>` element inside the component’s template.
 - The button has an attribute `[tooltip]="'test'"`, which binds the tooltip text to `"test"`.
 
 **Setup (`beforeEach`)**
+
 - The `TestBed.configureTestingModule` is used to set up the testing module.
 - The `TooltipDirective` and `TestTooltipDirectiveComponent` are included in the `imports` array.
 - `compileComponents()` ensures that the component and directive are compiled before testing.
@@ -4789,21 +4974,24 @@ This Angular test file is designed to test a custom directive, `TooltipDirective
 **Test Cases**
 
 1. **Checking if the TooltipDirective is Applied**
-  - The test verifies that only one element (the `<button>`) has the `TooltipDirective` applied by checking the length of `des`.
+
+- The test verifies that only one element (the `<button>`) has the `TooltipDirective` applied by checking the length of `des`.
 
 2. **Ensuring the Directive is Listed in the Button’s Provider Tokens**
-  - This test checks if the `TooltipDirective` is included in the provider tokens of the `<button>` element.
-  - `des[0].providerTokens` is used to confirm the directive is present.
+
+- This test checks if the `TooltipDirective` is included in the provider tokens of the `<button>` element.
+- `des[0].providerTokens` is used to confirm the directive is present.
 
 3. **Verifying that the TooltipDirective can be Injected**
-  - This test ensures that the `TooltipDirective` can be retrieved from the element’s injector.
-  - `des[0].injector.get(TooltipDirective)` is used to get an instance of the directive.
-  - The test expects the retrieved directive instance to be truthy, confirming successful injection.
+
+- This test ensures that the `TooltipDirective` can be retrieved from the element’s injector.
+- `des[0].injector.get(TooltipDirective)` is used to get an instance of the directive.
+- The test expects the retrieved directive instance to be truthy, confirming successful injection.
 
 **Conclusion**
 
-This test file verifies that the `TooltipDirective` is correctly applied, 
-registered in the button’s providers, and can be injected when needed. 
+This test file verifies that the `TooltipDirective` is correctly applied,
+registered in the button’s providers, and can be injected when needed.
 It ensures that the directive functions as expected within an Angular application.
 
 ---
@@ -4812,7 +5000,6 @@ It ensures that the directive functions as expected within an Angular applicatio
 
 A pipe will be used to convert temperatures between degrees Celsius and Fahrenheit, and vice versa.
 The pipe will then be tested in the `tempConversion` component.
-
 
 ![temp-conversion.png](readme/temp-conversion.png)
 
@@ -4828,7 +5015,7 @@ Let's create the pipe first:
 ng generate pipe shared/pipe/tempConverter
 ```
 
-The pipe is named `tempConverter`. The class implements the interface Pipe `transform()`, 
+The pipe is named `tempConverter`. The class implements the interface Pipe `transform()`,
 resulting in a methode transform. The method accepts two arguments:
 
 - value: the temperature in Fahrenheit or Celcius
@@ -4882,7 +5069,6 @@ describe('TempConverterPipe', () => {
     expect(pipe.transform(0, 'F')).toBe('32.00');
   });
 });
-
 ```
 
 The unit test is calling the transform method with `C` and `F`unit.
@@ -4892,7 +5078,7 @@ The unit test is calling the transform method with `C` and `F`unit.
 Let's create the component:
 
 ```shell
-ng generate component tempConversion 
+ng generate component tempConversion
 ```
 
 File: temp-conversion.component.ts
@@ -4913,7 +5099,6 @@ export class TempConversionComponent {
   celsius = 0;
   fahrenheit = 0;
 }
-
 ```
 
 ### The HTML Template for Temp-Conversion-Pipe-Component
@@ -4922,72 +5107,84 @@ File: temp-conversion.component.html
 
 ```html
 <section class="container legend">
-<div class="row mt-3">
-  <h4>Fahrenheit to Celsius</h4>
-</div>
-<div class="row align-items-center">
-<div class="col-sm-2">
-  <label for="fahrenheitToCelsius" class="col-form-label">Fahrenheit</label>
+  <div class="row mt-3">
+    <h4>Fahrenheit to Celsius</h4>
   </div>
-  <div class="col-sm-3">
-<input type="text" id="fahrenheitToCelsius" class="form-control" [(ngModel)]="fahrenheit" />
+  <div class="row align-items-center">
+    <div class="col-sm-2">
+      <label for="fahrenheitToCelsius" class="col-form-label">Fahrenheit</label>
+    </div>
+    <div class="col-sm-3">
+      <input
+        type="text"
+        id="fahrenheitToCelsius"
+        class="form-control"
+        [(ngModel)]="fahrenheit" />
+    </div>
+    <div class="col-sm-5">
+      <span id="fahrenheitToCelsiusDisplay"
+        >Celsius : {{ fahrenheit | tempConverter: 'C' }}
+      </span>
+    </div>
   </div>
-  <div class="col-sm-5">
-<span id="fahrenheitToCelsiusDisplay">Celsius : {{ fahrenheit | tempConverter: 'C' }} </span>
-</div>
-</div>
-<div class="row mt-3">
-  <h4>Celsius to Fahrenheit</h4>
-</div>
-<div class="row align-items-center">
-<div class="col-sm-2">
-  <label for="celsiusToFahrenheit" class="col-form-label">Celsius</label>
+  <div class="row mt-3">
+    <h4>Celsius to Fahrenheit</h4>
   </div>
-  <div class="col-sm-3">
-<input type="text" id="celsiusToFahrenheit" class="form-control" [(ngModel)]="celsius" />
+  <div class="row align-items-center">
+    <div class="col-sm-2">
+      <label for="celsiusToFahrenheit" class="col-form-label">Celsius</label>
+    </div>
+    <div class="col-sm-3">
+      <input
+        type="text"
+        id="celsiusToFahrenheit"
+        class="form-control"
+        [(ngModel)]="celsius" />
+    </div>
+    <div class="col-sm-5">
+      <span id="celsiusToFahrenheitDisplay"
+        >Fahrenheit : {{ celsius | tempConverter: 'F' }}
+      </span>
+    </div>
   </div>
-  <div class="col-sm-5">
-<span id="celsiusToFahrenheitDisplay">Fahrenheit : {{ celsius | tempConverter: 'F' }} </span>
-</div>
-</div>
 </section>
 ```
 
 **Purpose of the Template**  
-The provided HTML template defines a user interface for temperature conversion between 
+The provided HTML template defines a user interface for temperature conversion between
 Fahrenheit and Celsius using Angular's two-way data binding and a custom pipe for conversion logic.
 
 **Layout and Structure**  
-The UI is organized using Bootstrap classes for responsive layout. 
-Each conversion direction (Fahrenheit to Celsius and Celsius to Fahrenheit) is encapsulated within a `row`, 
-with proper spacing (`mt-3`) for visual separation. 
-Labels, inputs, and result displays are laid out using Bootstrap’s 
+The UI is organized using Bootstrap classes for responsive layout.
+Each conversion direction (Fahrenheit to Celsius and Celsius to Fahrenheit) is encapsulated within a `row`,
+with proper spacing (`mt-3`) for visual separation.
+Labels, inputs, and result displays are laid out using Bootstrap’s
 grid system to ensure alignment and responsiveness.
 
 **Fahrenheit to Celsius Section**  
-This section begins with a heading to label the conversion type. 
-A labeled input field allows the user to enter a Fahrenheit value. 
-The value entered in this input is bound bidirectionally to a component property 
-named `fahrenheit` using Angular's `ngModel` directive. 
-A span element is used to display the result of the conversion. 
-It utilizes the custom pipe `tempConverter` with `'C'` as the argument, 
+This section begins with a heading to label the conversion type.
+A labeled input field allows the user to enter a Fahrenheit value.
+The value entered in this input is bound bidirectionally to a component property
+named `fahrenheit` using Angular's `ngModel` directive.
+A span element is used to display the result of the conversion.
+It utilizes the custom pipe `tempConverter` with `'C'` as the argument,
 instructing the pipe to convert the value to Celsius.
 
 **Celsius to Fahrenheit Section**  
-Following the same structure, this section handles conversion from Celsius to Fahrenheit. 
-The input field is bound to a `celsius` property, 
+Following the same structure, this section handles conversion from Celsius to Fahrenheit.
+The input field is bound to a `celsius` property,
 and the result is displayed using the `tempConverter` pipe with `'F'` as the argument.
 
 **Data Binding and Pipe Usage**  
-The use of `[(ngModel)]` enables real-time data synchronization between the input 
-fields and component properties, allowing instant updates to the conversion 
-result as the user types. 
-The `tempConverter` pipe processes the input value and returns the converted 
+The use of `[(ngModel)]` enables real-time data synchronization between the input
+fields and component properties, allowing instant updates to the conversion
+result as the user types.
+The `tempConverter` pipe processes the input value and returns the converted
 temperature based on the specified direction (`'C'` for Celsius, `'F'` for Fahrenheit).
 
 **Conclusion**  
-This component provides a clean and interactive interface for bi-directional 
-temperature conversion, leveraging Angular's template syntax, pipes, 
+This component provides a clean and interactive interface for bi-directional
+temperature conversion, leveraging Angular's template syntax, pipes,
 and reactive capabilities to deliver a seamless user experience.
 
 ### Unit Test for the Temp-Conversion-Pipe-Component
@@ -5007,7 +5204,12 @@ describe('TempConversionComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, FormsModule, TempConversionComponent, TempConverterPipe],
+      imports: [
+        ReactiveFormsModule,
+        FormsModule,
+        TempConversionComponent,
+        TempConverterPipe,
+      ],
       providers: [],
     }).compileComponents();
   });
@@ -5025,8 +5227,12 @@ describe('TempConversionComponent', () => {
   it('should convert "32 Fahrenheit" to "0 degrees"', () => {
     // get the name's input and display elements from the DOM
     const hostElement: HTMLElement = fixture.nativeElement!;
-    const nameInput: HTMLInputElement = hostElement.querySelector('#fahrenheitToCelsius')!;
-    const nameDisplay: HTMLElement = hostElement.querySelector('#fahrenheitToCelsiusDisplay')!;
+    const nameInput: HTMLInputElement = hostElement.querySelector(
+      '#fahrenheitToCelsius'
+    )!;
+    const nameDisplay: HTMLElement = hostElement.querySelector(
+      '#fahrenheitToCelsiusDisplay'
+    )!;
 
     // simulate user entering a new name into the input box
     nameInput.value = '32';
@@ -5043,8 +5249,12 @@ describe('TempConversionComponent', () => {
   it('should convert "0 degrees" to "32 Fahrenheit"', () => {
     // get the name's input and display elements from the DOM
     const hostElement: HTMLElement = fixture.nativeElement!;
-    const nameInput: HTMLInputElement = hostElement.querySelector('#celsiusToFahrenheit')!;
-    const nameDisplay: HTMLElement = hostElement.querySelector('#celsiusToFahrenheitDisplay')!;
+    const nameInput: HTMLInputElement = hostElement.querySelector(
+      '#celsiusToFahrenheit'
+    )!;
+    const nameDisplay: HTMLElement = hostElement.querySelector(
+      '#celsiusToFahrenheitDisplay'
+    )!;
 
     // simulate user entering a new name into the input box
     nameInput.value = '0';
@@ -5058,39 +5268,37 @@ describe('TempConversionComponent', () => {
     expect(nameDisplay.textContent).toBe('Fahrenheit : 32.00 ');
   });
 });
-
 ```
 
 **Purpose of the Test Suite**  
-The test suite is designed to validate the functionality of a temperature conversion component 
-in an Angular application. It checks whether the component is created successfully 
+The test suite is designed to validate the functionality of a temperature conversion component
+in an Angular application. It checks whether the component is created successfully
 and verifies the correct behavior of Fahrenheit to Celsius and Celsius to Fahrenheit conversions.
 
-
 **Component Initialization**  
-Before any tests run, the Angular testing module is configured to include the necessary imports and declarations. 
-The component is compiled, instantiated, and the fixture is initialized. 
-This setup ensures that the component is ready for interaction and that the DOM 
+Before any tests run, the Angular testing module is configured to include the necessary imports and declarations.
+The component is compiled, instantiated, and the fixture is initialized.
+This setup ensures that the component is ready for interaction and that the DOM
 is rendered appropriately for test inspection.
 
 **Test for Component Creation**  
-The first test verifies the component is instantiated properly. 
+The first test verifies the component is instantiated properly.
 If the component instance exists and is truthy, it confirms successful creation and basic setup.
 
 **Fahrenheit to Celsius Conversion Test**  
-This test simulates a user entering "32" into an input field meant for Fahrenheit values. 
-The DOM is queried to find the relevant input and display elements. 
-After programmatically entering the value and dispatching an input event, Angular is prompted to detect changes. 
+This test simulates a user entering "32" into an input field meant for Fahrenheit values.
+The DOM is queried to find the relevant input and display elements.
+After programmatically entering the value and dispatching an input event, Angular is prompted to detect changes.
 The test then asserts that the displayed Celsius value is correctly converted to "0.00".
 
 **Celsius to Fahrenheit Conversion Test**  
-This test mirrors the previous one but in the opposite direction. 
-It inputs "0" into the Celsius field, triggers the input event, 
-and refreshes Angular’s change detection. It confirms that the corresponding Fahrenheit output is displayed as "32.00", 
+This test mirrors the previous one but in the opposite direction.
+It inputs "0" into the Celsius field, triggers the input event,
+and refreshes Angular’s change detection. It confirms that the corresponding Fahrenheit output is displayed as "32.00",
 ensuring bidirectional conversion accuracy.
 
 **Conclusion**  
-These tests ensure the temperature conversion logic functions correctly and that 
+These tests ensure the temperature conversion logic functions correctly and that
 user inputs are properly processed and displayed in the UI through Angular bindings and custom pipes.
 
 ---
@@ -5249,7 +5457,6 @@ server {
 
 <br/>
 
-
 Create a Dockerfile in the root folder of the project:
 
 ```dockerfile
@@ -5318,7 +5525,6 @@ File `build.sh`
 docker buildx build --platform linux/amd64 -t uportal/todo-angular -f Dockerfile .
 ```
 
-
 File `build-arm.sh`
 
 ```shell
@@ -5328,11 +5534,11 @@ File `build-arm.sh`
 docker buildx build --platform linux/arm64 -t uportal/todo-angular -f Dockerfile .
 ```
 
-In order to inject environment variables into the project, 
+In order to inject environment variables into the project,
 we create a start.sh file in the root folder of the project.
 
+File `start.sh`
 
- File `start.sh`
 ```shell
 #!/bin/sh
 
@@ -5344,7 +5550,7 @@ fi
 
 
 nginx -g "daemon off;"
-````
+```
 
 <br/>
 
@@ -5357,18 +5563,15 @@ Replace **uportal** with your **dockerhub id**.
 File: `docker-compose.yml`
 
 ```yaml
-
 services:
   todo-angular:
     image: uportal/todo-angular:latest
 
     restart: unless-stopped
     ports:
-      - "4000:80"
+      - '4000:80'
     environment:
       API_BASE_PATH: https://todo-h2.united-portal.com
-
-
 ```
 
 <br/>
@@ -5378,7 +5581,6 @@ services:
 Traefik is a reverse proxy on linux. There is a version 1.x and 2.x for the yaml-file possible, depending on the use of the traefik version.
 
 [https://doc.traefik.io/traefik/](https://doc.traefik.io/traefik/)
-
 
 **For traefik version 2.x**
 
@@ -5419,16 +5621,15 @@ networks:
     external: true
 
 services:
-
   todo-angular:
     image: uportal/todo-angular:latest
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.todo-angular.rule=Host(`todo-angular.united-portal.com`)"
-      - "traefik.http.routers.todo-angular.tls=true"
-      - "traefik.http.routers.todo-angular.tls.certresolver=lets-encrypt"
-      - "traefik.http.routers.todo-angular.entrypoints=websecure"
-      - "traefik.http.services.todo-angular.loadbalancer.server.port=80"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.todo-angular.rule=Host(`todo-angular.united-portal.com`)'
+      - 'traefik.http.routers.todo-angular.tls=true'
+      - 'traefik.http.routers.todo-angular.tls.certresolver=lets-encrypt'
+      - 'traefik.http.routers.todo-angular.entrypoints=websecure'
+      - 'traefik.http.services.todo-angular.loadbalancer.server.port=80'
     restart: unless-stopped
     ports:
       - 4000:80
@@ -5437,6 +5638,4 @@ services:
 
     environment:
       API_BASE_PATH: https://todo-h2.united-portal.com
-
-
 ```

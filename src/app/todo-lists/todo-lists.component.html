@@ -31,21 +31,27 @@
             {{ row.count }}
           </span>
 
-        <!-- eslint-disable -->
-        <span (click)="onDelete(row.listId)" appClickStopPropagation
-              (keydown.enter)="onEdit(i)" appKeydownStopPropagation
-              role="button"
-              tabindex="{{ i * 3 + 4 }}"
-              class="float-right">
-              <i class="fa fa-trash"></i>
+          <!-- eslint-disable -->
+          <span
+            (click)="onDelete(row.listId)"
+            appClickStopPropagation
+            (keydown.enter)="onEdit(i)"
+            appKeydownStopPropagation
+            role="button"
+            tabindex="{{ i * 3 + 4 }}"
+            class="float-right">
+            <i class="fa fa-trash"></i>
           </span>
 
-        <span (click)="onEdit(i)" appClickStopPropagation
-              (keydown.enter)="onEdit(i)" appKeydownStopPropagation
-              role="button"
-              tabindex="{{ i * 3 + 3 }}"
-              class="float-right">
-              <i class="fa fa-edit"></i>
+          <span
+            (click)="onEdit(i)"
+            appClickStopPropagation
+            (keydown.enter)="onEdit(i)"
+            appKeydownStopPropagation
+            role="button"
+            tabindex="{{ i * 3 + 3 }}"
+            class="float-right">
+            <i class="fa fa-edit"></i>
           </span>
           <!-- eslint-enable -->
           <span class="float-right" tabindex="-1" [routerLink]="['/todoitem/', row.listId]">
