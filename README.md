@@ -3753,13 +3753,13 @@ File: `signup.component.ts`
 import { Component, ViewChild } from '@angular/core';
 import { Signup } from '../model/signup';
 import { FormsModule, NgForm } from '@angular/forms';
-import { NgIf, NgFor, JsonPipe } from '@angular/common';
+import { JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.scss'],
-  imports: [FormsModule, NgIf, NgFor, JsonPipe],
+  imports: [FormsModule, JsonPipe],
 })
 export class SignupComponent {
   model: Signup = new Signup();
@@ -3807,29 +3807,31 @@ File: `signup.component.html`
 ```html
 <h4 class="component-title">Signup</h4>
 <div class="row">
-  <form novalidate
-        (ngSubmit)="onSubmit(f)"
-        #f="ngForm">
-
+  <form novalidate (ngSubmit)="onSubmit(f)" #f="ngForm">
     <fieldset ngModelGroup="name">
       <div class="row form-group mt-3">
         <div class="col-sm-3">
           <label for="firstName" class="fs-6 col-form-label text-black-50">First Name</label>
         </div>
         <div class="col-sm-6">
-          <input type="text"
-                 id="firstName"
-                 autocomplete="on"
-                 class="form-control"
-                 name="firstName"
-                 [(ngModel)]="model.firstName"
-                 required
-                 #firstName="ngModel">
-          <div class="form-control-feedback text-danger "
-               *ngIf="firstName.errors && (firstName.dirty || firstName.touched)">
-            <p *ngIf="firstName.errors?.['required']"><small>First name is
-              required</small></p>
+          <input
+            type="text"
+            id="firstName"
+            autocomplete="on"
+            class="form-control"
+            name="firstName"
+            [(ngModel)]="model.firstName"
+            required
+            #firstName="ngModel" />
+          @if (firstName.errors && (firstName.dirty || firstName.touched)) {
+          <div
+            class="form-control-feedback text-danger"
+          >
+            @if (firstName.hasError('required')) {
+            <p><small>First name is required</small></p>
+            }
           </div>
+          }
         </div>
       </div>
       <div class="row form-group mt-2">
@@ -3837,18 +3839,24 @@ File: `signup.component.html`
           <label for="lastName" class="fs-6 col-form-label text-black-50">Last Name</label>
         </div>
         <div class="col-sm-6">
-          <input type="text"
-                 id="lastName"
-                 autocomplete="on"
-                 class="form-control"
-                 name="lastName"
-                 [(ngModel)]="model.lastName"
-                 required
-                 #lastName="ngModel">
-          <div class="form-control-feedback text-danger"
-               *ngIf="lastName.errors && (lastName.dirty || lastName.touched)">
-            <p *ngIf="lastName.errors?.['required']"><small>Last name is required</small></p>
+          <input
+            type="text"
+            id="lastName"
+            autocomplete="on"
+            class="form-control"
+            name="lastName"
+            [(ngModel)]="model.lastName"
+            required
+            #lastName="ngModel" />
+          @if (lastName.errors && (lastName.dirty || lastName.touched)) {
+          <div
+            class="form-control-feedback text-danger"
+          >
+            @if (lastName.hasError('required')) {
+            <p><small>Last name is required</small></p>
+            }
           </div>
+          }
         </div>
       </div>
     </fieldset>
@@ -3857,44 +3865,57 @@ File: `signup.component.html`
         <label for="email" class="fs-6 col-form-label text-black-50">Email</label>
       </div>
       <div class="col-sm-6">
-        <input type="email"
-               id="email"
-               autocomplete="on"
-               class="form-control"
-               name="email"
-               [(ngModel)]="model.email"
-               required
-               pattern="[^ @]*@[^ @]*"
-               #email="ngModel">
-        <div class="form-control-feedback text-danger"
-             *ngIf="email.errors && (email.dirty || email.touched)">
-          <p id="email-error-required" *ngIf="email.errors?.['required']"><small>Email is required</small></p>
-          <p id="email-error-at-least" *ngIf="email.errors?.['pattern']"><small>Email must contain at least the &#64;
-            character</small></p>
+        <input
+          type="email"
+          id="email"
+          autocomplete="on"
+          class="form-control"
+          name="email"
+          [(ngModel)]="model.email"
+          required
+          pattern="[^ @]*@[^ @]*"
+          #email="ngModel" />
+        @if (email.errors && (email.dirty || email.touched)) {
+        <div class="form-control-feedback text-danger">
+          @if (email.hasError('required')) {
+          <p id="email-error-required"><small>Email is required</small></p>
+          }
+          @if (email.hasError('pattern')) {
+          <p id="email-error-at-least">
+            <small>Email must contain at least the &#64; character</small>
+          </p>
+          }
         </div>
+        }
       </div>
-
     </div>
     <div class="row form-group mt-2">
       <div class="col-sm-3">
         <label for="password" class="fs-6 col-form-label text-black-50">Password</label>
       </div>
       <div class="col-sm-6">
-        <input type="password"
-               id="password"
-               autocomplete="on"
-               class="form-control"
-               name="password"
-               [(ngModel)]="model.password"
-               required
-               minlength="8"
-               #password="ngModel">
-        <div class="form-control-feedback text-danger"
-             *ngIf="password.errors && (password.dirty || password.touched)">
-          <p id="password-error-required" *ngIf="password.errors?.['required']"><small>Password is required</small></p>
-          <p id="password-error-at-least" *ngIf="password.errors?.['minlength']"><small>Password must be at least 8
-            characters long</small></p>
+        <input
+          type="password"
+          id="password"
+          autocomplete="on"
+          class="form-control"
+          name="password"
+          [(ngModel)]="model.password"
+          required
+          minlength="8"
+          #password="ngModel" />
+        @if (password.errors && (password.dirty || password.touched)) {
+        <div class="form-control-feedback text-danger">
+          @if (password.hasError('required')) {
+          <p id="password-error-required"><small>Password is required</small></p>
+          }
+          @if (password.hasError('minlength')) {
+          <p id="password-error-at-least">
+            <small>Password must be at least 8 characters long</small>
+          </p>
+          }
         </div>
+        }
       </div>
     </div>
     <div class="row form-group mt-2">
@@ -3902,24 +3923,18 @@ File: `signup.component.html`
         <label for="language" class="fs-6 col-form-label text-black-50">Language</label>
       </div>
       <div class="col-sm-6">
-        <select class="form-control"
-                id="language"
-                name="language"
-                [(ngModel)]="model.language">
+        <select class="form-control" id="language" name="language" [(ngModel)]="model.language">
           <option value="">Please select a language</option>
-          <option *ngFor="let lang of langs"
-                  [value]="lang">{{lang}}
-          </option>
+          @for (lang of langs; track lang) {
+          <option [value]="lang">{{ lang }}</option>
+          }
         </select>
       </div>
     </div>
     <div class="row form-group mt-4">
-      <div class="col-sm-3"><label></label></div>
+      <div class="col-sm-3"></div>
       <div class="col-sm-6">
-        <button type="submit"
-                class="btn btn-primary float-end"
-                [disabled]="f.invalid">Submit
-        </button>
+        <button type="submit" class="btn btn-primary float-end" [disabled]="f.invalid">Submit</button>
       </div>
     </div>
   </form>
@@ -3933,6 +3948,7 @@ File: `signup.component.html`
 <div class="row mt-4">
   <pre><small>{{model | json}}</small></pre>
 </div>
+
 ```
 
 **Explanation of signup.component.html**
@@ -4184,15 +4200,15 @@ The typescript class `login.component.ts` has the following content:
 
 File: `login.component.ts`
 ```typescript
-import { Component, OnInit } from '@angular/core';
+iimport { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgClass, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
-  imports: [FormsModule, ReactiveFormsModule, NgClass, NgIf],
+  imports: [FormsModule, ReactiveFormsModule, NgClass],
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
@@ -4220,6 +4236,7 @@ export class LoginComponent implements OnInit {
     });
   }
 }
+
 ```
 
 
@@ -4288,10 +4305,16 @@ File: `login.component.html`
                 placeholder="name@example.com"
                 formControlName="email"
                 [ngClass]="{ 'is-invalid': submitted && f['email'].errors }" />
-              <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
-                <div *ngIf="f['email'].errors?.['required']">Email is required</div>
-                <div *ngIf="f['email'].errors?.['email']">Email must be a valid email address</div>
+              @if (submitted && f['email'].errors) {
+              <div class="invalid-feedback">
+                @if (f['email'].hasError('required')) {
+                <div>Email is required</div>
+                }
+                @if (f['email'].hasError('email')) {
+                <div>Email must be a valid email address</div>
+                }
               </div>
+              }
               <label for="floatingInput">Email address</label>
             </div>
             <div class="form-floating mb-3">
@@ -4303,9 +4326,13 @@ File: `login.component.html`
                 placeholder="Password"
                 formControlName="password"
                 [ngClass]="{ 'is-invalid': submitted && f['password'].errors }" />
-              <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
-                <div *ngIf="f['password'].errors?.['required']">Password is required</div>
+              @if (submitted && f['password'].errors) {
+              <div class="invalid-feedback">
+                @if (f['password'].hasError('required')) {
+                <div>Password is required</div>
+                }
               </div>
+              }
               <label for="floatingPassword">Password</label>
             </div>
             <div class="form-check mb-3">
@@ -4326,6 +4353,7 @@ File: `login.component.html`
     </div>
   </div>
 </div>
+
 ```
 
 **Angular Login Component Template Explanation**
@@ -4358,6 +4386,7 @@ The form uses Angular's **Reactive Forms** with `formGroup` and `formControlName
   - Applies the Bootstrap `is-invalid` class if validation fails after submission.
   
 - **Validation Messages:**
+   (*ngIf is deprecated, use @if instead*)  @if (submitted && f['email'].errors) and @if (f['password'].errors?.['required']) {
   - **`*ngIf="submitted && f['email'].errors?.['required']"`** → Displays "Email is required" if the field is empty.
   - **`*ngIf="f['email'].errors?.['email']"`** → Displays "Email must be a valid email address" if the email format is incorrect.
 

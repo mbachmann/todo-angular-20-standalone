@@ -15,10 +15,16 @@
                 placeholder="name@example.com"
                 formControlName="email"
                 [ngClass]="{ 'is-invalid': submitted && f['email'].errors }" />
-              <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
-                <div *ngIf="f['email'].errors?.['required']">Email is required</div>
-                <div *ngIf="f['email'].errors?.['email']">Email must be a valid email address</div>
-              </div>
+              @if (submitted && f['email'].errors) {
+                <div class="invalid-feedback">
+                  @if (f['email'].hasError('required')) {
+                    <div>Email is required</div>
+                  }
+                  @if (f['email'].hasError('email')) {
+                    <div>Email must be a valid email address</div>
+                  }
+                </div>
+              }
               <label for="floatingInput">Email address</label>
             </div>
             <div class="form-floating mb-3">
@@ -30,9 +36,13 @@
                 placeholder="Password"
                 formControlName="password"
                 [ngClass]="{ 'is-invalid': submitted && f['password'].errors }" />
-              <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
-                <div *ngIf="f['password'].errors?.['required']">Password is required</div>
-              </div>
+              @if (submitted && f['password'].errors) {
+                <div class="invalid-feedback">
+                  @if (f['password'].hasError('required')) {
+                    <div>Password is required</div>
+                  }
+                </div>
+              }
               <label for="floatingPassword">Password</label>
             </div>
             <div class="form-check mb-3">
