@@ -12,8 +12,7 @@
     "lint:fix": "ng lint --fix",
     "prettier:write": "prettier --config .prettierrc.json --write .",
     "prettier:check": "prettier --config .prettierrc.json --check .",
-    "generate:api": "openapi-generator-cli generate -g typescript-angular -i  src/app/openapi/api-docs.yaml -o src/app/openapi-gen",
-    "lint": "ng lint"
+    "generate:api": "openapi-generator-cli generate -g typescript-angular -i  src/app/openapi/api-docs.yaml -o src/app/openapi-gen --additional-properties=ngVersion=20.0.3",    "lint": "ng lint"
   },
   "private": true,
   "dependencies": {
