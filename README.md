@@ -441,8 +441,9 @@ Add the `generate:api` command to the scripts section of `package.json` (the las
   "scripts": {
     ...
     ...
-    "generate:api": "openapi-generator-cli generate -g typescript-angular -i  src/app/openapi/api-docs.yaml -o src/app/openapi-gen"
-  },
+    "generate:api": "openapi-generator-cli generate -g typescript-angular -i  src/app/openapi/api-docs.yaml -o src/app/openapi-gen --additional-properties=ngVersion=20.0.3",
+    ...  
+  }
 ```
 
 Create a file `openapitools.json` in the root of the project and adjust the version to 5.3.0 of the generator:
@@ -452,7 +453,7 @@ Create a file `openapitools.json` in the root of the project and adjust the vers
   "$schema": "node_modules/@openapitools/openapi-generator-cli/config.schema.json",
   "spaces": 2,
   "generator-cli": {
-    "version": "5.3.0"
+    "version": "7.8.0"
   }
 }
 ```
